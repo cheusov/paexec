@@ -76,12 +76,12 @@ void executor ()
 	int i;
 
 	for (;;){
-		printf ("executor:\n");
+		fprintf (stderr, "executor:\n");
 
 		MPI_Recv (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END,
 				  MPI_COMM_WORLD, &status);
 
-		printf ("executor: size = %d\n", size);
+		fprintf (stderr, "executor: size = %d\n", size);
 
 		if (size < 0)
 			return;
@@ -98,7 +98,7 @@ void executor ()
 		MPI_Recv (buf, size, MPI_CHAR, 0, TAG_DATA,
 				  MPI_COMM_WORLD, &status);
 
-		printf ("executor: buf = %s\n", buf);
+		fprintf (stderr, "executor: buf = %s\n", buf);
 #ifndef NDEBUG
 		MPI_Get_count (&status, MPI_CHAR, &cnt);
 		assert (cnt == size);
@@ -108,9 +108,9 @@ void executor ()
 			buf [i] = toupper ((unsigned char) buf [i]);
 		}
 
-		printf ("executor: mpi_send size = %d\n", size);
+		fprintf (stderr, "executor: mpi_send size = %d\n", size);
 		MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
-		printf ("executor: mpi_send buf = %s\n", buf);
+		fprintf (stderr, "executor: mpi_send buf = %s\n", buf);
 		MPI_Send (buf, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
 
 		size = -1;
@@ -125,10 +125,10 @@ void send_line_to_executor (int i, char *line)
 
 	assert (status_arr [i] == st_wait);
 
-	printf ("send to executor: size = %d\n", size);
+	fprintf (stderr, "send to executor: size = %d\n", size);
 
 	MPI_Send (&size, 1, MPI_INT, i, TAG_SIZE_OR_END, MPI_COMM_WORLD);
-	printf ("send to executor: line = %s\n", line);
+	fprintf (stderr, "send to executor: line = %s\n", line);
 	MPI_Send (line, size, MPI_CHAR, i, TAG_DATA, MPI_COMM_WORLD);
 
 	status_arr [i] = st_busy;
@@ -153,11 +153,11 @@ void master ()
 	while (count_busy > 0 || !eof){
 		/* send lines to executors */
 		if (count_wait > 0 && !eof){
-			printf ("count_wait=%d\n", count_wait);
+			fprintf (stderr, "count_wait=%d\n", count_wait);
 			for (i=1; i < count; ++i){
 				if (status_arr [i] == st_wait){
 					line = getnextline ();
-					printf ("line=%s\n", line);
+					fprintf (stderr, "line=%s\n", line);
 					if (line){
 						send_line_to_executor (i, line);
 					}else{
@@ -183,11 +183,11 @@ void master ()
 
 		/* recieve results from executors */
 		if (count_busy > 0){
-			printf ("count_busy=%d\n", count_busy);
+			fprintf (stderr, "count_busy=%d\n", count_busy);
 			MPI_Recv (&size, 1, MPI_INT, MPI_ANY_SOURCE, TAG_SIZE_OR_END,
 					  MPI_COMM_WORLD, &status);
 
-			printf ("recv size: %d\n", size);
+			fprintf (stderr, "recv size: %d\n", size);
 			source = status.MPI_SOURCE;
 
 			if (size < 0){
