@@ -13,6 +13,7 @@ static int rank;
 static int count;
 
 typedef enum {
+	st_master,
 	st_wait,
 	st_busy,
 	st_dead,
@@ -34,12 +35,13 @@ void master_init ()
 		exit (1);
 	}
 
-	for (i=0; i < count; ++i){
+	status_arr [0] = st_master;
+	for (i=1; i < count; ++i){
 		status_arr [i] = st_wait;
 	}
 
 	count_busy = 0;
-	count_wait = count;
+	count_wait = count-1;
 }
 
 char *getnextline (void)
@@ -110,7 +112,6 @@ void executor ()
 		MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
 		printf ("executor: mpi_send buf = %s\n", buf);
 		MPI_Send (buf, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
-		fflush (stdout);
 
 		size = -1;
 		MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
@@ -153,7 +154,7 @@ void master ()
 		/* send lines to executors */
 		if (count_wait > 0 && !eof){
 			printf ("count_wait=%d\n", count_wait);
-			for (i=0; i < count; ++i){
+			for (i=1; i < count; ++i){
 				if (status_arr [i] == st_wait){
 					line = getnextline ();
 					printf ("line=%s\n", line);
@@ -162,7 +163,7 @@ void master ()
 					}else{
 						eof = 1;
 
-						for (j=0; j < count; ++j){
+						for (j=1; j < count; ++j){
 							if (status_arr [j] == st_wait){
 								size = -1;
 								MPI_Send (&size, 1, MPI_INT, j,
@@ -175,9 +176,9 @@ void master ()
 					}
 					break;
 				}
-
-				abort ();
 			}
+
+			assert (i < count);
 		}
 
 		/* recieve results from executors */
