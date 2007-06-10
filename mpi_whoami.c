@@ -6,8 +6,8 @@
 
 #include <mpi.h>
 
-#define TAG_SIZE_OR_END 1
-#define TAG_DATA        2
+#define TAG_SIZE_OR_END 2
+#define TAG_DATA        4
 
 static int rank;
 static int count;
@@ -110,6 +110,7 @@ void executor ()
 		MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
 		printf ("executor: mpi_send buf = %s\n", buf);
 		MPI_Send (buf, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
+		fflush (stdout);
 
 		size = -1;
 		MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
