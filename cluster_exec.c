@@ -5,6 +5,13 @@
 #include <ctype.h>
 #include <unistd.h>
 
+#ifdef __linux__
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <getopt.h>
+#endif
+
 #include <mpi.h>
 
 #define TAG_SIZE_OR_END 2
@@ -12,6 +19,8 @@
 
 static int rank;
 static int count;
+
+static int verbose = 0;
 
 typedef enum {
 	st_master,
@@ -95,12 +104,16 @@ void executor ()
 	int i;
 
 	for (;;){
-		fprintf (stderr, "executor:\n");
+		if (verbose){
+			fprintf (stderr, "executor:\n");
+		}
 
 		MPI_Recv (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END,
 				  MPI_COMM_WORLD, &status);
 
-		fprintf (stderr, "executor: size = %d\n", size);
+		if (verbose){
+			fprintf (stderr, "executor: size = %d\n", size);
+		}
 
 		if (size < 0)
 			return;
@@ -113,7 +126,9 @@ void executor ()
 		MPI_Recv (buf, size, MPI_CHAR, 0, TAG_DATA,
 				  MPI_COMM_WORLD, &status);
 
-		fprintf (stderr, "executor: buf = %s\n", buf);
+		if (verbose){
+			fprintf (stderr, "executor: buf = %s\n", buf);
+		}
 #ifndef NDEBUG
 		MPI_Get_count (&status, MPI_CHAR, &cnt);
 		assert (cnt == size);
@@ -123,9 +138,16 @@ void executor ()
 			buf [i] = toupper ((unsigned char) buf [i]);
 		}
 
-		fprintf (stderr, "executor: mpi_send size = %d\n", size);
+		if (verbose){
+			fprintf (stderr, "executor: mpi_send size = %d\n", size);
+		}
+
 		MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
-		fprintf (stderr, "executor: mpi_send buf = %s\n", buf);
+
+		if (verbose){
+			fprintf (stderr, "executor: mpi_send buf = %s\n", buf);
+		}
+
 		MPI_Send (buf, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
 
 		size = -1;
@@ -140,10 +162,16 @@ void send_line_to_executor (int i, char *line)
 
 	assert (status_arr [i] == st_wait);
 
-	fprintf (stderr, "send to executor: size = %d\n", size);
+	if (verbose){
+		fprintf (stderr, "send to executor: size = %d\n", size);
+	}
 
 	MPI_Send (&size, 1, MPI_INT, i, TAG_SIZE_OR_END, MPI_COMM_WORLD);
-	fprintf (stderr, "send to executor: line = %s\n", line);
+
+	if (verbose){
+		fprintf (stderr, "send to executor: line = %s\n", line);
+	}
+
 	MPI_Send (line, size, MPI_CHAR, i, TAG_DATA, MPI_COMM_WORLD);
 
 	status_arr [i] = st_busy;
@@ -168,11 +196,18 @@ void master ()
 	while (count_busy > 0 || !eof){
 		/* send lines to executors */
 		if (count_wait > 0 && !eof){
-			fprintf (stderr, "count_wait=%d\n", count_wait);
+			if (verbose){
+				fprintf (stderr, "count_wait=%d\n", count_wait);
+			}
+
 			for (i=1; i < count; ++i){
 				if (status_arr [i] == st_wait){
 					line = getnextline ();
-					fprintf (stderr, "line=%s\n", line);
+
+					if (verbose){
+						fprintf (stderr, "line=%s\n", line);
+					}
+
 					if (line){
 						send_line_to_executor (i, line);
 					}else{
@@ -198,11 +233,17 @@ void master ()
 
 		/* recieve results from executors */
 		if (count_busy > 0){
-			fprintf (stderr, "count_busy=%d\n", count_busy);
+			if (verbose){
+				fprintf (stderr, "count_busy=%d\n", count_busy);
+			}
+
 			MPI_Recv (&size, 1, MPI_INT, MPI_ANY_SOURCE, TAG_SIZE_OR_END,
 					  MPI_COMM_WORLD, &status);
 
-			fprintf (stderr, "recv size: %d\n", size);
+			if (verbose){
+				fprintf (stderr, "recv size: %d\n", size);
+			}
+
 			source = status.MPI_SOURCE;
 
 			if (size < 0){
@@ -231,37 +272,56 @@ void master ()
 					  MPI_COMM_WORLD, &status);
 			MPI_Get_count (&status, MPI_CHAR, &cnt);
 
-			printf ("source = %d cnt = %d, res = %s\n", source, cnt, buf);
+			if (verbose){
+				printf ("source = %d cnt = %d ", source, cnt);
+			}
+			printf ("%s\n", buf);
 		}
 	}
 }
 
 void usage ()
 {
-	printf ("
-Usage: mpi_run -np <N> cluster_exec [OPTIONS] [files...]
-OPTIONS:
-      -h --help             give this help
-      -v --verbose          verbose mode
+	printf ("\n\
+Usage: mpi_run -np <N> cluster_exec [OPTIONS] [files...]\n\
+OPTIONS:\n\
+      -h --help             give this help\n\
+      -v --verbose          verbose mode\n\
 ");
 }
 
 void process_args (int *argc, char ***argv)
 {
+	int c;
+
 	struct option longopts [] = {
-		{ "verbose",  0, 0, 'v' },
 		{ "help",     0, 0, 'h' },
+		{ "version",  0, 0, 'V' },
+		{ "verbose",  0, 0, 'v' },
 		{ NULL,       0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "vh", longopts, NULL), c != EOF){
+	while (c = getopt_long (*argc, *argv, "vhV", longopts, NULL), c != EOF){
 		switch (c) {
-			case 'v':
+			case 'V':
+				printf ("cluster_exec v. 0.1\n");
+				exit (0);
 				break;
 			case 'h':
+				usage ();
+				exit (0);
 				break;
+			case 'v':
+				verbose = 1;
+				break;
+			default:
+				usage ();
+				exit (1);
 		}
 	}
+
+	*argc -= optind;
+	*argv += optind;
 }
 
 int main (int argc, char **argv)
@@ -272,6 +332,7 @@ int main (int argc, char **argv)
 	MPI_Comm_rank (MPI_COMM_WORLD, &rank);
 
 	if (rank == 0){
+		process_args (&argc, &argv);
 		master ();
 	}else{
 		executor ();
