@@ -84,6 +84,7 @@ char *getnextline (void)
 
 	if (fgets (line, sizeof (line), stdin)){
 		++line_num;
+
 		len = strlen (line);
 		if (len > 0 && line [len-1] == '\n'){
 			line [len-1] = '\0';
@@ -172,6 +173,7 @@ void send_line_to_executor (int i, char *line)
 		fprintf (stderr, "send to executor: size = %d\n", size);
 	}
 
+	line_num_arr [i] = line_num;
 	MPI_Send (&size, 1, MPI_INT, i, TAG_SIZE_OR_END, MPI_COMM_WORLD);
 
 	if (verbose){
@@ -281,6 +283,9 @@ void master_recv_data_from_executor ()
 	if (verbose){
 		printf ("source = %d ", source);
 	}
+	if (show_line_num){
+		printf ("%d ", line_num_arr [source]);
+	}
 	printf ("%s\n", buf);
 }
 
@@ -308,6 +313,7 @@ Usage: mpi_run -np <N> cluster_exec [OPTIONS] [files...]\n\
 OPTIONS:\n\
       -h --help             give this help\n\
       -v --verbose          verbose mode\n\
+      -l --line-num         show line numbers\n\
 ");
 }
 
@@ -323,7 +329,7 @@ void process_args (int *argc, char ***argv)
 		{ NULL,       0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "vhV", longopts, NULL), c != EOF){
+	while (c = getopt_long (*argc, *argv, "vhVl", longopts, NULL), c != EOF){
 		switch (c) {
 			case 'V':
 				printf ("cluster_exec v. 0.1\n");
