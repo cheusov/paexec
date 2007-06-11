@@ -164,7 +164,7 @@ void executor ()
 
 void send_line_to_executor (int i, char *line)
 {
-	size_t size = strlen (line);
+	int size = strlen (line);
 	++size;
 
 	assert (status_arr [i] == st_wait);
