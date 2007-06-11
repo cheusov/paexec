@@ -12,6 +12,10 @@
 #include <getopt.h>
 #endif
 
+#ifdef __NetBSD__
+#include <getopt.h>
+#endif
+
 #include <mpi.h>
 #include <maa.h>
 
