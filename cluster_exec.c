@@ -13,6 +13,7 @@
 #endif
 
 #include <mpi.h>
+#include <maa.h>
 
 #define TAG_SIZE_OR_END 2
 #define TAG_DATA        4
@@ -24,6 +25,8 @@ static int verbose  = 0;
 
 static int line_num = 0;
 static int show_line_num = 0;
+
+static const int minus_one = -1;
 
 typedef enum {
 	st_master,
@@ -108,7 +111,9 @@ char *getnextline (void)
 void executor_process_and_send (char *buf, int size)
 {
 	int i;
-
+#if 0
+	
+#else
 	for (i=0; i < size; ++i){
 		buf [i] = toupper ((unsigned char) buf [i]);
 	}
@@ -124,6 +129,7 @@ void executor_process_and_send (char *buf, int size)
 	}
 
 	MPI_Send (buf, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
+#endif
 }
 
 /* executor process */
@@ -179,8 +185,8 @@ void executor ()
 		/* end of line processing,
 		   needs further lines to be processed
 		*/
-		size = -1;
-		MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
+		MPI_Send ((void*) &minus_one, 1, MPI_INT, 0,
+				  TAG_SIZE_OR_END, MPI_COMM_WORLD);
 	}
 }
 
@@ -211,12 +217,20 @@ void master_send_line_to_executor (int i, char *line)
 	++count_busy;
 }
 
+/* mark executor as dead, when there are no new tasks for it */
+void master_mark_executor_dead (int num)
+{
+	MPI_Send ((void *) &minus_one, 1, MPI_INT, num,
+			  TAG_SIZE_OR_END, MPI_COMM_WORLD);
+
+	status_arr [num] = st_dead;
+}
+
 /* next line to free executor */
 void master_send_new_task_to_executor ()
 {
 	int i, j;
 	char *line;
-	int size;
 
 	if (verbose){
 		fprintf (stderr, "count_wait=%d\n", count_wait);
@@ -237,11 +251,7 @@ void master_send_new_task_to_executor ()
 
 				for (j=1; j < count; ++j){
 					if (status_arr [j] == st_wait){
-						size = -1;
-						MPI_Send (&size, 1, MPI_INT, j,
-								  TAG_SIZE_OR_END, MPI_COMM_WORLD);
-
-						status_arr [j] = st_dead;
+						master_mark_executor_dead (j);
 						--count_wait;
 					}
 				}
@@ -280,11 +290,7 @@ void master_recv_data_from_executor ()
 		--count_busy;
 
 		if (eof){
-			size = -1;
-			MPI_Send (&size, 1, MPI_INT, source,
-					  TAG_SIZE_OR_END, MPI_COMM_WORLD);
-
-			status_arr [source] = st_dead;
+			master_mark_executor_dead (source);
 		}else{
 			status_arr [source] = st_wait;
 			++count_wait;
@@ -392,7 +398,11 @@ int main (int argc, char **argv)
 		process_args (&argc, &argv);
 		master ();
 	}else{
+		maa_init ("cluster_exec");
+
 		executor ();
+
+		maa_shutdown ();
 	}
 
 	MPI_Finalize ();
