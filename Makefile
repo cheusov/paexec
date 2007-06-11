@@ -1,10 +1,10 @@
 CC=		cc
 MPICC=		mpicc
-CFLAGS=		-I/usr/pkg/include -I/usr/pkg/include -g -O0 -Wall
+CFLAGS=		-I/usr/pkg/include -g -O0 -Wall
 
 .PHONY : all
 all : cluster_exec subprocess
-make
+
 cluster_exec.o : cluster_exec.c
 	$(MPICC) -o $@ -c $(CFLAGS) cluster_exec.c
 cluster_exec : cluster_exec.o
