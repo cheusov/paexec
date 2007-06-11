@@ -1,6 +1,6 @@
 CC=		mpicc
 LD=		$(CC)
-CFLAGS=		-g -O0
+CFLAGS=		-g -O0 -Wall
 
 .PHONY : all
 all : cluster_exec
