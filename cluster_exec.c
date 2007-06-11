@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <unistd.h>
 
 #include <mpi.h>
 
@@ -231,6 +232,34 @@ void master ()
 			MPI_Get_count (&status, MPI_CHAR, &cnt);
 
 			printf ("source = %d cnt = %d, res = %s\n", source, cnt, buf);
+		}
+	}
+}
+
+void usage ()
+{
+	printf ("
+Usage: mpi_run -np <N> cluster_exec [OPTIONS] [files...]
+OPTIONS:
+      -h --help             give this help
+      -v --verbose          verbose mode
+");
+}
+
+void process_args (int *argc, char ***argv)
+{
+	struct option longopts [] = {
+		{ "verbose",  0, 0, 'v' },
+		{ "help",     0, 0, 'h' },
+		{ NULL,       0, 0, 0 },
+	};
+
+	while (c = getopt_long (*argc, *argv, "vh", longopts, NULL), c != EOF){
+		switch (c) {
+			case 'v':
+				break;
+			case 'h':
+				break;
 		}
 	}
 }
