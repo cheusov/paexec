@@ -26,14 +26,32 @@ static int count_wait = 0;
 
 static int eof = 0;
 
-void master_init ()
+void *xmalloc (size_t s)
 {
-	int i;
-	status_arr = (status_t *) malloc (count * sizeof (status_t));
-	if (!status_arr){
+	void *p = malloc (s);
+	if (!p){
 		perror ("malloc failed");
 		exit (1);
 	}
+
+	return p;
+}
+
+void *xrealloc (void *p, size_t s)
+{
+	p = realloc (p, s);
+	if (!p){
+		perror ("realloc failed");
+		exit (1);
+	}
+
+	return p;
+}
+
+void master_init ()
+{
+	int i;
+	status_arr = (status_t *) xmalloc (count * sizeof (status_t));
 
 	status_arr [0] = st_master;
 	for (i=1; i < count; ++i){
@@ -88,11 +106,7 @@ void executor ()
 
 		if (size > buf_size){
 			buf_size = size;
-			buf = realloc (buf, size);
-			if (!buf){
-				perror ("realloc failed");
-				exit (1);
-			}
+			buf = xrealloc (buf, size);
 		}
 
 		MPI_Recv (buf, size, MPI_CHAR, 0, TAG_DATA,
@@ -209,18 +223,14 @@ void master ()
 
 			if (size > buf_size){
 				buf_size = size;
-				buf = realloc (buf, size);
-				if (!buf){
-					perror ("realloc failed");
-					exit (1);
-				}
+				buf = xrealloc (buf, size);
 			}
 
 			MPI_Recv (buf, size, MPI_CHAR, source, TAG_DATA,
 					  MPI_COMM_WORLD, &status);
 			MPI_Get_count (&status, MPI_CHAR, &cnt);
 
-			printf ("cnt = %d, res = %s\n", cnt, buf);
+			printf ("source = %d cnt = %d, res = %s\n", source, cnt, buf);
 		}
 	}
 }
