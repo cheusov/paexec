@@ -40,6 +40,7 @@ static int count_wait = 0;
 
 static int eof = 0;
 
+/* wrappers */
 void *xmalloc (size_t s)
 {
 	void *p = malloc (s);
@@ -62,6 +63,7 @@ void *xrealloc (void *p, size_t s)
 	return p;
 }
 
+/* */
 void master_init ()
 {
 	int i;
@@ -77,6 +79,7 @@ void master_init ()
 	count_wait = count-1;
 }
 
+/* returns next line from stdin */
 char *getnextline (void)
 {
 	static char line [2048];
@@ -101,6 +104,29 @@ char *getnextline (void)
 	}
 }
 
+/* process data and send results back to the master */
+void executor_process_and_send (char *buf, int size)
+{
+	int i;
+
+	for (i=0; i < size; ++i){
+		buf [i] = toupper ((unsigned char) buf [i]);
+	}
+
+	if (verbose){
+		fprintf (stderr, "executor: mpi_send size = %d\n", size);
+	}
+
+	MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
+
+	if (verbose){
+		fprintf (stderr, "executor: mpi_send buf = %s\n", buf);
+	}
+
+	MPI_Send (buf, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
+}
+
+/* executor process */
 void executor ()
 {
 	MPI_Status status;
@@ -108,13 +134,13 @@ void executor ()
 	char *buf = NULL;
 	int buf_size = 0;
 	int cnt;
-	int i;
 
 	for (;;){
 		if (verbose){
 			fprintf (stderr, "executor:\n");
 		}
 
+		/* reading the line size */
 		MPI_Recv (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END,
 				  MPI_COMM_WORLD, &status);
 
@@ -122,14 +148,20 @@ void executor ()
 			fprintf (stderr, "executor: size = %d\n", size);
 		}
 
-		if (size < 0)
+		if (size < 0){
+			/* end of line processing,
+			   needs further lines to be processed
+			 */
 			return;
+		}
 
+		/* */
 		if (size > buf_size){
 			buf_size = size;
 			buf = xrealloc (buf, size);
 		}
 
+		/* reading the line */
 		MPI_Recv (buf, size, MPI_CHAR, 0, TAG_DATA,
 				  MPI_COMM_WORLD, &status);
 
@@ -141,28 +173,19 @@ void executor ()
 		assert (cnt == size);
 #endif
 
-		for (i=0; i < size; ++i){
-			buf [i] = toupper ((unsigned char) buf [i]);
-		}
+		/* process data and send results back to the master */
+		executor_process_and_send (buf, size);
 
-		if (verbose){
-			fprintf (stderr, "executor: mpi_send size = %d\n", size);
-		}
-
-		MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
-
-		if (verbose){
-			fprintf (stderr, "executor: mpi_send buf = %s\n", buf);
-		}
-
-		MPI_Send (buf, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
-
+		/* end of line processing,
+		   needs further lines to be processed
+		*/
 		size = -1;
 		MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
 	}
 }
 
-void send_line_to_executor (int i, char *line)
+/* send line to executor and mark it as busy */
+void master_send_line_to_executor (int i, char *line)
 {
 	int size = strlen (line);
 	++size;
@@ -188,6 +211,7 @@ void send_line_to_executor (int i, char *line)
 	++count_busy;
 }
 
+/* next line to free executor */
 void master_send_new_task_to_executor ()
 {
 	int i, j;
@@ -207,7 +231,7 @@ void master_send_new_task_to_executor ()
 			}
 
 			if (line){
-				send_line_to_executor (i, line);
+				master_send_line_to_executor (i, line);
 			}else{
 				eof = 1;
 
@@ -229,6 +253,7 @@ void master_send_new_task_to_executor ()
 	assert (i < count);
 }
 
+/* read results from any executor */
 void master_recv_data_from_executor ()
 {
 	MPI_Status status;
@@ -289,6 +314,7 @@ void master_recv_data_from_executor ()
 	printf ("%s\n", buf);
 }
 
+/* master process */
 void master ()
 {
 	master_init ();
