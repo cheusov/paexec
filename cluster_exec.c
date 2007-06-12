@@ -112,11 +112,8 @@ void executor_process_and_send (char *buf, int size)
 	write (proc_fdin, "\n", 1);
 
 	if (put_until_emptyline (proc_fdout, executor_send_result, NULL)){
-		if (verbose){
-			fprintf (stderr, "executor: subprocess dyed :-(\n");
-		}
-
-		pid = -1;
+		fprintf (stderr, "Child process exited unexpectedly\n");
+		exit (0);
 	}
 #else
 	int i;
@@ -171,9 +168,7 @@ void executor ()
 		}
 
 		if (size < 0){
-			/* end of line processing,
-			   needs further lines to be processed
-			 */
+			/* no more lines to be processed */
 			return;
 		}
 
@@ -417,6 +412,8 @@ int main (int argc, char **argv)
 		maa_init ("cluster_exec");
 
 		executor ();
+
+		pr_close (proc_fdin);
 
 		maa_shutdown ();
 	}
