@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <maa.h>
 
@@ -47,7 +48,22 @@ ssize_t xread (int fd, void *buf, size_t nbytes)
 	}while (ret == -1 && errno == EINTR);
 
 	if (ret == -1){
-		perror ("select failed");
+		perror ("read failed");
+		exit (1);
+	}
+
+	return ret;
+}
+
+ssize_t xwrite (int fd, const void *buf, size_t count)
+{
+	ssize_t ret;
+	do {
+		ret = write (fd, buf, count);
+	}while (ret == -1 && errno == EINTR);
+
+	if (ret == -1){
+		perror ("write failed");
 		exit (1);
 	}
 
@@ -65,21 +81,15 @@ void *xrealloc (void *p, size_t s)
 	return p;
 }
 
-void put_line (char *linebuf, size_t linebuf_size, size_t line_size)
+void put_line (const char *linebuf)
 {
-	linebuf [line_size] = 0;
 	printf ("line: %s\n", linebuf);
 }
 
-void print (int fdin)
+/* returns 1 if eof appeares */
+int print (int fdin)
 {
 	char buf [20];
-#if 0
-	size_t cnt;
-	while (cnt = xread (fdin, buf, sizeof (buf)), cnt != 0){
-		write (1, buf, cnt);
-	}
-#else
 	ssize_t cnt;
 
 	char *linebuf       = NULL;
@@ -88,8 +98,6 @@ void print (int fdin)
 
 	char c;
 	int i;
-
-	nonblock (fdin);
 
 	fd_set rset;
 
@@ -112,36 +120,59 @@ void print (int fdin)
 
 //			fprintf (stderr, "cnt = %d\n", cnt);
 			if (!cnt){
-				put_line (linebuf, linebuf_size, line_size);
-				return;
+				linebuf [line_size] = 0;
+				put_line (linebuf);
+				return 1;
 			}
 
 			for (i=0; i < cnt; ++i){
 				c = buf [i];
-				if (c == '\n'){
-					put_line (linebuf, linebuf_size, line_size);
-					line_size = 0;
-				}else{
+				if (c != '\n'){
 					linebuf [line_size++] = c;
+				}else if (!line_size){
+					return 0;
+				}else{
+					linebuf [line_size] = 0;
+					put_line (linebuf);
+					line_size = 0;
 				}
 			}
 		}
 	}
-#endif
+
+	abort (); /* this should not happen */
+	return 1;
 }
 
 int main ()
 {
-	int proc_fdout;
+	int proc_fdin, proc_fdout;
 	int pid;
+	char buf [3000];
+	size_t len;
 
 	maa_init ("subprocess");
 
-	pr_open ("/bin/ls -la", PR_CREATE_STDOUT,
-			 NULL, &proc_fdout, NULL);
+	pr_open ("/home/cheusov/tmp/list_files",
+			 PR_CREATE_STDIN | PR_CREATE_STDOUT,
+			 &proc_fdin, &proc_fdout, NULL);
 
 	fprintf (stderr, "pid=%d\n", pid);
-	print (proc_fdout);
+
+	nonblock (proc_fdout);
+
+	while (fgets (buf, sizeof (buf), stdin)){
+		len = strlen (buf);
+		if (len > 0 && buf [len-1] == '\n'){
+			buf [len-1] = 0;
+			--len;
+		}
+
+		write (proc_fdin, buf, len);
+		write (proc_fdin, "\n", 1);
+
+		print (proc_fdout);
+	}
 
 	maa_shutdown ();
 

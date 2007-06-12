@@ -13,7 +13,7 @@ cluster_exec : cluster_exec.o
 subprocess.o : subprocess.c
 	$(CC) -o $@ -c $(CFLAGS) $<
 subprocess : subprocess.o
-	$(CC) -o $@ -L/usr/pkg/lib -lmaa subprocess.o
+	$(CC) -o $@ -L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib -lmaa subprocess.o
 
 .PHONY : clean
 clean:
