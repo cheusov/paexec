@@ -6,7 +6,7 @@
 #include "wrappers.h"
 #include "nonblock_helpers.h"
 
-void put_line (const char *linebuf, void *data)
+void put_line (char *linebuf, void *data)
 {
 	printf ("line: %s\n", linebuf);
 }

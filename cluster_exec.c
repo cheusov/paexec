@@ -20,6 +20,7 @@
 #include <maa.h>
 
 #include "wrappers.h"
+#include "nonblock_helpers.h"
 
 #define TAG_SIZE_OR_END 2
 #define TAG_DATA        4
@@ -33,6 +34,9 @@ static int line_num = 0;
 static int show_line_num = 0;
 
 static const int minus_one = -1;
+
+static pid_t pid = -1;
+static int proc_fdin, proc_fdout;
 
 typedef enum {
 	st_master,
@@ -90,13 +94,32 @@ char *getnextline (void)
 	}
 }
 
+void executor_send_result (char *line, void *data)
+{
+	int size = (int) strlen (line) + 1;
+
+	MPI_Send (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END, MPI_COMM_WORLD);
+	MPI_Send (line, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
+}
+
 /* process data and send results back to the master */
 void executor_process_and_send (char *buf, int size)
 {
-	int i;
-#if 0
-	
+#if 1
+	int len = (int) strlen (buf);
+
+	write (proc_fdin, buf, len);
+	write (proc_fdin, "\n", 1);
+
+	if (put_until_emptyline (proc_fdout, executor_send_result, NULL)){
+		if (verbose){
+			fprintf (stderr, "executor: subprocess dyed :-(\n");
+		}
+
+		pid = -1;
+	}
 #else
+	int i;
 	for (i=0; i < size; ++i){
 		buf [i] = toupper ((unsigned char) buf [i]);
 	}
@@ -115,6 +138,14 @@ void executor_process_and_send (char *buf, int size)
 #endif
 }
 
+void executor_init ()
+{
+	pid = pr_open ("/home/cheusov/tmp/uc",
+				   PR_CREATE_STDIN | PR_CREATE_STDOUT,
+				   &proc_fdin, &proc_fdout, NULL);
+	nonblock (proc_fdout);
+}
+
 /* executor process */
 void executor ()
 {
@@ -123,6 +154,8 @@ void executor ()
 	char *buf = NULL;
 	int buf_size = 0;
 	int cnt;
+
+	executor_init ();
 
 	for (;;){
 		if (verbose){
