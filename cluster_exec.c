@@ -19,6 +19,8 @@
 #include <mpi.h>
 #include <maa.h>
 
+#include "wrappers.h"
+
 #define TAG_SIZE_OR_END 2
 #define TAG_DATA        4
 
@@ -46,29 +48,6 @@ static int count_busy = 0;
 static int count_wait = 0;
 
 static int eof = 0;
-
-/* wrappers */
-void *xmalloc (size_t s)
-{
-	void *p = malloc (s);
-	if (!p){
-		perror ("malloc failed");
-		exit (1);
-	}
-
-	return p;
-}
-
-void *xrealloc (void *p, size_t s)
-{
-	p = realloc (p, s);
-	if (!p){
-		perror ("realloc failed");
-		exit (1);
-	}
-
-	return p;
-}
 
 /* */
 void master_init ()
