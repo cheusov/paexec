@@ -5,13 +5,15 @@
 
 #include "wrappers.h"
 
-void put_line (const char *linebuf)
+void put_line (const char *linebuf, void *data)
 {
 	printf ("line: %s\n", linebuf);
 }
 
-/* returns 1 if eof appeares */
-int print (int fdin)
+typedef void (*line_putter_t) (const char *, void *);
+
+/* returns 1 if eof happens */
+int put_until_emptyline (int fd, line_putter_t putter, void *data)
 {
 	char buf [20];
 	ssize_t cnt;
@@ -27,15 +29,15 @@ int print (int fdin)
 
 	for (;;){
 		FD_ZERO (&rset);
-		FD_SET (fdin, &rset);
+		FD_SET (fd, &rset);
 
 //		fprintf (stderr, "select\n");
-		xselect (fdin+1, &rset, NULL, NULL, NULL);
+		xselect (fd+1, &rset, NULL, NULL, NULL);
 
 //		fprintf (stderr, "check\n");
-		if (FD_ISSET (fdin, &rset)){
+		if (FD_ISSET (fd, &rset)){
 //			fprintf (stderr, "yes\n");
-			cnt = xread (fdin, buf, sizeof (buf));
+			cnt = xread (fd, buf, sizeof (buf));
 
 			if (line_size + cnt >= linebuf_size){
 				linebuf = xrealloc (linebuf, linebuf_size + cnt+1);
@@ -45,7 +47,7 @@ int print (int fdin)
 //			fprintf (stderr, "cnt = %d\n", cnt);
 			if (!cnt){
 				linebuf [line_size] = 0;
-				put_line (linebuf);
+				putter (linebuf, data);
 				return 1;
 			}
 
@@ -57,7 +59,7 @@ int print (int fdin)
 					return 0;
 				}else{
 					linebuf [line_size] = 0;
-					put_line (linebuf);
+					putter (linebuf, data);
 					line_size = 0;
 				}
 			}
@@ -95,7 +97,7 @@ int main ()
 		write (proc_fdin, buf, len);
 		write (proc_fdin, "\n", 1);
 
-		print (proc_fdout);
+		put_until_emptyline (proc_fdout, put_line, NULL);
 	}
 
 	maa_shutdown ();
