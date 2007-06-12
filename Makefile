@@ -6,17 +6,19 @@ CFLAGS=		-I/usr/pkg/include -g -O0 -Wall
 all : cluster_exec subprocess
 
 wrappers.o : wrappers.c
-	$(CC) -o $@ -c $(CFLAGS) wrappers.c
+	$(CC) -o $@ -c $(CFLAGS) $<
+nonblock_helpers.o : nonblock_helpers.c
+	$(CC) -o $@ -c $(CFLAGS) $<
 
 cluster_exec.o : cluster_exec.c
 	$(MPICC) -o $@ -c $(CFLAGS) cluster_exec.c
-cluster_exec : cluster_exec.o wrappers.o
-	$(MPICC) -o $@ cluster_exec.o wrappers.o -L/usr/pkg/lib -lmaa
+cluster_exec : cluster_exec.o nonblock_helpers.o wrappers.o
+	$(MPICC) -o $@ $^ -L/usr/pkg/lib -lmaa
 
 subprocess.o : subprocess.c
 	$(CC) -o $@ -c $(CFLAGS) subprocess.c
-subprocess : subprocess.o wrappers.o
-	$(CC) -o $@ subprocess.o wrappers.o -L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib -lmaa
+subprocess : subprocess.o nonblock_helpers.o wrappers.o
+	$(CC) -o $@ $^ -L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib -lmaa
 
 .PHONY : clean
 clean:
