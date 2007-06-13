@@ -38,6 +38,8 @@ static const int minus_one = -1;
 static pid_t pid = -1;
 static int proc_fdin, proc_fdout;
 
+static char *cmd;
+
 typedef enum {
 	st_master,
 	st_wait,
@@ -135,9 +137,24 @@ void executor_process_and_send (char *buf, int size)
 #endif
 }
 
-void executor_init ()
+void executor_recieve_cmd ()
 {
-	pid = pr_open ("/home/cheusov/tmp/uc",
+	MPI_Status status;
+	int size;
+
+	MPI_Recv (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END,
+			  MPI_COMM_WORLD, &status);
+
+	cmd = xmalloc (size);
+
+	MPI_Recv (cmd, size, MPI_CHAR, 0, TAG_DATA,
+			  MPI_COMM_WORLD, &status);
+}
+
+void executor_subprocess ()
+{
+	assert (cmd);
+	pid = pr_open (cmd,
 				   PR_CREATE_STDIN | PR_CREATE_STDOUT,
 				   &proc_fdin, &proc_fdout, NULL);
 	nonblock (proc_fdout);
@@ -152,7 +169,8 @@ void executor ()
 	int buf_size = 0;
 	int cnt;
 
-	executor_init ();
+	executor_recieve_cmd ();
+	executor_subprocess ();
 
 	for (;;){
 		if (verbose){
@@ -331,10 +349,26 @@ void master_recv_data_from_executor ()
 	printf ("%s\n", buf);
 }
 
+void master_send_cmd ()
+{
+	int size;
+	int i;
+
+	size = (int) strlen (cmd) + 1;
+
+	for (i=1; i < count; ++i){
+		MPI_Send (&size, 1, MPI_INT, i, TAG_SIZE_OR_END,
+				  MPI_COMM_WORLD);
+		MPI_Send (cmd, size, MPI_CHAR, i, TAG_DATA,
+				  MPI_COMM_WORLD);
+	}
+}
+
 /* master process */
 void master ()
 {
 	master_init ();
+	master_send_cmd ();
 
 	while (count_busy > 0 || !eof){
 		/* send lines to executors */
@@ -352,7 +386,7 @@ void master ()
 void usage ()
 {
 	printf ("\n\
-Usage: mpi_run -np <N> cluster_exec [OPTIONS] [files...]\n\
+Usage: mpi_run -np <N> cluster_exec [OPTIONS] cmd [files...]\n\
 OPTIONS:\n\
       -h --help             give this help\n\
       -v --verbose          verbose mode\n\
@@ -394,8 +428,12 @@ void process_args (int *argc, char ***argv)
 		}
 	}
 
-	*argc -= optind;
-	*argv += optind;
+	if (optind + 1 != *argc){
+		fprintf (stderr, "missing cmd argument\n");
+		exit (1);
+	}
+
+	cmd = (*argv) [optind];
 }
 
 int main (int argc, char **argv)
