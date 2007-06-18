@@ -1,6 +1,7 @@
 CC=		cc
 MPICC=		mpicc
 CFLAGS=		-I/usr/pkg/include -g -O0 -Wall
+LIBDIR=		/usr/pkg/lib
 
 .PHONY : all
 all : cluster_exec
@@ -13,8 +14,8 @@ nonblock_helpers.o : nonblock_helpers.c
 cluster_exec.o : cluster_exec.c
 	$(MPICC) -o $@ -c $(CFLAGS) cluster_exec.c
 cluster_exec : cluster_exec.o nonblock_helpers.o wrappers.o
-	$(MPICC) -o $@ $^ -L/usr/pkg/lib -lmaa
+	$(MPICC) -o $@ $^ -L${LIBDIR} -lmaa
 
 .PHONY : clean
 clean:
-	rm -f *~ *.o core.* *.core core cluster_exec subprocess
+	rm -f *~ *.o core.* *.core core cluster_exec
