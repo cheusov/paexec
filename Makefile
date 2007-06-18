@@ -3,7 +3,7 @@ MPICC=		mpicc
 CFLAGS=		-I/usr/pkg/include -g -O0 -Wall
 
 .PHONY : all
-all : cluster_exec subprocess
+all : cluster_exec
 
 wrappers.o : wrappers.c
 	$(CC) -o $@ -c $(CFLAGS) $<
@@ -14,11 +14,6 @@ cluster_exec.o : cluster_exec.c
 	$(MPICC) -o $@ -c $(CFLAGS) cluster_exec.c
 cluster_exec : cluster_exec.o nonblock_helpers.o wrappers.o
 	$(MPICC) -o $@ $^ -L/usr/pkg/lib -lmaa
-
-subprocess.o : subprocess.c
-	$(CC) -o $@ -c $(CFLAGS) subprocess.c
-subprocess : subprocess.o nonblock_helpers.o wrappers.o
-	$(CC) -o $@ $^ -L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib -lmaa
 
 .PHONY : clean
 clean:
