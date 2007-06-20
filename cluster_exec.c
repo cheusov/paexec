@@ -30,6 +30,8 @@
 #endif
 
 #include <mpi.h>
+
+#define DMALLOC_FUNC_CHECK
 #include <maa.h>
 
 #include "wrappers.h"
