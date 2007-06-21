@@ -89,7 +89,7 @@ void master_init ()
 /* returns next line from stdin */
 char *getnextline (void)
 {
-	static char line [2048];
+	static char line [204800];
 	size_t len;
 
 	if (fgets (line, sizeof (line), stdin)){
