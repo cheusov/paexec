@@ -16,13 +16,14 @@
 #include "wrappers.h"
 #include "nonblock_helpers.h"
 
+static size_t linebuf_size = 0;
+static char *linebuf       = NULL;
+
 int put_until_emptyline (int fd, line_putter_t putter, void *data)
 {
 	char buf [20];
 	ssize_t cnt;
 
-	char *linebuf       = NULL;
-	size_t linebuf_size = 0;
 	size_t line_size    = 0;
 
 	char c;
