@@ -65,6 +65,7 @@ typedef enum {
 static status_t *status_arr   = NULL;
 static int      *line_num_arr = NULL;
 
+static int count_dead = 0;
 static int count_busy = 0;
 static int count_wait = 0;
 
@@ -103,6 +104,7 @@ char *getnextline (void)
 		return line;
 	}else if (ferror (stdin)){
 		perror ("fgets faild");
+
 		exit (1);
 
 		return NULL; /* no compilation warnings! */
@@ -268,6 +270,7 @@ void master_mark_executor_dead (int num)
 			  TAG_SIZE_OR_END, MPI_COMM_WORLD);
 
 	status_arr [num] = st_dead;
+	++count_dead;
 }
 
 /* next line to free executor */
@@ -299,12 +302,14 @@ void master_send_new_task_to_executor ()
 						--count_wait;
 					}
 				}
+
+				assert (count_wait == 0);
 			}
-			break;
+//			break;
 		}
 	}
 
-	assert (i < count);
+//	assert (i < count);
 }
 
 /* read results from any executor */
@@ -379,6 +384,14 @@ void master_send_cmd ()
 	}
 }
 
+void progress (const char *p)
+{
+	fprintf (stderr, "%s : %d + %d + %d == %d\n",
+			 p,
+			count_wait, count_busy, count_dead,
+			count_wait + count_busy + count_dead);
+}
+
 /* master process */
 void master ()
 {
@@ -386,15 +399,24 @@ void master ()
 	master_send_cmd ();
 
 	while (count_busy > 0 || !eof){
+//		progress ("1");
+		assert (count_wait + count_busy + count_dead == count - 1);
+
 		/* send lines to executors */
 		if (count_wait > 0 && !eof){
 			master_send_new_task_to_executor ();
 		}
 
+//		progress ("2");
+		assert (count_wait + count_busy + count_dead == count - 1);
+
 		/* recieve results from executors */
 		if (count_busy > 0){
 			master_recv_data_from_executor ();
 		}
+
+//		progress ("3");
+		assert (count_wait + count_busy + count_dead == count - 1);
 	}
 }
 
