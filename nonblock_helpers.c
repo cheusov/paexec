@@ -12,6 +12,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "wrappers.h"
 #include "nonblock_helpers.h"
@@ -42,6 +43,11 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 		if (FD_ISSET (fd, &rset)){
 //			fprintf (stderr, "yes\n");
 			cnt = xread (fd, buf, sizeof (buf));
+
+			if (cnt < 0){
+				perror ("Reading from child process failed\n");
+				return 1;
+			}
 
 			if (line_size + cnt >= linebuf_size){
 				linebuf = xrealloc (linebuf, linebuf_size + cnt+1);
