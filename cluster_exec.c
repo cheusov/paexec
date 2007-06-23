@@ -127,8 +127,8 @@ void executor_process_and_send (char *buf, int size)
 #if 1
 	int len = (int) strlen (buf);
 
-	write (proc_fdin, buf, len);
-	write (proc_fdin, "\n", 1);
+	xwrite (proc_fdin, buf, len);
+	xwrite (proc_fdin, "\n", 1);
 
 	if (put_until_emptyline (proc_fdout, executor_send_result, NULL)){
 		fprintf (stderr, "Child process exited unexpectedly\n");
