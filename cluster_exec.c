@@ -37,7 +37,7 @@
 #include "wrappers.h"
 #include "nonblock_helpers.h"
 
-#define TAG_DATA        4
+#define TAG_STRING        4
 
 static int rank;
 static int count;
@@ -116,7 +116,7 @@ void executor_send_result (char *line, void *data)
 {
 	int size = (int) strlen (line) + 1;
 
-	MPI_Send (line, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
+	MPI_Send (line, size, MPI_CHAR, 0, TAG_STRING,  MPI_COMM_WORLD);
 }
 
 /* process data and send results back to the master */
@@ -146,7 +146,7 @@ void executor_process_and_send (char *buf, int size)
 		fprintf (stderr, "executor: mpi_send buf = %s\n", buf);
 	}
 
-	MPI_Send (buf, size, MPI_CHAR, 0, TAG_DATA,  MPI_COMM_WORLD);
+	MPI_Send (buf, size, MPI_CHAR, 0, TAG_STRING,  MPI_COMM_WORLD);
 #endif
 }
 
@@ -155,12 +155,12 @@ void executor_recieve_cmd ()
 	MPI_Status status;
 	int size;
 
-	MPI_Probe (0, TAG_DATA, MPI_COMM_WORLD, &status);
+	MPI_Probe (0, TAG_STRING, MPI_COMM_WORLD, &status);
 	MPI_Get_count (&status, MPI_CHAR, &size);
 
 	cmd = xmalloc (size);
 
-	MPI_Recv (cmd, size, MPI_CHAR, 0, TAG_DATA, MPI_COMM_WORLD, &status);
+	MPI_Recv (cmd, size, MPI_CHAR, 0, TAG_STRING, MPI_COMM_WORLD, &status);
 }
 
 void executor_subprocess ()
@@ -190,7 +190,7 @@ void executor ()
 		}
 
 		/* reading the line size */
-		MPI_Probe (0, TAG_DATA, MPI_COMM_WORLD, &status);
+		MPI_Probe (0, TAG_STRING, MPI_COMM_WORLD, &status);
 		MPI_Get_count (&status, MPI_CHAR, &size);
 
 		if (verbose){
@@ -204,7 +204,7 @@ void executor ()
 		}
 
 		/* reading the line */
-		MPI_Recv (buf, size, MPI_CHAR, 0, TAG_DATA,
+		MPI_Recv (buf, size, MPI_CHAR, 0, TAG_STRING,
 				  MPI_COMM_WORLD, &status);
 
 		if (size == 1){
@@ -226,7 +226,7 @@ void executor ()
 		/* end of line processing,
 		   needs further lines to be processed
 		*/
-		MPI_Send ("", 1, MPI_CHAR, 0, TAG_DATA, MPI_COMM_WORLD);
+		MPI_Send ("", 1, MPI_CHAR, 0, TAG_STRING, MPI_COMM_WORLD);
 	}
 }
 
@@ -248,7 +248,7 @@ void master_send_line_to_executor (int i, char *line)
 		fprintf (stderr, "send to executor: line = %s\n", line);
 	}
 
-	MPI_Send (line, size, MPI_CHAR, i, TAG_DATA, MPI_COMM_WORLD);
+	MPI_Send (line, size, MPI_CHAR, i, TAG_STRING, MPI_COMM_WORLD);
 
 	status_arr [i] = st_busy;
 
@@ -259,7 +259,7 @@ void master_send_line_to_executor (int i, char *line)
 /* mark executor as dead, when there are no new tasks for it */
 void master_mark_executor_dead (int num)
 {
-	MPI_Send ("", 1, MPI_CHAR, num, TAG_DATA, MPI_COMM_WORLD);
+	MPI_Send ("", 1, MPI_CHAR, num, TAG_STRING, MPI_COMM_WORLD);
 
 	status_arr [num] = st_dead;
 	++count_dead;
@@ -318,7 +318,7 @@ void master_recv_data_from_executor ()
 		fprintf (stderr, "count_busy=%d\n", count_busy);
 	}
 
-	MPI_Probe (MPI_ANY_SOURCE, TAG_DATA, MPI_COMM_WORLD, &status);
+	MPI_Probe (MPI_ANY_SOURCE, TAG_STRING, MPI_COMM_WORLD, &status);
 
 	if (verbose){
 		fprintf (stderr, "recv size: %d\n", size);
@@ -332,7 +332,7 @@ void master_recv_data_from_executor ()
 		buf = xrealloc (buf, size);
 	}
 
-	MPI_Recv (buf, size, MPI_CHAR, source, TAG_DATA,
+	MPI_Recv (buf, size, MPI_CHAR, source, TAG_STRING,
 			  MPI_COMM_WORLD, &status);
 
 	if (size == 1){
@@ -370,7 +370,7 @@ void master_send_cmd ()
 	size = (int) strlen (cmd) + 1;
 
 	for (i=1; i < count; ++i){
-		MPI_Send (cmd, size, MPI_CHAR, i, TAG_DATA, MPI_COMM_WORLD);
+		MPI_Send (cmd, size, MPI_CHAR, i, TAG_STRING, MPI_COMM_WORLD);
 	}
 }
 
