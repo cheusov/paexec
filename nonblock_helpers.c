@@ -22,7 +22,7 @@ static char *linebuf       = NULL;
 
 int put_until_emptyline (int fd, line_putter_t putter, void *data)
 {
-#if 1
+#if 0
 	char c;
 	int len = 0;
 	while (xread (fd, &c, 1) == 1){
@@ -45,6 +45,7 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 
 		++len;
 	}
+	return 1;
 #else
 	char buf [20000];
 	ssize_t cnt;
@@ -74,7 +75,7 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 			}
 
 			if (line_size + cnt >= linebuf_size){
-				linebuf_size += line_size + cnt + 1;
+				linebuf_size += cnt + 1;
 				linebuf = xrealloc (linebuf, linebuf_size);
 			}
 

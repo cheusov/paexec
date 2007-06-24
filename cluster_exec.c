@@ -184,7 +184,7 @@ void executor_subprocess ()
 	pid = pr_open (cmd,
 				   PR_CREATE_STDIN | PR_CREATE_STDOUT,
 				   &proc_fdin, &proc_fdout, NULL);
-//	nonblock (proc_fdout);
+	nonblock (proc_fdout);
 }
 
 /* executor process */
