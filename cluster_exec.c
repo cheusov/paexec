@@ -37,7 +37,6 @@
 #include "wrappers.h"
 #include "nonblock_helpers.h"
 
-#define TAG_SIZE_OR_END 2
 #define TAG_DATA        4
 
 static int rank;
@@ -156,13 +155,12 @@ void executor_recieve_cmd ()
 	MPI_Status status;
 	int size;
 
-	MPI_Recv (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END,
-			  MPI_COMM_WORLD, &status);
+	MPI_Probe (0, TAG_DATA, MPI_COMM_WORLD, &status);
+	MPI_Get_count (&status, MPI_CHAR, &size);
 
 	cmd = xmalloc (size);
 
-	MPI_Recv (cmd, size, MPI_CHAR, 0, TAG_DATA,
-			  MPI_COMM_WORLD, &status);
+	MPI_Recv (cmd, size, MPI_CHAR, 0, TAG_DATA, MPI_COMM_WORLD, &status);
 }
 
 void executor_subprocess ()
@@ -192,16 +190,11 @@ void executor ()
 		}
 
 		/* reading the line size */
-		MPI_Recv (&size, 1, MPI_INT, 0, TAG_SIZE_OR_END,
-				  MPI_COMM_WORLD, &status);
+		MPI_Probe (0, TAG_DATA, MPI_COMM_WORLD, &status);
+		MPI_Get_count (&status, MPI_CHAR, &size);
 
 		if (verbose){
 			fprintf (stderr, "executor: size = %d\n", size);
-		}
-
-		if (size < 0){
-			/* no more lines to be processed */
-			return;
 		}
 
 		/* */
@@ -213,6 +206,11 @@ void executor ()
 		/* reading the line */
 		MPI_Recv (buf, size, MPI_CHAR, 0, TAG_DATA,
 				  MPI_COMM_WORLD, &status);
+
+		if (size == 1){
+			/* no more lines to be processed */
+			return;
+		}
 
 		if (verbose){
 			fprintf (stderr, "executor: buf = %s\n", buf);
@@ -228,8 +226,7 @@ void executor ()
 		/* end of line processing,
 		   needs further lines to be processed
 		*/
-		MPI_Send ("", 1, MPI_CHAR, 0,
-				  TAG_DATA, MPI_COMM_WORLD);
+		MPI_Send ("", 1, MPI_CHAR, 0, TAG_DATA, MPI_COMM_WORLD);
 	}
 }
 
@@ -246,7 +243,6 @@ void master_send_line_to_executor (int i, char *line)
 	}
 
 	line_num_arr [i] = line_num;
-	MPI_Send (&size, 1, MPI_INT, i, TAG_SIZE_OR_END, MPI_COMM_WORLD);
 
 	if (verbose){
 		fprintf (stderr, "send to executor: line = %s\n", line);
@@ -263,8 +259,7 @@ void master_send_line_to_executor (int i, char *line)
 /* mark executor as dead, when there are no new tasks for it */
 void master_mark_executor_dead (int num)
 {
-	MPI_Send ((void *) &minus_one, 1, MPI_INT, num,
-			  TAG_SIZE_OR_END, MPI_COMM_WORLD);
+	MPI_Send ("", 1, MPI_CHAR, num, TAG_DATA, MPI_COMM_WORLD);
 
 	status_arr [num] = st_dead;
 	++count_dead;
@@ -375,10 +370,7 @@ void master_send_cmd ()
 	size = (int) strlen (cmd) + 1;
 
 	for (i=1; i < count; ++i){
-		MPI_Send (&size, 1, MPI_INT, i, TAG_SIZE_OR_END,
-				  MPI_COMM_WORLD);
-		MPI_Send (cmd, size, MPI_CHAR, i, TAG_DATA,
-				  MPI_COMM_WORLD);
+		MPI_Send (cmd, size, MPI_CHAR, i, TAG_DATA, MPI_COMM_WORLD);
 	}
 }
 
