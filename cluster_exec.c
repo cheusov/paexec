@@ -89,7 +89,7 @@ void master_init ()
 /* returns next line from stdin */
 char *getnextline (void)
 {
-	static char line [204800];
+	static char line [20480];
 	size_t len;
 
 	if (fgets (line, sizeof (line), stdin)){
@@ -150,17 +150,32 @@ void executor_process_and_send (char *buf, int size)
 #endif
 }
 
+void MPI_RecvString (
+	char **buf, int *sz,
+	int source, int tag, MPI_Comm comm, MPI_Status *status)
+{
+	int size;
+
+	MPI_Probe (source, tag, comm, status);
+	MPI_Get_count (status, MPI_CHAR, &size);
+
+	if (verbose){
+		fprintf (stderr, "size from MPI_Get_count: %d\n", size);
+	}
+
+	*buf = xmalloc (size);
+
+	MPI_Recv (*buf, size, MPI_CHAR, source, tag, comm, status);
+
+	if (sz)
+		*sz = size;
+}
+
 void executor_recieve_cmd ()
 {
 	MPI_Status status;
-	int size;
 
-	MPI_Probe (0, TAG_STRING, MPI_COMM_WORLD, &status);
-	MPI_Get_count (&status, MPI_CHAR, &size);
-
-	cmd = xmalloc (size);
-
-	MPI_Recv (cmd, size, MPI_CHAR, 0, TAG_STRING, MPI_COMM_WORLD, &status);
+	MPI_RecvString (&cmd, NULL, 0, TAG_STRING, MPI_COMM_WORLD, &status);
 }
 
 void executor_subprocess ()
@@ -169,7 +184,7 @@ void executor_subprocess ()
 	pid = pr_open (cmd,
 				   PR_CREATE_STDIN | PR_CREATE_STDOUT,
 				   &proc_fdin, &proc_fdout, NULL);
-	nonblock (proc_fdout);
+//	nonblock (proc_fdout);
 }
 
 /* executor process */
@@ -233,8 +248,7 @@ void executor ()
 /* send line to executor and mark it as busy */
 void master_send_line_to_executor (int i, char *line)
 {
-	int size = strlen (line);
-	++size;
+	int size = strlen (line) + 1;
 
 	assert (status_arr [i] == st_wait);
 
@@ -259,6 +273,10 @@ void master_send_line_to_executor (int i, char *line)
 /* mark executor as dead, when there are no new tasks for it */
 void master_mark_executor_dead (int num)
 {
+	if (verbose){
+		fprintf (stderr, "marking process %d as dead\n", num);
+	}
+
 	MPI_Send ("", 1, MPI_CHAR, num, TAG_STRING, MPI_COMM_WORLD);
 
 	status_arr [num] = st_dead;
@@ -277,6 +295,7 @@ void master_send_new_task_to_executor ()
 
 	for (i=1; i < count; ++i){
 		if (status_arr [i] == st_wait){
+			assert (!eof);
 			line = getnextline ();
 
 			if (verbose){
@@ -296,12 +315,11 @@ void master_send_new_task_to_executor ()
 				}
 
 				assert (count_wait == 0);
+
+				break;
 			}
-//			break;
 		}
 	}
-
-//	assert (i < count);
 }
 
 /* read results from any executor */
@@ -320,16 +338,16 @@ void master_recv_data_from_executor ()
 
 	MPI_Probe (MPI_ANY_SOURCE, TAG_STRING, MPI_COMM_WORLD, &status);
 
+	source = status.MPI_SOURCE;
+	MPI_Get_count (&status, MPI_CHAR, &size);
+
 	if (verbose){
 		fprintf (stderr, "recv size: %d\n", size);
 	}
 
-	source = status.MPI_SOURCE;
-	MPI_Get_count (&status, MPI_CHAR, &size);
-
 	if (size > buf_size){
 		buf_size = size;
-		buf = xrealloc (buf, size);
+		buf = xrealloc (buf, buf_size);
 	}
 
 	MPI_Recv (buf, size, MPI_CHAR, source, TAG_STRING,
@@ -389,6 +407,10 @@ void master ()
 	master_send_cmd ();
 
 	while (count_busy > 0 || !eof){
+		if (verbose){
+			fprintf (stderr, "eof=%d\n", eof);
+		}
+
 //		progress ("1");
 		assert (count_wait + count_busy + count_dead == count - 1);
 

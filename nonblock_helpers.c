@@ -22,7 +22,31 @@ static char *linebuf       = NULL;
 
 int put_until_emptyline (int fd, line_putter_t putter, void *data)
 {
-	char buf [20];
+#if 1
+	char c;
+	int len = 0;
+	while (xread (fd, &c, 1) == 1){
+		if (len >= linebuf_size){
+			++linebuf_size;
+			linebuf = xrealloc (linebuf, linebuf_size);
+		}
+
+		if (c == '\n'){
+			if (len == 0){
+				return 0;
+			}
+
+			linebuf [len] = 0;
+			putter (linebuf, data);
+			len = 0;
+		}else{
+			linebuf [len] = c;
+		}
+
+		++len;
+	}
+#else
+	char buf [20000];
 	ssize_t cnt;
 
 	size_t line_size    = 0;
@@ -50,8 +74,8 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 			}
 
 			if (line_size + cnt >= linebuf_size){
-				linebuf = xrealloc (linebuf, linebuf_size + cnt+1);
-				linebuf_size += cnt+1;
+				linebuf_size += line_size + cnt + 1;
+				linebuf = xrealloc (linebuf, linebuf_size);
 			}
 
 //			fprintf (stderr, "cnt = %d\n", cnt);
@@ -78,4 +102,5 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 
 	abort (); /* this should not happen */
 	return 1;
+#endif
 }
