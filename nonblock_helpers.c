@@ -13,6 +13,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "wrappers.h"
 #include "nonblock_helpers.h"
@@ -26,8 +27,8 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 	char c;
 	int len = 0;
 	while (xread (fd, &c, 1) == 1){
-		if (len >= linebuf_size){
-			++linebuf_size;
+		if (len + 1 >= linebuf_size){
+			linebuf_size = len + 20;
 			linebuf = xrealloc (linebuf, linebuf_size);
 		}
 
@@ -41,10 +42,14 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 			len = 0;
 		}else{
 			linebuf [len] = c;
+			++len;
 		}
-
-		++len;
 	}
+
+	assert (len < linebuf_size);
+	linebuf [len] = 0;
+
+	putter (linebuf, data);
 	return 1;
 #else
 	char buf [20000];
