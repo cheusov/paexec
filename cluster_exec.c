@@ -94,7 +94,7 @@ char *getnextline (void)
 	static char line [BUFSIZE];
 
 	size_t len;
-	size_t n;
+//	size_t n;
 	if (fgets (line, BUFSIZE, stdin)){
 //	if (getline (&gline, &n, stdin)){
 		++line_num;
