@@ -52,7 +52,7 @@ static const int minus_one = -1;
 static pid_t pid = -1;
 static int proc_fdin, proc_fdout;
 
-static char *cmd;
+static char *cmd = NULL;
 
 typedef enum {
 	st_master,
@@ -86,13 +86,17 @@ void master_init ()
 	count_wait = count-1;
 }
 
+#define BUFSIZE 10000
+
 /* returns next line from stdin */
 char *getnextline (void)
 {
-	static char line [20480];
-	size_t len;
+	static char line [BUFSIZE];
 
-	if (fgets (line, sizeof (line), stdin)){
+	size_t len;
+	size_t n;
+	if (fgets (line, BUFSIZE, stdin)){
+//	if (getline (&gline, &n, stdin)){
 		++line_num;
 
 		len = strlen (line);
@@ -159,11 +163,15 @@ void MPI_RecvString (
 	MPI_Probe (source, tag, comm, status);
 	MPI_Get_count (status, MPI_CHAR, &size);
 
+	assert (size >= 0);
+
 	if (verbose){
 		fprintf (stderr, "size from MPI_Get_count: %d\n", size);
 	}
 
-	*buf = xmalloc (size);
+	assert (*buf == NULL);
+
+	*buf = xrealloc (*buf, size);
 
 	MPI_Recv (*buf, size, MPI_CHAR, source, tag, comm, status);
 
@@ -215,7 +223,7 @@ void executor ()
 		/* */
 		if (size > buf_size){
 			buf_size = size;
-			buf = xrealloc (buf, size);
+			buf = xrealloc (buf, buf_size);
 		}
 
 		/* reading the line */
@@ -248,6 +256,8 @@ void executor ()
 /* send line to executor and mark it as busy */
 void master_send_line_to_executor (int i, char *line)
 {
+	assert (i >= 0 && i < count);
+
 	int size = strlen (line) + 1;
 
 	assert (status_arr [i] == st_wait);
@@ -273,6 +283,8 @@ void master_send_line_to_executor (int i, char *line)
 /* mark executor as dead, when there are no new tasks for it */
 void master_mark_executor_dead (int num)
 {
+	assert (num >= 0 && num < count);
+
 	if (verbose){
 		fprintf (stderr, "marking process %d as dead\n", num);
 	}
@@ -293,9 +305,8 @@ void master_send_new_task_to_executor ()
 		fprintf (stderr, "count_wait=%d\n", count_wait);
 	}
 
-	for (i=1; i < count; ++i){
+	for (i=1; i < count && !eof; ++i){
 		if (status_arr [i] == st_wait){
-			assert (!eof);
 			line = getnextline ();
 
 			if (verbose){
@@ -315,8 +326,6 @@ void master_send_new_task_to_executor ()
 				}
 
 				assert (count_wait == 0);
-
-				break;
 			}
 		}
 	}
