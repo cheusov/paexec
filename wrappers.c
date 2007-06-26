@@ -16,6 +16,10 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define DMALLOC_FUNC_CHECK
+#include <maa.h>
 
 #include "wrappers.h"
 
@@ -23,13 +27,13 @@ void nonblock (int fd)
 {
 	int ret = fcntl (fd, F_GETFL, 0);
 	if (ret == -1){
-		perror ("fcntl failed");
+		log_error ("", "fcntl failed: %s\n", strerror (errno));
 		exit (1);
 	}
 
 	ret = fcntl (fd, F_SETFL, ret | O_NONBLOCK);
 	if (ret == -1){
-		perror ("fcntl failed");
+		log_error ("", "fcntl failed: %s\n", strerror (errno));
 		exit (1);
 	}
 }
@@ -45,7 +49,7 @@ int xselect (
 	}while (ret == -1 && errno == EINTR);
 
 	if (ret == -1){
-		perror ("select failed");
+		log_error ("", "select failed: %s\n", strerror (errno));
 		exit (1);
 	}
 
@@ -60,7 +64,7 @@ ssize_t xread (int fd, void *buf, size_t nbytes)
 	}while (ret == -1 && errno == EINTR);
 
 	if (ret == -1){
-		perror ("read failed");
+		log_error ("", "read failed: %s\n", strerror (errno));
 		exit (1);
 	}
 
@@ -75,7 +79,7 @@ ssize_t xwrite (int fd, const void *buf, size_t count)
 	}while (ret == -1 && errno == EINTR);
 
 	if (ret == -1){
-		perror ("write failed");
+		log_error ("", "write failed: %s\n", strerror (errno));
 		exit (1);
 	}
 
@@ -86,7 +90,7 @@ void *xmalloc (size_t s)
 {
 	void *p = malloc (s);
 	if (!p){
-		perror ("malloc failed");
+		log_error ("", "malloc failed: %s\n", strerror (errno));
 		exit (1);
 	}
 
@@ -97,7 +101,7 @@ void *xrealloc (void *p, size_t s)
 {
 	p = realloc (p, s);
 	if (!p){
-		perror ("realloc failed");
+		log_error ("", "realloc failed: %s\n", strerror (errno));
 		exit (1);
 	}
 

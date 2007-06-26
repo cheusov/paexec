@@ -133,7 +133,7 @@ void executor_process_and_send (char *buf, int size)
 	xwrite (proc_fdin, "\n", 1);
 
 	if (put_until_emptyline (proc_fdout, executor_send_result, NULL)){
-		fprintf (stderr, "Child process exited unexpectedly\n");
+		log_error ("", "Child process exited unexpectedly");
 		exit (0);
 	}
 #else
@@ -143,11 +143,11 @@ void executor_process_and_send (char *buf, int size)
 	}
 
 	if (verbose){
-		fprintf (stderr, "executor: mpi_send size = %d\n", size);
+		log_info ("executor: mpi_send size = %d", size);
 	}
 
 	if (verbose){
-		fprintf (stderr, "executor: mpi_send buf = %s\n", buf);
+		log_info ("executor: mpi_send buf = %s", buf);
 	}
 
 	MPI_Send (buf, size, MPI_CHAR, 0, TAG_STRING,  MPI_COMM_WORLD);
@@ -166,7 +166,7 @@ void MPI_RecvString (
 	assert (size >= 0);
 
 	if (verbose){
-		fprintf (stderr, "size from MPI_Get_count: %d\n", size);
+		log_info ("size from MPI_Get_count: %d", size);
 	}
 
 	assert (*buf == NULL);
@@ -209,7 +209,7 @@ void executor ()
 
 	for (;;){
 		if (verbose){
-			fprintf (stderr, "executor:\n");
+			log_info ("executor:");
 		}
 
 		/* reading the line size */
@@ -217,7 +217,7 @@ void executor ()
 		MPI_Get_count (&status, MPI_CHAR, &size);
 
 		if (verbose){
-			fprintf (stderr, "executor: size = %d\n", size);
+			log_info ("executor: size = %d", size);
 		}
 
 		/* */
@@ -236,7 +236,7 @@ void executor ()
 		}
 
 		if (verbose){
-			fprintf (stderr, "executor: buf = %s\n", buf);
+			log_info ("executor: buf = %s", buf);
 		}
 #ifndef NDEBUG
 		MPI_Get_count (&status, MPI_CHAR, &cnt);
@@ -263,13 +263,13 @@ void master_send_line_to_executor (int i, char *line)
 	assert (status_arr [i] == st_wait);
 
 	if (verbose){
-		fprintf (stderr, "send to executor: size = %d\n", size);
+		log_info ("send to executor: size = %d", size);
 	}
 
 	line_num_arr [i] = line_num;
 
 	if (verbose){
-		fprintf (stderr, "send to executor: line = %s\n", line);
+		log_info ("send to executor: line = %s", line);
 	}
 
 	MPI_Send (line, size, MPI_CHAR, i, TAG_STRING, MPI_COMM_WORLD);
@@ -286,7 +286,7 @@ void master_mark_executor_dead (int num)
 	assert (num >= 0 && num < count);
 
 	if (verbose){
-		fprintf (stderr, "marking process %d as dead\n", num);
+		log_info ("marking process %d as dead", num);
 	}
 
 	MPI_Send ("", 1, MPI_CHAR, num, TAG_STRING, MPI_COMM_WORLD);
@@ -302,7 +302,7 @@ void master_send_new_task_to_executor ()
 	char *line;
 
 	if (verbose){
-		fprintf (stderr, "count_wait=%d\n", count_wait);
+		log_info ("count_wait=%d", count_wait);
 	}
 
 	for (i=1; i < count && !eof; ++i){
@@ -310,7 +310,7 @@ void master_send_new_task_to_executor ()
 			line = getnextline ();
 
 			if (verbose){
-				fprintf (stderr, "line=%s\n", line);
+				log_info ("line=%s", line);
 			}
 
 			if (line){
@@ -342,7 +342,7 @@ void master_recv_data_from_executor ()
 	int cnt = 0;
 
 	if (verbose){
-		fprintf (stderr, "count_busy=%d\n", count_busy);
+		log_info ("count_busy=%d", count_busy);
 	}
 
 	MPI_Probe (MPI_ANY_SOURCE, TAG_STRING, MPI_COMM_WORLD, &status);
@@ -351,7 +351,7 @@ void master_recv_data_from_executor ()
 	MPI_Get_count (&status, MPI_CHAR, &size);
 
 	if (verbose){
-		fprintf (stderr, "recv size: %d\n", size);
+		log_info ("recv size: %d", size);
 	}
 
 	if (size > buf_size){
@@ -403,7 +403,7 @@ void master_send_cmd ()
 
 void progress (const char *p)
 {
-	fprintf (stderr, "%s : %d + %d + %d == %d\n",
+	log_info ("%s : %d + %d + %d == %d",
 			 p,
 			count_wait, count_busy, count_dead,
 			count_wait + count_busy + count_dead);
@@ -417,7 +417,7 @@ void master ()
 
 	while (count_busy > 0 || !eof){
 		if (verbose){
-			fprintf (stderr, "eof=%d\n", eof);
+			log_info ("eof=%d", eof);
 		}
 
 //		progress ("1");
@@ -487,11 +487,20 @@ void process_args (int *argc, char ***argv)
 	}
 
 	if (optind + 1 != *argc){
-		fprintf (stderr, "missing cmd argument\n");
+		log_error ("", "missing cmd argument");
 		exit (1);
 	}
 
 	cmd = (*argv) [optind];
+}
+
+void log_to_file (void)
+{
+	char logfile [2000];
+
+	snprintf (logfile, sizeof (logfile), "logfile.%d", rank);
+
+	log_file ("cluster_exec", logfile);
 }
 
 int main (int argc, char **argv)
@@ -501,11 +510,15 @@ int main (int argc, char **argv)
 	MPI_Comm_size (MPI_COMM_WORLD, &count);
 	MPI_Comm_rank (MPI_COMM_WORLD, &rank);
 
+	log_to_file ();
+
 	if (rank == 0){
 		process_args (&argc, &argv);
 		master ();
 	}else{
 		maa_init ("cluster_exec");
+
+		log_info ("I started");
 
 		executor ();
 
