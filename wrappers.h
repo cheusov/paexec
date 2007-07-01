@@ -26,5 +26,6 @@ ssize_t xread (int fd, void *buf, size_t nbytes);
 ssize_t xwrite (int fd, const void *buf, size_t count);
 void *xmalloc (size_t s);
 void *xrealloc (void *p, size_t s);
+void xfree(void *ptr);
 
 #endif // _WRAPPERS_H_

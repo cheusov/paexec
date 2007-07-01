@@ -107,3 +107,9 @@ void *xrealloc (void *p, size_t s)
 
 	return p;
 }
+
+void xfree(void *ptr)
+{
+	if (ptr)
+		free (ptr);
+}
