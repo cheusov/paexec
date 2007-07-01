@@ -25,7 +25,7 @@
 #include <getopt.h>
 #endif
 
-#ifdef __NetBSD__
+#if defined( __NetBSD__) || defined(sun)
 #include <getopt.h>
 #endif
 
@@ -161,7 +161,7 @@ void write_to_exec (void)
 	for (i=0; i < count; ++i){
 		if (!busy [i]){
 			if (verbose){
-				printf ("send to %d (pid: %d)\n", i, pids [i]);
+				printf ("send to %d (pid: %d)\n", i, (int) pids [i]);
 			}
 
 			busy [i] = 1;
@@ -253,7 +253,7 @@ void loop (void)
 						}
 
 						if (verbose){
-							printf ("from pid %d: %s\n", pids [i], buf_out [i]);
+							printf ("from pid %d: %s\n", (int) pids [i], buf_out [i]);
 						}
 
 						memmove (buf_out [i],
