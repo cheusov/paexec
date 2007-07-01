@@ -223,6 +223,11 @@ void loop (void)
 				size_stdin += cnt;
 			}else{
 				eof = 1;
+				for (i=0; i < count; ++i){
+					if (!busy [i]){
+						close (fd_in [i]);
+					}
+				}
 			}
 		}
 
