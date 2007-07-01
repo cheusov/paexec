@@ -292,6 +292,9 @@ void loop (void)
 				}
 
 				size_out [i] += cnt;
+				if (size_out [i] == BUFSIZE){
+					err_fatal (NULL, "Too long line!\n");
+				}
 			}
 		}
 
