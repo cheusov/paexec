@@ -165,9 +165,12 @@ void write_to_exec (void)
 			}
 
 			busy [i] = 1;
+			size_out [i] = 0;
+			++busy_count;
+
 			xwrite (fd_in [i], buf_stdin, strlen (buf_stdin));
 			xwrite (fd_in [i], "\n", 1);
-			++busy_count;
+
 			return;
 		}
 	}
@@ -216,7 +219,6 @@ void loop (void)
 						cnt        -= i + 1;
 
 						i = -1;
-						continue;
 					}
 				}
 
@@ -238,13 +240,20 @@ void loop (void)
 							 buf_out [i] + size_out [i],
 							 BUFSIZE - size_out [i]);
 
+				if (verbose){
+					buf_out [i] [size_out [i] + cnt] = 0;
+					printf ("cnt = %d\n", cnt);
+					printf ("buf_out [%d] = %s\n", i, buf_out [i]);
+					printf ("size_out [%d] = %d\n", i, size_out [i]);
+				}
+
 				if (!cnt){
 					err_fatal (__FUNCTION__, "Unexpected eof\n");
 				}
 
 				for (j=0; j < cnt; ++j){
-					if (buf_out [i] [size_stdin + j] == '\n'){
-						buf_out [i] [size_stdin + j] = 0;
+					if (buf_out [i] [size_out [i] + j] == '\n'){
+						buf_out [i] [size_out [i] + j] = 0;
 
 						if (!buf_out [i] [0]){
 							busy [i] = 0;
@@ -257,9 +266,7 @@ void loop (void)
 							break;
 						}
 
-						if (verbose){
-							printf ("from pid %d: %s\n", (int) pids [i], buf_out [i]);
-						}
+						printf ("from pid %d: %s\n", (int) pids [i], buf_out [i]);
 
 						memmove (buf_out [i],
 								 buf_out [i] + size_out [i] + j + 1,
@@ -271,6 +278,8 @@ void loop (void)
 						j = -1;
 					}
 				}
+
+				size_out [i] += cnt;
 			}
 		}
 
@@ -304,9 +313,9 @@ void loop (void)
 		printf ("wait for childs\n");
 	}
 
-//	for (i=0; i < count; ++i){
-//		pr_wait (pids [i]);
-//	}
+	for (i=0; i < count; ++i){
+		pr_wait (pids [i]);
+	}
 }
 
 void process_args (int *argc, char ***argv)
