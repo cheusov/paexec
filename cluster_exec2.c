@@ -68,13 +68,20 @@ int busy_count   = 0;
 
 pid_t *pids      = NULL;
 
+int *line_nums   = NULL;
+
 int max_fd    = 0;
+
+int line_num = 0;
 
 char *buf_stdin   = NULL;
 size_t size_stdin = 0;
 
 char **splitted_args     = NULL;
 int splitted_args_count = 0;
+
+int show_pid      = 0;
+int show_line_num = 0;
 
 void init (void)
 {
@@ -92,6 +99,8 @@ void init (void)
 	size_out = xmalloc (count * sizeof (*size_out));
 
 	busy     = xmalloc (count * sizeof (*busy));
+
+	line_nums = xmalloc (count * sizeof (*line_nums));
 
 	// stdin
 	buf_stdin = xmalloc (BUFSIZE);
@@ -156,8 +165,10 @@ void write_to_exec (void)
 				printf ("send to %d (pid: %d)\n", i, (int) pids [i]);
 			}
 
-			busy [i] = 1;
-			size_out [i] = 0;
+			busy [i]      = 1;
+			size_out [i]  = 0;
+			line_nums [i] = line_num;
+
 			++busy_count;
 
 			xwrite (fd_in [i], buf_stdin, strlen (buf_stdin));
@@ -211,6 +222,8 @@ void loop (void)
 						cnt        -= i + 1;
 
 						i = -1;
+
+						++line_num;
 					}
 				}
 
@@ -258,7 +271,14 @@ void loop (void)
 							break;
 						}
 
-						printf ("from pid %d: %s\n", (int) pids [i], buf_out [i]);
+						if (show_line_num){
+							printf ("%d ", line_nums [i]);
+						}
+						if (show_pid){
+							printf ("%d ", (int) pids [i]);
+						}
+
+						printf ("%s\n", buf_out [i]);
 
 						memmove (buf_out [i],
 								 buf_out [i] + size_out [i] + j + 1,
@@ -297,6 +317,7 @@ void loop (void)
 			}
 		}
 
+		// exit ?
 		if (!busy_count && eof)
 			break;
 	}
@@ -361,10 +382,12 @@ void process_args (int *argc, char ***argv)
 		{ "version",  0, 0, 'V' },
 		{ "verbose",  0, 0, 'v' },
 		{ "args",     1, 0, 'a' },
+		{ "show-pid", 0, 0, 'p' },
+		{ "show-line-num", 0, 0, 'l' },
 		{ NULL,       0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVva:", longopts, NULL), c != EOF){
+	while (c = getopt_long (*argc, *argv, "hVva:pl", longopts, NULL), c != EOF){
 		switch (c) {
 			case 'V':
 				printf ("cluster_exec v. 0.1\n");
@@ -379,6 +402,12 @@ void process_args (int *argc, char ***argv)
 				break;
 			case 'a':
 				args = strdup (optarg);
+				break;
+			case 'p':
+				show_pid = 1;
+				break;
+			case 'l':
+				show_line_num = 1;
 				break;
 			default:
 				usage ();
