@@ -54,18 +54,13 @@ char *args = NULL;
 char *cmd  = NULL;
 
 int verbose = 0;
-int count   = 10;
+int count   = 0;
 
 int *fd_in       = NULL;
 int *fd_out      = NULL;
 
-//char **buf_in    = NULL;
 char **buf_out   = NULL;
 
-//size_t *offs_in  = NULL;
-//size_t *offs_out = NULL;
-
-//size_t *size_in  = NULL;
 size_t *size_out = NULL;
 
 int *busy        = NULL;
@@ -78,9 +73,13 @@ int max_fd    = 0;
 char *buf_stdin   = NULL;
 size_t size_stdin = 0;
 
+char **splitted_args     = NULL;
+int splitted_args_count = 0;
+
 void init (void)
 {
 	int i;
+	char cmd_arg [2000];
 
 	// arrays
 	pids  = xmalloc (count * sizeof (*pids));
@@ -88,13 +87,8 @@ void init (void)
 	fd_in  = xmalloc (count * sizeof (*fd_in));
 	fd_out = xmalloc (count * sizeof (*fd_out));
 
-//	buf_in  = xmalloc (count * sizeof (*buf_in));
 	buf_out = xmalloc (count * sizeof (*buf_out));
 
-//	offs_in  = xmalloc (count * sizeof (*offs_in));
-//	offs_out = xmalloc (count * sizeof (*offs_out));
-
-//	size_in  = xmalloc (count * sizeof (*size_in));
 	size_out = xmalloc (count * sizeof (*size_out));
 
 	busy     = xmalloc (count * sizeof (*busy));
@@ -104,20 +98,18 @@ void init (void)
 
 	// in/out
 	for (i=0; i < count; ++i){
-//		buf_in  [i] = xmalloc (BUFSIZE);
 		buf_out [i] = xmalloc (BUFSIZE);
 
-//		offs_out [i] = 0;
 		size_out [i] = 0;
 
 		busy [i] = 0;
 
+		snprintf (cmd_arg, sizeof (cmd_arg), "%s %s", cmd, splitted_args [i]);
 		pids [i] = pr_open (
-			/* "/home/cheusov/tmp/toupper" */ cmd,
+			cmd_arg,
 			PR_CREATE_STDIN | PR_CREATE_STDOUT,
 			&fd_in [i], &fd_out [i], NULL);
 
-//		nonblock (fd_in [i]);
 		nonblock (fd_out [i]);
 
 		if (fd_in [i] > max_fd){
@@ -318,6 +310,48 @@ void loop (void)
 	}
 }
 
+void split_args (void)
+{
+	char *last = NULL;
+	char *p = args;
+	char c;
+
+	for (;;){
+		c = *p;
+
+		switch (c){
+			case ' ':
+			case '\t':
+			case '\r':
+			case 0:
+				if (last){
+					*p = 0;
+
+					++splitted_args_count;
+
+					splitted_args = xrealloc (
+						splitted_args,
+						splitted_args_count * sizeof (*splitted_args));
+
+					splitted_args [splitted_args_count - 1] = last;
+
+					last = NULL;
+				}
+				break;
+			default:
+				if (!last){
+					last = p;
+				}
+				break;
+		}
+
+		if (!c)
+			break;
+
+		++p;
+	}
+}
+
 void process_args (int *argc, char ***argv)
 {
 	int c;
@@ -330,7 +364,7 @@ void process_args (int *argc, char ***argv)
 		{ NULL,       0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "vhVl", longopts, NULL), c != EOF){
+	while (c = getopt_long (*argc, *argv, "hVva:", longopts, NULL), c != EOF){
 		switch (c) {
 			case 'V':
 				printf ("cluster_exec v. 0.1\n");
@@ -352,6 +386,14 @@ void process_args (int *argc, char ***argv)
 		}
 	}
 
+	if (args){
+		split_args ();
+		count = splitted_args_count;
+	}else{
+		fprintf (stderr, "-a option is mandatory\n");
+		exit (1);
+	}
+
 	if (optind + 1 != *argc){
 		log_error ("", "missing cmd argument");
 		exit (1);
@@ -369,17 +411,29 @@ void log_to_file (void)
 
 int main (int argc, char **argv)
 {
+	int i;
+
 	maa_init ("cluster_exec");
 
 //	log_to_file ();
 
 	process_args (&argc, &argv);
 
+	if (verbose){
+		printf ("count = %d\n", count);
+		for (i=0; i < count; ++i){
+			printf ("splitted_args [%d]=%s\n", i, splitted_args [i]);
+		}
+		printf ("cmd = %s\n", cmd);
+	}
+
 	init ();
 
 	log_info ("I started");
 
 	loop ();
+
+	xfree (args);
 
 	maa_shutdown ();
 	return 0;
