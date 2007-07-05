@@ -73,10 +73,17 @@ ssize_t xread (int fd, void *buf, size_t nbytes)
 
 ssize_t xwrite (int fd, const void *buf, size_t count)
 {
-	ssize_t ret;
-	do {
-		ret = write (fd, buf, count);
-	}while (ret == -1 && errno == EINTR);
+	ssize_t ret = 0;
+	while (count){
+		do {
+			ret = write (fd, buf, count);
+		}while (ret == -1 && errno == EINTR);
+
+		if (ret > 0){
+			count -= ret;
+			buf   += ret;
+		}
+	}
 
 	if (ret == -1){
 		log_error ("", "write failed: %s\n", strerror (errno));
