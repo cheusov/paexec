@@ -181,6 +181,18 @@ void write_to_exec (void)
 	abort ();
 }
 
+void print_line (int num)
+{
+	if (show_line_num){
+		printf ("%d ", line_nums [num]);
+	}
+	if (show_pid){
+		printf ("%d ", (int) pids [num]);
+	}
+
+	printf ("%s\n", buf_out [num]);
+}
+
 void loop (void)
 {
 	fd_set rset;
@@ -249,7 +261,7 @@ void loop (void)
 					buf_out [i] [size_out [i] + cnt] = 0;
 					printf ("cnt = %d\n", cnt);
 					printf ("buf_out [%d] = %s\n", i, buf_out [i]);
-					printf ("size_out [%d] = %d\n", i, size_out [i]);
+					printf ("size_out [%d] = %d\n", i, (int) size_out [i]);
 				}
 
 				if (!cnt){
@@ -272,14 +284,7 @@ void loop (void)
 							break;
 						}
 
-						if (show_line_num){
-							printf ("%d ", line_nums [i]);
-						}
-						if (show_pid){
-							printf ("%d ", (int) pids [i]);
-						}
-
-						printf ("%s\n", buf_out [i]);
+						print_line (i);
 
 						memmove (buf_out [i],
 								 buf_out [i] + size_out [i] + j + 1,
