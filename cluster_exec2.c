@@ -232,7 +232,7 @@ void loop (void)
 				eof = 1;
 				for (i=0; i < count; ++i){
 					if (!busy [i]){
-						close (fd_in [i]);
+						xclose (fd_in [i]);
 					}
 				}
 			}
@@ -261,11 +261,12 @@ void loop (void)
 						buf_out [i] [size_out [i] + j] = 0;
 
 						if (!buf_out [i] [0]){
+							assert (busy [i] == 1);
 							busy [i] = 0;
 							--busy_count;
 
 							if (eof){
-								close (fd_in [i]);
+								xclose (fd_in [i]);
 							}
 
 							break;

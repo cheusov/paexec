@@ -27,5 +27,6 @@ ssize_t xwrite (int fd, const void *buf, size_t count);
 void *xmalloc (size_t s);
 void *xrealloc (void *p, size_t s);
 void xfree(void *ptr);
+int xclose (int fd);
 
 #endif // _WRAPPERS_H_

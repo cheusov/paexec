@@ -113,3 +113,18 @@ void xfree(void *ptr)
 	if (ptr)
 		free (ptr);
 }
+
+int xclose (int fd)
+{
+	int ret;
+	do {
+		ret = close (fd);
+	}while (ret == -1 && errno == EINTR);
+
+	if (ret == -1){
+		log_error ("", "close failed: %s\n", strerror (errno));
+		exit (1);
+	}
+
+	return ret;
+}
