@@ -348,6 +348,7 @@ void split_args (void)
 			case ' ':
 			case '\t':
 			case '\r':
+			case '\n':
 			case 0:
 				if (last){
 					*p = 0;
