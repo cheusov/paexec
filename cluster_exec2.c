@@ -132,30 +132,6 @@ void init (void)
 	nonblock (0);
 }
 
-int fd_in2index (int fd)
-{
-	int i;
-	for (i=0; i < count; ++i){
-		if (fd_in [i] == fd)
-			return i;
-	}
-
-	err_fatal_errno (__FUNCTION__, "fd_in %d is not found\n", fd);
-	return -1;
-}
-
-int fd_out2index (int fd)
-{
-	int i;
-	for (i=0; i < count; ++i){
-		if (fd_out [i] == fd)
-			return i;
-	}
-
-	err_fatal_errno (__FUNCTION__, "fd_out %d is not found\n", fd);
-	return -1;
-}
-
 void write_to_exec (void)
 {
 	int i;
