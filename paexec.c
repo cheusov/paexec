@@ -11,6 +11,10 @@
  *
  */
 
+#ifdef HAVE_CONFIG
+#include <config.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +22,10 @@
 #include <ctype.h>
 #include <unistd.h>
 
+/***********************************************************
+  No, I don't want to use overcomplicated autoconf for this small check.
+  Use config.h for getopt_long.
+*/
 #ifdef __linux__
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -28,6 +36,10 @@
 #if defined( __NetBSD__) || defined(sun)
 #include <getopt.h>
 #endif
+
+/*
+  End of getopt_long tricks
+***********************************************************/
 
 #define DMALLOC_FUNC_CHECK
 #include <maa.h>
