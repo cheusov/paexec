@@ -52,18 +52,22 @@
 void usage ()
 {
 	printf ("\n\
-Usage: cluster_exec [OPTIONS] cmd [files...]\n\
+Usage: paexec [OPTIONS] [files...]\n\
 OPTIONS:\n\
-      -h --help             give this help\n\
-      -V --version          show version\n\
-      -v --verbose          verbose mode\n\
-      -a --args             list of args (space-separated)\n\
--a is mandatory option\n\
+      -h --help                        give this help\n\
+      -V --version                     show version\n\
+      -v --verbose                     verbose mode\n\
+\n\
+      -n --nodes <nodes>               list of cluster nodes\n\
+      -c --cmd <command>               path to program\n\
+      -t --transport <transport>       path to the transport program\n\
+-n, -c and -t is mandatory option\n\
 ");
 }
 
-char *args = NULL;
-char *cmd  = NULL;
+char *nodes      = NULL;
+char *cmd       = NULL;
+char *transport = NULL;
 
 int verbose = 0;
 int count   = 0;
@@ -89,8 +93,8 @@ int line_num = 0;
 char *buf_stdin   = NULL;
 size_t size_stdin = 0;
 
-char **splitted_args     = NULL;
-int splitted_args_count = 0;
+char **splitted_nodes    = NULL;
+int splitted_nodes_count = 0;
 
 int show_pid      = 0;
 int show_line_num = 0;
@@ -125,7 +129,9 @@ void init (void)
 
 		busy [i] = 0;
 
-		snprintf (cmd_arg, sizeof (cmd_arg), "%s %s", cmd, splitted_args [i]);
+		snprintf (cmd_arg, sizeof (cmd_arg), "%s %s %s",
+				  transport, splitted_nodes [i], cmd);
+
 		pids [i] = pr_open (
 			cmd_arg,
 			PR_CREATE_STDIN | PR_CREATE_STDOUT,
@@ -328,10 +334,10 @@ void loop (void)
 	}
 }
 
-void split_args (void)
+void split_nodes (void)
 {
 	char *last = NULL;
-	char *p = args;
+	char *p = nodes;
 	char c;
 
 	for (;;){
@@ -346,13 +352,13 @@ void split_args (void)
 				if (last){
 					*p = 0;
 
-					++splitted_args_count;
+					++splitted_nodes_count;
 
-					splitted_args = xrealloc (
-						splitted_args,
-						splitted_args_count * sizeof (*splitted_args));
+					splitted_nodes = xrealloc (
+						splitted_nodes,
+						splitted_nodes_count * sizeof (*splitted_nodes));
 
-					splitted_args [splitted_args_count - 1] = last;
+					splitted_nodes [splitted_nodes_count - 1] = last;
 
 					last = NULL;
 				}
@@ -379,16 +385,18 @@ void process_args (int *argc, char ***argv)
 		{ "help",     0, 0, 'h' },
 		{ "version",  0, 0, 'V' },
 		{ "verbose",  0, 0, 'v' },
-		{ "args",     1, 0, 'a' },
+		{ "nodes",    1, 0, 'n' },
+		{ "cmd",      1, 0, 'c' },
+		{ "transport",1, 0, 't' },
 		{ "show-pid", 0, 0, 'p' },
 		{ "show-line-num", 0, 0, 'l' },
 		{ NULL,       0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVva:pl", longopts, NULL), c != EOF){
+	while (c = getopt_long (*argc, *argv, "hVvn:plc:t:", longopts, NULL), c != EOF){
 		switch (c) {
 			case 'V':
-				printf ("cluster_exec v. 0.1\n");
+				printf ("paexec v. 0.2\n");
 				exit (0);
 				break;
 			case 'h':
@@ -398,8 +406,14 @@ void process_args (int *argc, char ***argv)
 			case 'v':
 				verbose = 1;
 				break;
-			case 'a':
-				args = strdup (optarg);
+			case 'n':
+				nodes = strdup (optarg);
+				break;
+			case 'c':
+				cmd = strdup (optarg);
+				break;
+			case 't':
+				transport = strdup (optarg);
 				break;
 			case 'p':
 				show_pid = 1;
@@ -413,34 +427,37 @@ void process_args (int *argc, char ***argv)
 		}
 	}
 
-	if (args){
-		split_args ();
-		count = splitted_args_count;
+	if (nodes){
+		split_nodes ();
+		count = splitted_nodes_count;
 	}else{
-		fprintf (stderr, "-a option is mandatory\n");
+		fprintf (stderr, "-n option is mandatory\n");
 		exit (1);
 	}
 
-	if (optind + 1 != *argc){
-		log_error ("", "missing cmd argument");
+	if (!cmd){
+		fprintf (stderr, "-c option is mandatory\n");
 		exit (1);
 	}
 
-	cmd = (*argv) [optind];
+	if (!transport){
+		fprintf (stderr, "-t option is mandatory\n");
+		exit (1);
+	}
 }
 
 void log_to_file (void)
 {
 	char logfile [2000] = "logfile";
 
-	log_file ("cluster_exec2", logfile);
+	log_file ("paexec", logfile);
 }
 
 int main (int argc, char **argv)
 {
 	int i;
 
-	maa_init ("cluster_exec");
+	maa_init ("paexec");
 
 //	log_to_file ();
 
@@ -449,7 +466,7 @@ int main (int argc, char **argv)
 	if (verbose){
 		printf ("count = %d\n", count);
 		for (i=0; i < count; ++i){
-			printf ("splitted_args [%d]=%s\n", i, splitted_args [i]);
+			printf ("splitted_nodes [%d]=%s\n", i, splitted_nodes [i]);
 		}
 		printf ("cmd = %s\n", cmd);
 	}
@@ -460,7 +477,9 @@ int main (int argc, char **argv)
 
 	loop ();
 
-	xfree (args);
+	xfree (nodes);
+	xfree (transport);
+	xfree (cmd);
 
 	maa_shutdown ();
 	return 0;

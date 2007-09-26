@@ -1,6 +1,6 @@
 CC=		cc
 CFLAGS=		-I/usr/pkg/include
-LDFLAGS=	-L/usr/pkg/lib
+LDFLAGS=	-L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib
 
 .PHONY : all
 all : paexec
