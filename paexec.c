@@ -11,8 +11,9 @@
  *
  */
 
-#ifdef HAVE_CONFIG
-#include <config.h>
+#ifdef HAVE_CONFIG_H
+/* if you need, add extra includes to config.h */
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -23,7 +24,7 @@
 #include <unistd.h>
 
 /***********************************************************
-  No, I don't want to use overcomplicated autoconf for this small check.
+  No, I don't want to use overbloated autoconf.
   Use config.h for getopt_long.
 */
 #ifdef __linux__
