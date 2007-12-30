@@ -28,5 +28,6 @@ void *xmalloc (size_t s);
 void *xrealloc (void *p, size_t s);
 void xfree(void *ptr);
 int xclose (int fd);
+char *xstrdup (char *s);
 
 #endif // _WRAPPERS_H_

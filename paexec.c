@@ -418,13 +418,13 @@ void process_args (int *argc, char ***argv)
 				verbose = 1;
 				break;
 			case 'n':
-				arg_nodes = strdup (optarg);
+				arg_nodes = xstrdup (optarg);
 				break;
 			case 'c':
-				arg_cmd = strdup (optarg);
+				arg_cmd = xstrdup (optarg);
 				break;
 			case 't':
-				arg_transport = strdup (optarg);
+				arg_transport = xstrdup (optarg);
 				break;
 			case 'p':
 				show_pid = 1;

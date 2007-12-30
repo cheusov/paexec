@@ -135,3 +135,14 @@ int xclose (int fd)
 
 	return ret;
 }
+
+char *xstrdup (char *s)
+{
+	char *p = strdup (s);
+	if (!p){
+		log_error ("", "strdup failed: %s\n", strerror (errno));
+		exit (1);
+	}
+
+	return p;
+}
