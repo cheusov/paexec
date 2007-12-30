@@ -12,7 +12,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-/* if you need, add extra includes to config.h */
+/* if you need, add extra includes to config.h
+   Use may use config.h for getopt_long for example */
 #include "config.h"
 #endif
 
@@ -23,10 +24,18 @@
 #include <ctype.h>
 #include <unistd.h>
 
+
+/***********************************************************/
+
+#ifndef BUFSIZE
+#define BUFSIZE 2048
+#endif
+
 /***********************************************************
   No, I don't want to use overbloated autoconf.
-  Use config.h for getopt_long.
 */
+#ifndef NO_HARDCODE
+
 #ifdef __linux__
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -38,6 +47,8 @@
 #include <getopt.h>
 #endif
 
+#endif /* NO_HARDCODE */
+
 /*
   End of getopt_long tricks
 ***********************************************************/
@@ -47,8 +58,6 @@
 
 #include "wrappers.h"
 #include "nonblock_helpers.h"
-
-#define BUFSIZE 2048
 
 void usage ()
 {
@@ -66,11 +75,13 @@ OPTIONS:\n\
 ");
 }
 
-char *nodes      = NULL;
+/* arguments */
+char *nodes     = NULL;
 char *cmd       = NULL;
 char *transport = NULL;
-
 int verbose = 0;
+
+/**/
 int count   = 0;
 
 int *fd_in       = NULL;
