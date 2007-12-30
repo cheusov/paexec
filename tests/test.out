@@ -1,0 +1,78 @@
+-----------------------------------------------------------------
+------- args: -V
+xxx
+-----------------------------------------------------------------
+------- args: --version
+xxx
+-----------------------------------------------------------------
+------- args: -h
+paexec - processes the list of autonomous tasks in parallel
+-----------------------------------------------------------------
+------- args: --help
+paexec - processes the list of autonomous tasks in parallel
+----------------------------------------------------------------- 
+------- args:
+0 A
+1 BB
+2 CCC
+3 DDDD
+4 EEEEE
+5 FFFFFF
+----------------------------------------------------------------- 
+------- args:
+0 substr[1,1]=a
+1 substr[1,1]=b
+1 substr[1,2]=bb
+1 substr[2,1]=b
+2 substr[1,1]=c
+2 substr[1,2]=cc
+2 substr[1,3]=ccc
+2 substr[2,1]=c
+2 substr[2,2]=cc
+2 substr[3,1]=c
+3 substr[1,1]=d
+3 substr[1,2]=dd
+3 substr[1,3]=ddd
+3 substr[1,4]=dddd
+3 substr[2,1]=d
+3 substr[2,2]=dd
+3 substr[2,3]=ddd
+3 substr[3,1]=d
+3 substr[3,2]=dd
+3 substr[4,1]=d
+4 substr[1,1]=e
+4 substr[1,2]=ee
+4 substr[1,3]=eee
+4 substr[1,4]=eeee
+4 substr[1,5]=eeeee
+4 substr[2,1]=e
+4 substr[2,2]=ee
+4 substr[2,3]=eee
+4 substr[2,4]=eeee
+4 substr[3,1]=e
+4 substr[3,2]=ee
+4 substr[3,3]=eee
+4 substr[4,1]=e
+4 substr[4,2]=ee
+4 substr[5,1]=e
+5 substr[1,1]=f
+5 substr[1,2]=ff
+5 substr[1,3]=fff
+5 substr[1,4]=ffff
+5 substr[1,5]=fffff
+5 substr[1,6]=ffffff
+5 substr[2,1]=f
+5 substr[2,2]=ff
+5 substr[2,3]=fff
+5 substr[2,4]=ffff
+5 substr[2,5]=fffff
+5 substr[3,1]=f
+5 substr[3,2]=ff
+5 substr[3,3]=fff
+5 substr[3,4]=ffff
+5 substr[4,1]=f
+5 substr[4,2]=ff
+5 substr[4,3]=fff
+5 substr[5,1]=f
+5 substr[5,2]=ff
+5 substr[6,1]=f

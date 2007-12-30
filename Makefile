@@ -30,6 +30,14 @@ install-dirs:
 .endif
 .endif
 
+##################################################
+
+.PHONY : test
+test : paexec
+	set -e; cd tests; \
+	./test.sh > _test.res; \
+	diff -u test.out _test.res
+
 ############################################################
 .include "Makefile.cvsdist"
 
