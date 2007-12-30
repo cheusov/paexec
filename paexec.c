@@ -61,8 +61,9 @@
 
 void usage ()
 {
-	printf ("\n\
-Usage: paexec [OPTIONS] [files...]\n\
+	printf ("\
+paexec - processes the list of autonomous tasks in parallel\n\
+usage: paexec [OPTIONS] [files...]\n\
 OPTIONS:\n\
       -h --help                        give this help\n\
       -V --version                     show version\n\
