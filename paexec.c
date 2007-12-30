@@ -499,6 +499,33 @@ void free_memory (void)
 		}
 		xfree (nodes);
 	}
+
+	if (fd_in)
+		xfree (fd_in);
+	if (fd_out)
+		xfree (fd_out);
+
+	if (buf_stdin)
+		xfree (buf_stdin);
+
+	if (buf_out){
+		for (i=0; i < nodes_count; ++i){
+			xfree (buf_out [i]);
+		}
+		xfree (buf_out);
+	}
+
+	if (size_out)
+		xfree (size_out);
+
+	if (busy)
+		xfree (busy);
+
+	if (pids)
+		xfree (pids);
+
+	if (line_nums)
+		xfree (line_nums);
 }
 
 int main (int argc, char **argv)
