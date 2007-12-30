@@ -104,7 +104,7 @@ void init (void)
 	int i;
 	char cmd_arg [2000];
 
-	// arrays
+	/* arrays */
 	pids  = xmalloc (count * sizeof (*pids));
 
 	fd_in  = xmalloc (count * sizeof (*fd_in));
@@ -118,10 +118,10 @@ void init (void)
 
 	line_nums = xmalloc (count * sizeof (*line_nums));
 
-	// stdin
+	/* stdin */
 	buf_stdin = xmalloc (BUFSIZE);
 
-	// in/out
+	/* in/out */
 	for (i=0; i < count; ++i){
 		buf_out [i] = xmalloc (BUFSIZE);
 
@@ -206,7 +206,7 @@ void loop (void)
 			printf ("select ret=%d\n", ret);
 		}
 
-		// stdin
+		/* stdin */
 		if (FD_ISSET (0, &rset)){
 			cnt = xread (0, buf_stdin + size_stdin, 1 /*BUFSIZE - size_stdin*/);
 			if (cnt){
@@ -244,7 +244,7 @@ void loop (void)
 			}
 		}
 
-		// fd_out
+		/* fd_out */
 		for (i=0; i < count; ++i){
 			if (FD_ISSET (fd_out [i], &rset)){
 				cnt = xread (fd_out [i],
@@ -259,7 +259,7 @@ void loop (void)
 				}
 
 				if (!cnt){
-					err_fatal (__FUNCTION__, "Unexpected eof\n");
+					err_fatal (__func__, "Unexpected eof\n");
 				}
 
 				for (j=0; j < cnt; ++j){
@@ -298,13 +298,13 @@ void loop (void)
 			}
 		}
 
-		// stdin
+		/* stdin */
 		FD_CLR (0, &rset);
 		if (!eof && busy_count != count){
 			FD_SET (0, &rset);
 		}
 
-		// fd_out
+		/* fd_out */
 		for (i=0; i < count; ++i){
 			FD_CLR (fd_out [i], &rset);
 			if (busy [i]){
@@ -320,7 +320,7 @@ void loop (void)
 			}
 		}
 
-		// exit ?
+		/* exit ? */
 		if (!busy_count && eof)
 			break;
 	}
@@ -459,7 +459,7 @@ int main (int argc, char **argv)
 
 	maa_init ("paexec");
 
-//	log_to_file ();
+	/*	log_to_file (); */
 
 	process_args (&argc, &argv);
 

@@ -67,12 +67,9 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 		FD_ZERO (&rset);
 		FD_SET (fd, &rset);
 
-//		fprintf (stderr, "select\n");
 		xselect (fd+1, &rset, NULL, NULL, NULL);
 
-//		fprintf (stderr, "check\n");
 		if (FD_ISSET (fd, &rset)){
-//			fprintf (stderr, "yes\n");
 			cnt = xread (fd, buf, sizeof (buf));
 
 			if (cnt < 0){
@@ -85,7 +82,6 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 				linebuf = xrealloc (linebuf, linebuf_size);
 			}
 
-//			fprintf (stderr, "cnt = %d\n", cnt);
 			if (!cnt){
 				linebuf [line_size] = 0;
 				putter (linebuf, data);
@@ -106,8 +102,5 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 			}
 		}
 	}
-
-	abort (); /* this should not happen */
-	return 1;
 #endif
 }
