@@ -83,8 +83,6 @@ char *arg_transport = NULL;
 int verbose = 0;
 
 /**/
-int count   = 0;
-
 int *fd_in       = NULL;
 int *fd_out      = NULL;
 
@@ -106,8 +104,8 @@ int line_num = 0;
 char *buf_stdin   = NULL;
 size_t size_stdin = 0;
 
-char **splitted_nodes    = NULL;
-int splitted_nodes_count = 0;
+char **nodes    = NULL;
+int nodes_count = 0;
 
 int show_pid      = 0;
 int show_line_num = 0;
@@ -118,24 +116,24 @@ void init (void)
 	char cmd_arg [2000];
 
 	/* arrays */
-	pids  = xmalloc (count * sizeof (*pids));
+	pids  = xmalloc (nodes_count * sizeof (*pids));
 
-	fd_in  = xmalloc (count * sizeof (*fd_in));
-	fd_out = xmalloc (count * sizeof (*fd_out));
+	fd_in  = xmalloc (nodes_count * sizeof (*fd_in));
+	fd_out = xmalloc (nodes_count * sizeof (*fd_out));
 
-	buf_out = xmalloc (count * sizeof (*buf_out));
+	buf_out = xmalloc (nodes_count * sizeof (*buf_out));
 
-	size_out = xmalloc (count * sizeof (*size_out));
+	size_out = xmalloc (nodes_count * sizeof (*size_out));
 
-	busy     = xmalloc (count * sizeof (*busy));
+	busy     = xmalloc (nodes_count * sizeof (*busy));
 
-	line_nums = xmalloc (count * sizeof (*line_nums));
+	line_nums = xmalloc (nodes_count * sizeof (*line_nums));
 
 	/* stdin */
 	buf_stdin = xmalloc (BUFSIZE);
 
 	/* in/out */
-	for (i=0; i < count; ++i){
+	for (i=0; i < nodes_count; ++i){
 		buf_out [i] = xmalloc (BUFSIZE);
 
 		size_out [i] = 0;
@@ -143,7 +141,7 @@ void init (void)
 		busy [i] = 0;
 
 		snprintf (cmd_arg, sizeof (cmd_arg), "%s %s %s",
-				  arg_transport, splitted_nodes [i], arg_cmd);
+				  arg_transport, nodes [i], arg_cmd);
 
 		pids [i] = pr_open (
 			cmd_arg,
@@ -166,7 +164,7 @@ void init (void)
 void write_to_exec (void)
 {
 	int i;
-	for (i=0; i < count; ++i){
+	for (i=0; i < nodes_count; ++i){
 		if (!busy [i]){
 			if (verbose){
 				printf ("send to %d (pid: %d)\n", i, (int) pids [i]);
@@ -249,7 +247,7 @@ void loop (void)
 				size_stdin += cnt;
 			}else{
 				eof = 1;
-				for (i=0; i < count; ++i){
+				for (i=0; i < nodes_count; ++i){
 					if (!busy [i]){
 						xclose (fd_in [i]);
 					}
@@ -258,7 +256,7 @@ void loop (void)
 		}
 
 		/* fd_out */
-		for (i=0; i < count; ++i){
+		for (i=0; i < nodes_count; ++i){
 			if (FD_ISSET (fd_out [i], &rset)){
 				cnt = xread (fd_out [i],
 							 buf_out [i] + size_out [i],
@@ -313,12 +311,12 @@ void loop (void)
 
 		/* stdin */
 		FD_CLR (0, &rset);
-		if (!eof && busy_count != count){
+		if (!eof && busy_count != nodes_count){
 			FD_SET (0, &rset);
 		}
 
 		/* fd_out */
-		for (i=0; i < count; ++i){
+		for (i=0; i < nodes_count; ++i){
 			FD_CLR (fd_out [i], &rset);
 			if (busy [i]){
 				FD_SET (fd_out [i], &rset);
@@ -328,7 +326,7 @@ void loop (void)
 		if (verbose){
 			printf ("busy_count = %d\n", busy_count);
 			printf ("eof = %d\n", eof);
-			for (i=0; i < count; ++i){
+			for (i=0; i < nodes_count; ++i){
 				printf ("busy [%d]=%d\n", i, busy [i]);
 			}
 		}
@@ -342,7 +340,7 @@ void loop (void)
 		printf ("wait for childs\n");
 	}
 
-	for (i=0; i < count; ++i){
+	for (i=0; i < nodes_count; ++i){
 		pr_wait (pids [i]);
 	}
 }
@@ -365,13 +363,13 @@ void split_nodes (void)
 				if (last){
 					*p = 0;
 
-					++splitted_nodes_count;
+					++nodes_count;
 
-					splitted_nodes = xrealloc (
-						splitted_nodes,
-						splitted_nodes_count * sizeof (*splitted_nodes));
+					nodes = xrealloc (
+						nodes,
+						nodes_count * sizeof (*nodes));
 
-					splitted_nodes [splitted_nodes_count - 1] = last;
+					nodes [nodes_count - 1] = last;
 
 					last = NULL;
 				}
@@ -442,7 +440,6 @@ void process_args (int *argc, char ***argv)
 
 	if (arg_nodes){
 		split_nodes ();
-		count = splitted_nodes_count;
 	}else{
 		fprintf (stderr, "-n option is mandatory\n");
 		exit (1);
@@ -477,9 +474,9 @@ int main (int argc, char **argv)
 	process_args (&argc, &argv);
 
 	if (verbose){
-		printf ("count = %d\n", count);
-		for (i=0; i < count; ++i){
-			printf ("splitted_nodes [%d]=%s\n", i, splitted_nodes [i]);
+		printf ("nodes_count = %d\n", nodes_count);
+		for (i=0; i < nodes_count; ++i){
+			printf ("nodes [%d]=%s\n", i, nodes [i]);
 		}
 		printf ("cmd = %s\n", arg_cmd);
 	}
