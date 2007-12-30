@@ -35,3 +35,7 @@ runtest -l -t ./paexec_notransport  -c ./task_toupper \
 printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
 runtest -l -c ./task_all_substrings \
     -n '1 2 3 4 5 6 7 8 9' | resort
+
+printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
+runtest -l -c ./task_all_substrings \
+    -n '+9' | resort

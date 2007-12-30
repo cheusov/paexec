@@ -23,7 +23,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <unistd.h>
-
+#include <limits.h>
 
 /***********************************************************/
 
@@ -69,7 +69,7 @@ OPTIONS:\n\
       -V --version                     show version\n\
       -v --verbose                     verbose mode\n\
 \n\
-      -n --nodes <nodes>               list of cluster nodes\n\
+      -n --nodes <nodes|+num>          list of cluster nodes|number of nodes\n\
       -c --cmd <command>               path to program\n\
       -t --transport <transport>       path to the transport program\n\
 -n, -c and -t is mandatory option\n\
@@ -353,7 +353,28 @@ void split_nodes (void)
 	char *last = NULL;
 	char *p = arg_nodes;
 	char c;
+	int i;
 
+	if (arg_nodes [0] == '+'){
+		/* "+NUM" format */
+		nodes_count = strtol (arg_nodes + 1, NULL, 10);
+		if (nodes_count == LONG_MAX)
+			err_fatal_errno ("split_nodes", "invalid option -n:");
+
+		if (arg_transport){
+			nodes = xmalloc (nodes_count * sizeof (nodes [0]));
+
+			for (i=0; i < nodes_count; ++i){
+				char num [50];
+				snprintf (num, sizeof (num), "%d", i);
+				nodes [i] = xstrdup (num);
+			}
+		}
+
+		return;
+	}
+
+	/* "node1 nodes2 ..." format */
 	for (;;){
 		c = *p;
 
@@ -372,7 +393,7 @@ void split_nodes (void)
 						nodes,
 						nodes_count * sizeof (*nodes));
 
-					nodes [nodes_count - 1] = last;
+					nodes [nodes_count - 1] = xstrdup (last);
 
 					last = NULL;
 				}
@@ -463,6 +484,23 @@ void log_to_file (void)
 	log_file ("paexec", logfile);
 }
 
+void free_memory (void)
+{
+	int i;
+
+	xfree (arg_nodes);
+	if (arg_transport)
+		xfree (arg_transport);
+	xfree (arg_cmd);
+
+	if (nodes){
+		for (i=0; i < nodes_count; ++i){
+			xfree (nodes [i]);
+		}
+		xfree (nodes);
+	}
+}
+
 int main (int argc, char **argv)
 {
 	int i;
@@ -487,10 +525,7 @@ int main (int argc, char **argv)
 
 	loop ();
 
-	xfree (arg_nodes);
-	if (arg_transport)
-		xfree (arg_transport);
-	xfree (arg_cmd);
+	free_memory ();
 
 	maa_shutdown ();
 	return 0;
