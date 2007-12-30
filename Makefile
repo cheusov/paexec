@@ -19,6 +19,8 @@ LDADD+=		$(MAALIB)
 
 MKMAN=		no
 
+CPPFLAGS+=	-DPAEXEC_VERSION='"${VERSION}"'
+
 ############################################################
 .PHONY: install-dirs
 install-dirs:

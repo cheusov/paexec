@@ -31,6 +31,10 @@
 #define BUFSIZE 2048
 #endif
 
+#ifndef PAEXEC_VERSION
+#define PAEXEC_VERSION "x.y.z"
+#endif
+
 /***********************************************************
   No, I don't want to use overbloated autoconf.
 */
@@ -436,7 +440,7 @@ void process_args (int *argc, char ***argv)
 	{
 		switch (c) {
 			case 'V':
-				printf ("paexec v. 0.2\n");
+				printf ("paexec %s written by Aleksey Cheusov\n", PAEXEC_VERSION);
 				exit (0);
 				break;
 			case 'h':
