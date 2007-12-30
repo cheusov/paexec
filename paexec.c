@@ -542,8 +542,7 @@ int main (int argc, char **argv)
 	int i;
 
 	maa_init ("paexec");
-
-	/*	log_to_file (); */
+	log_stream ("paexec", stderr);
 
 	process_args (&argc, &argv);
 
@@ -557,12 +556,11 @@ int main (int argc, char **argv)
 
 	init ();
 
-	log_info ("I started");
-
 	loop ();
 
 	free_memory ();
 
+	log_close ();
 	maa_shutdown ();
 	return 0;
 }
