@@ -140,8 +140,11 @@ void init (void)
 
 		busy [i] = 0;
 
-		snprintf (cmd_arg, sizeof (cmd_arg), "%s %s %s",
-				  arg_transport, nodes [i], arg_cmd);
+		if (arg_transport)
+			snprintf (cmd_arg, sizeof (cmd_arg), "%s %s %s",
+					  arg_transport, nodes [i], arg_cmd);
+		else
+			snprintf (cmd_arg, sizeof (cmd_arg), "%s", arg_cmd);
 
 		pids [i] = pr_open (
 			cmd_arg,
@@ -396,15 +399,17 @@ void process_args (int *argc, char ***argv)
 		{ "help",     0, 0, 'h' },
 		{ "version",  0, 0, 'V' },
 		{ "verbose",  0, 0, 'v' },
+		{ "show-pid", 0, 0, 'p' },
+		{ "show-line-num", 0, 0, 'l' },
 		{ "nodes",    1, 0, 'n' },
 		{ "cmd",      1, 0, 'c' },
 		{ "transport",1, 0, 't' },
-		{ "show-pid", 0, 0, 'p' },
-		{ "show-line-num", 0, 0, 'l' },
 		{ NULL,       0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVvn:plc:t:", longopts, NULL), c != EOF){
+	while (c = getopt_long (*argc, *argv, "hVvpln:c:t:", longopts, NULL),
+		   c != EOF)
+	{
 		switch (c) {
 			case 'V':
 				printf ("paexec v. 0.2\n");
@@ -449,11 +454,6 @@ void process_args (int *argc, char ***argv)
 		fprintf (stderr, "-c option is mandatory\n");
 		exit (1);
 	}
-
-	if (!arg_transport){
-		fprintf (stderr, "-t option is mandatory\n");
-		exit (1);
-	}
 }
 
 void log_to_file (void)
@@ -488,7 +488,8 @@ int main (int argc, char **argv)
 	loop ();
 
 	xfree (arg_nodes);
-	xfree (arg_transport);
+	if (arg_transport)
+		xfree (arg_transport);
 	xfree (arg_cmd);
 
 	maa_shutdown ();
