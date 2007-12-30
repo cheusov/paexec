@@ -77,9 +77,9 @@ OPTIONS:\n\
 }
 
 /* arguments */
-char *nodes     = NULL;
-char *cmd       = NULL;
-char *transport = NULL;
+char *arg_nodes     = NULL;
+char *arg_cmd       = NULL;
+char *arg_transport = NULL;
 int verbose = 0;
 
 /**/
@@ -143,7 +143,7 @@ void init (void)
 		busy [i] = 0;
 
 		snprintf (cmd_arg, sizeof (cmd_arg), "%s %s %s",
-				  transport, splitted_nodes [i], cmd);
+				  arg_transport, splitted_nodes [i], arg_cmd);
 
 		pids [i] = pr_open (
 			cmd_arg,
@@ -350,7 +350,7 @@ void loop (void)
 void split_nodes (void)
 {
 	char *last = NULL;
-	char *p = nodes;
+	char *p = arg_nodes;
 	char c;
 
 	for (;;){
@@ -420,13 +420,13 @@ void process_args (int *argc, char ***argv)
 				verbose = 1;
 				break;
 			case 'n':
-				nodes = strdup (optarg);
+				arg_nodes = strdup (optarg);
 				break;
 			case 'c':
-				cmd = strdup (optarg);
+				arg_cmd = strdup (optarg);
 				break;
 			case 't':
-				transport = strdup (optarg);
+				arg_transport = strdup (optarg);
 				break;
 			case 'p':
 				show_pid = 1;
@@ -440,7 +440,7 @@ void process_args (int *argc, char ***argv)
 		}
 	}
 
-	if (nodes){
+	if (arg_nodes){
 		split_nodes ();
 		count = splitted_nodes_count;
 	}else{
@@ -448,12 +448,12 @@ void process_args (int *argc, char ***argv)
 		exit (1);
 	}
 
-	if (!cmd){
+	if (!arg_cmd){
 		fprintf (stderr, "-c option is mandatory\n");
 		exit (1);
 	}
 
-	if (!transport){
+	if (!arg_transport){
 		fprintf (stderr, "-t option is mandatory\n");
 		exit (1);
 	}
@@ -481,7 +481,7 @@ int main (int argc, char **argv)
 		for (i=0; i < count; ++i){
 			printf ("splitted_nodes [%d]=%s\n", i, splitted_nodes [i]);
 		}
-		printf ("cmd = %s\n", cmd);
+		printf ("cmd = %s\n", arg_cmd);
 	}
 
 	init ();
@@ -490,9 +490,9 @@ int main (int argc, char **argv)
 
 	loop ();
 
-	xfree (nodes);
-	xfree (transport);
-	xfree (cmd);
+	xfree (arg_nodes);
+	xfree (arg_transport);
+	xfree (arg_cmd);
 
 	maa_shutdown ();
 	return 0;
