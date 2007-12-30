@@ -488,10 +488,14 @@ void free_memory (void)
 {
 	int i;
 
+	if (arg_nodes)
 	xfree (arg_nodes);
+
 	if (arg_transport)
 		xfree (arg_transport);
-	xfree (arg_cmd);
+
+	if (arg_cmd)
+		xfree (arg_cmd);
 
 	if (nodes){
 		for (i=0; i < nodes_count; ++i){
