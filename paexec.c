@@ -65,13 +65,16 @@ void usage ()
 paexec - processes the list of autonomous tasks in parallel\n\
 usage: paexec [OPTIONS] [files...]\n\
 OPTIONS:\n\
-      -h --help                        give this help\n\
-      -V --version                     show version\n\
-      -v --verbose                     verbose mode\n\
+  -h --help                give this help\n\
+  -V --version             show version\n\
+  -v --verbose             verbose mode\n\
 \n\
-      -n --nodes <nodes|+num>          list of cluster nodes|number of nodes\n\
-      -c --cmd <command>               path to program\n\
-      -t --transport <transport>       path to the transport program\n\
+  -p --show-pid            include pid of processor to the output\n\
+  -l --show-task           include task number (0-based) to the output\n\
+\n\
+  -n --nodes <nodes|+num>  list of cluster nodes|number of nodes\n\
+  -c --cmd <command>       path to program\n\
+  -t --transport <trans>   path to the transport program\n\
 -n, -c and -t is mandatory option\n\
 ");
 }
@@ -417,15 +420,15 @@ void process_args (int *argc, char ***argv)
 	int c;
 
 	struct option longopts [] = {
-		{ "help",     0, 0, 'h' },
-		{ "version",  0, 0, 'V' },
-		{ "verbose",  0, 0, 'v' },
-		{ "show-pid", 0, 0, 'p' },
-		{ "show-line-num", 0, 0, 'l' },
-		{ "nodes",    1, 0, 'n' },
-		{ "cmd",      1, 0, 'c' },
-		{ "transport",1, 0, 't' },
-		{ NULL,       0, 0, 0 },
+		{ "help",      0, 0, 'h' },
+		{ "version",   0, 0, 'V' },
+		{ "verbose",   0, 0, 'v' },
+		{ "show-pid",  0, 0, 'p' },
+		{ "show-task", 0, 0, 'l' },
+		{ "nodes",     1, 0, 'n' },
+		{ "cmd",       1, 0, 'c' },
+		{ "transport", 1, 0, 't' },
+		{ NULL,        0, 0, 0 },
 	};
 
 	while (c = getopt_long (*argc, *argv, "hVvpln:c:t:", longopts, NULL),
