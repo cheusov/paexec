@@ -171,29 +171,33 @@ void init (void)
 	nonblock (0);
 }
 
-void write_to_exec (void)
+int find_free_node (void)
 {
 	int i;
 	for (i=0; i < nodes_count; ++i){
-		if (!busy [i]){
-			if (verbose){
-				printf ("send to %d (pid: %d)\n", i, (int) pids [i]);
-			}
-
-			busy [i]      = 1;
-			size_out [i]  = 0;
-			task_nums [i] = task_num;
-
-			++busy_count;
-
-			xwrite (fd_in [i], buf_stdin, strlen (buf_stdin));
-			xwrite (fd_in [i], "\n", 1);
-
-			return;
-		}
+		if (!busy [i])
+			return i;
 	}
 
-	abort ();
+	err_fatal (NULL, "internal error: there is no free node\n");
+}
+
+void send_to_node (void)
+{
+	int n = find_free_node ();
+
+	if (verbose){
+		printf ("send to %d (pid: %d)\n", n, (int) pids [n]);
+	}
+
+	busy [n]      = 1;
+	size_out [n]  = 0;
+	task_nums [n] = task_num;
+
+	++busy_count;
+
+	xwrite (fd_in [n], buf_stdin, strlen (buf_stdin));
+	xwrite (fd_in [n], "\n", 1);
 }
 
 void print_line (int num)
@@ -213,7 +217,7 @@ void loop (void)
 	fd_set rset;
 
 	int ret = 0;
-	int eof = 0;
+	int end_of_stdin = 0;
 	int cnt = 0;
 
 	int i, j;
@@ -239,7 +243,7 @@ void loop (void)
 							printf ("stdin: %s\n", buf_stdin);
 						}
 
-						write_to_exec ();
+						send_to_node ();
 
 						memmove (buf_stdin,
 								 buf_stdin + size_stdin + i + 1,
@@ -256,10 +260,11 @@ void loop (void)
 
 				size_stdin += cnt;
 			}else{
-				eof = 1;
+				end_of_stdin = 1;
 				for (i=0; i < nodes_count; ++i){
 					if (!busy [i]){
 						xclose (fd_in [i]);
+						fd_in [i] = -1;
 					}
 				}
 			}
@@ -289,11 +294,18 @@ void loop (void)
 
 						if (!buf_out [i] [0]){
 							assert (busy [i] == 1);
+							if (cnt != 1){
+								err_fatal (
+									NULL,
+									"extra data from processor obtained, no data should follow an empty line");
+							}
+
 							busy [i] = 0;
 							--busy_count;
 
-							if (eof){
+							if (end_of_stdin){
 								xclose (fd_in [i]);
+								fd_in [i] = -1;
 							}
 
 							break;
@@ -321,28 +333,29 @@ void loop (void)
 
 		/* stdin */
 		FD_CLR (0, &rset);
-		if (!eof && busy_count != nodes_count){
+		if (!end_of_stdin && busy_count != nodes_count){
 			FD_SET (0, &rset);
 		}
 
 		/* fd_out */
 		for (i=0; i < nodes_count; ++i){
-			FD_CLR (fd_out [i], &rset);
 			if (busy [i]){
 				FD_SET (fd_out [i], &rset);
+			}else{
+				FD_CLR (fd_out [i], &rset);
 			}
 		}
 
 		if (verbose){
 			printf ("busy_count = %d\n", busy_count);
-			printf ("eof = %d\n", eof);
+			printf ("end_of_stdin = %d\n", end_of_stdin);
 			for (i=0; i < nodes_count; ++i){
 				printf ("busy [%d]=%d\n", i, busy [i]);
 			}
 		}
 
 		/* exit ? */
-		if (!busy_count && eof)
+		if (!busy_count && end_of_stdin)
 			break;
 	}
 
