@@ -102,11 +102,11 @@ int busy_count   = 0;
 
 pid_t *pids      = NULL;
 
-int *line_nums   = NULL;
+int *task_nums   = NULL;
 
 int max_fd    = 0;
 
-int line_num = 0;
+int task_num = 0;
 
 char *buf_stdin   = NULL;
 size_t size_stdin = 0;
@@ -115,12 +115,12 @@ char **nodes    = NULL;
 int nodes_count = 0;
 
 int show_pid      = 0;
-int show_line_num = 0;
+int show_task_num = 0;
 
 void init (void)
 {
 	int i;
-	char cmd_arg [2000];
+	char full_cmd [2000];
 
 	/* arrays */
 	pids  = xmalloc (nodes_count * sizeof (*pids));
@@ -134,7 +134,7 @@ void init (void)
 
 	busy     = xmalloc (nodes_count * sizeof (*busy));
 
-	line_nums = xmalloc (nodes_count * sizeof (*line_nums));
+	task_nums = xmalloc (nodes_count * sizeof (*task_nums));
 
 	/* stdin */
 	buf_stdin = xmalloc (BUFSIZE);
@@ -148,13 +148,13 @@ void init (void)
 		busy [i] = 0;
 
 		if (arg_transport)
-			snprintf (cmd_arg, sizeof (cmd_arg), "%s %s %s",
+			snprintf (full_cmd, sizeof (full_cmd), "%s %s %s",
 					  arg_transport, nodes [i], arg_cmd);
 		else
-			snprintf (cmd_arg, sizeof (cmd_arg), "%s", arg_cmd);
+			snprintf (full_cmd, sizeof (full_cmd), "%s", arg_cmd);
 
 		pids [i] = pr_open (
-			cmd_arg,
+			full_cmd,
 			PR_CREATE_STDIN | PR_CREATE_STDOUT,
 			&fd_in [i], &fd_out [i], NULL);
 
@@ -182,7 +182,7 @@ void write_to_exec (void)
 
 			busy [i]      = 1;
 			size_out [i]  = 0;
-			line_nums [i] = line_num;
+			task_nums [i] = task_num;
 
 			++busy_count;
 
@@ -198,8 +198,8 @@ void write_to_exec (void)
 
 void print_line (int num)
 {
-	if (show_line_num){
-		printf ("%d ", line_nums [num]);
+	if (show_task_num){
+		printf ("%d ", task_nums [num]);
 	}
 	if (show_pid){
 		printf ("%d ", (int) pids [num]);
@@ -250,7 +250,7 @@ void loop (void)
 
 						i = -1;
 
-						++line_num;
+						++task_num;
 					}
 				}
 
@@ -463,7 +463,7 @@ void process_args (int *argc, char ***argv)
 				show_pid = 1;
 				break;
 			case 'l':
-				show_line_num = 1;
+				show_task_num = 1;
 				break;
 			default:
 				usage ();
@@ -474,13 +474,11 @@ void process_args (int *argc, char ***argv)
 	if (arg_nodes){
 		split_nodes ();
 	}else{
-		fprintf (stderr, "-n option is mandatory\n");
-		exit (1);
+		err_fatal (NULL, "-n option is mandatory!\n");
 	}
 
 	if (!arg_cmd){
-		fprintf (stderr, "-c option is mandatory\n");
-		exit (1);
+		err_fatal (NULL, "-c option is mandatory!\n");
 	}
 }
 
@@ -496,7 +494,7 @@ void free_memory (void)
 	int i;
 
 	if (arg_nodes)
-	xfree (arg_nodes);
+		xfree (arg_nodes);
 
 	if (arg_transport)
 		xfree (arg_transport);
@@ -535,8 +533,8 @@ void free_memory (void)
 	if (pids)
 		xfree (pids);
 
-	if (line_nums)
-		xfree (line_nums);
+	if (task_nums)
+		xfree (task_nums);
 }
 
 int main (int argc, char **argv)
