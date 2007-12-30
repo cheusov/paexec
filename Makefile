@@ -1,20 +1,36 @@
-CC=		cc
-CFLAGS=		-I/usr/pkg/include
-LDFLAGS=	-L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib
+############################################################
 
-.PHONY : all
-all : paexec
+PREFIX?=/usr/local
+BINDIR?=${PREFIX}/bin
+MANDIR?=${PREFIX}/man
 
-wrappers.o : wrappers.c
-	$(CC) -o $@ -c $(CFLAGS) $<
-nonblock_helpers.o : nonblock_helpers.c
-	$(CC) -o $@ -c $(CFLAGS) $<
+INST_DIR?=	${INSTALL} -d
 
-paexec.o : paexec.c
-	$(CC) -o $@ -c $(CFLAGS) paexec.c
-paexec : paexec.o nonblock_helpers.o wrappers.o
-	$(CC) -o $@ $^ $(LDFLAGS) -lmaa
+############################################################
 
-.PHONY : clean
-clean:
-	rm -f *~ *.o core.* *.core core paexec
+PROG=		paexec
+SRCS=		paexec.c wrappers.c nonblock_helpers.c
+
+VERSION=	0.6.0
+
+MAALIB?=	-lmaa
+
+LDADD+=		$(MAALIB)
+
+MKMAN=		no
+
+############################################################
+.PHONY: install-dirs
+install-dirs:
+	$(INST_DIR) ${DESTDIR}${BINDIR}
+.if "$(MKMAN)" != "no"
+	$(INST_DIR) ${DESTDIR}${MANDIR}/man1
+.if "$(MKCATPAGES)" != "no"
+	$(INST_DIR) ${DESTDIR}${MANDIR}/cat1
+.endif
+.endif
+
+############################################################
+.include "Makefile.cvsdist"
+
+.include <bsd.prog.mk>
