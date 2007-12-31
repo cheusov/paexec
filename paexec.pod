@@ -8,49 +8,63 @@ B<paexec> I<[options]>
 
 =head1 DESCRIPTION
 
-Suppose you have a looooong list of AUTONOMOUS tasks that need to be
+Suppose you have a long list of AUTONOMOUS tasks that need to be
 done, for example, you want to convert thousands of .wav audio files
-.ogg format.  Also suppose that multiple CPUs (processors) are
+to .ogg format.  Also suppose that multiple CPUs (processors) are
 available, e.g. multi-CPU SMP system (or modern multikernel CPU) or a
 cluster consisting of individual computers connected with a network or
-via internet. B<paexec> can efficiently does this work for you, that
-is B<paexec> efficiently distribute different tasks to different
-machines (or CPUs), and can receive results of processing from them
-(if any) and send it to stdout for further processing.
+via internet. B<paexec> can efficiently do this work, that
+is B<paexec> efficiently distributes different tasks to different
+processors (or computers), receives the results of processing from them
+(if any) and sends these results to stdout.
 
 There are several notions that should be defined: I<task>, I<command>,
 I<transport>, I<processor>.
 
 I<Tasks> are read by B<paexec> from stdin and are represented as one
-line of text, i.e. one line - one task. There is no limit on the size
-of task (a number of symbols in in).
+line of text, i.e. one input line - one task. There is no limit on the
+size of task (a number of symbols in in) but it is recomended not to make
+it too long (see DETAILS section below).
 
-I<Processor> - remote computer or CPU identifier, for example CPU
-ordinal number or computer's DNS name like node12.cluster.company.com.
+I<Processor> identifier - remote computer or CPU identifier, for
+example CPU ordinal number or computer's DNS name like
+node12.cluster.company.com.
 
-I<Command> - program that reads one-line task from stdin and sends
-multiline output text to stdout where empty line means
-JOB_IS_DONE__I_AM_READY_FOR_THE_NEXT_ONE. After sending an empty line
-to stdout the I<command> MUST FLUSH stdout. Remember that empty line
+I<Command> - user's program that reads one-line task from stdin and sends
+multiline result to stdout where an empty line means
+JOB_IS_DONE__I_AM_READY_FOR_THE_NEXT_ONE. After sending the empty line
+to stdout, stdout MUST BE FLUSHED. Remember that empty line
 MUST NOT appears in general result lines. Otherwise B<paexec> may hang
 because of deadlock.
 
-I<Transport> - special program that helps to run I<command> on the remote
-I<processor>. It takes the I<processor> as its first argument and
-I<command> with its arguments as the rest.  Good example is
-'/usr/bin/ssh'. '/usr/bin/ssh -x' or 'rsh' are also allowed.
+I<Transport> - special program that helps to run I<command> on the
+I<processor>. It takes the I<processor> identifier as its first
+argument and I<command> with its arguments as the rest.  For example,
+is '/usr/bin/ssh'. Both I<transport> and I<command> may 
+be specified with their arguments, i.e. '/usr/bin/ssh -x' is allowed
+as a I<transport> program.
 
-Algorithm (to better understand how paexec really works):
+Algorithm. I<Commands> are run on each I<processor> with a help of
+I<transport> program. Then, I<tasks> are read from stdin one-by-one
+and are sent to free I<processors> (exactly one task per process at
+the time). At the same time result lines are read from I<commands's>
+stdout and are output to B<paexec's> stdout. When an empty line is
+obtained from the I<processor> (this means that I<processor> finished
+its job) it is marked as free and becomes ready for the next
+job. These steps repeat until the end of stdin is reached and all
+I<processors> finish their job.
+
+More formally (to better understand how paexec works):
 
    run_command_on_each_processor
    mark_all_processors_free
-   while !end_of_stdin or not_all_processors_are_free
-      while there_is_free_processor/i and !end_of_stdin
+   while not(end_of_stdin) or not(all_processors_are_free)
+      while there_is_free_processor/i and not(end_of_stdin)
          task = read_task_from_stdin
          send_task_to_processor(task, i)
          mark_processor_as_busy(i)
       end
-      while result_line_from_processor_is_ready/i
+      while result_line_from_processor_is_available/i
          result = read_result_line_from_processor(i)
          send_line_to_stdout(result)
          if is_empty_line(result)
@@ -61,18 +75,20 @@ Algorithm (to better understand how paexec really works):
    end
    close_command_on_each_processor
 
-Note that program that do your actual job is run on the remote
-processor once at startup.
+Note that I<command> that do your actual job is run on the remote
+processor once at startup, it is not restarted for every job.
 
 Also note that output contains result lines (obtained from different
-I<processor+commands>) in a mixed order. That is, first line of output
-may contain result line obtain from the first I<processor>, the second
-line of output - from the second I<processor>, but the third output
-line may contain result line from the first I<processor> again. It is
-also not garanteed that the first line of output will be from the
-first I<processor> or from the first I<task>. All output lines are
-output as soon as they are ready. B<paexec> works this way for
-the efficiently reasons.
+I<processors>) in the mixed order. That is, the first line of the
+output may contain a result line obtain from the first I<processor>,
+the second line of output - from the second I<processor>, but the
+third output line may contain result line from the first I<processor>
+again. It is also not garanteed that the first line of output will be
+from the first I<processor> or from the first I<task>. All result
+lines are output as soon as they are read by B<paexec>, i.e as soon as
+they are ready to be output. B<paexec> works this way for the
+efficiency reasons.  You can play with I<-l> and I<-k> options to see
+what happens.
 
 =head1 OPTIONS
 
@@ -88,7 +104,7 @@ Display version information.
 
 =item B<-c>|B<--cmd> I<command>
 
-Path to I<command>
+Command with its arguments
 
 =item B<-n>|B<--procs> I<processors|+number>
 
@@ -97,33 +113,35 @@ nonation) a number of processors.
 
 Path to I<command>
 
+=item B<-p>|B<--show-pid>
+
+Include pid of paexec's subprocess that communicates with
+I<processor+command> to the output. Pid prepands the actual result
+line. Space character is used as a separator.
+
+=item B<-l>|B<--show-line>
+
+Include line number (0-based) to the output, i.e. from which task
+(stdin line number) this particular output line is produced.
+It appears before pid if I<-p> is also applied. Space
+character is used as a separator.
+
 =item B<-d>|B<--debug>
 
 Turn on a debugging mode (for debugging purposes only)
-
-=item B<-p>|B<--show-pid>
-
-Include pid of paexec's subprocess that communicates with the remove
-I<processor+command> to the output. Pid appears in the output before
-the actual result line and space character is used as a separator.
-
-=item B<-l>|B<--show-task>
-
-Include task number (0-based) to the output. It appears before pid, in
-case I<-p> is also applied. Space is used as a separator.
 
 =back
 
 =head1 DETAILS/INTERNALS
 
-accept(2) system call and non-blocking read(2) operation is used to
-read tasks from stdin and result lines from remote processors.
+accept(2) system call and non-blocking read(2) are used to read
+I<tasks> from stdin and result lines from I<processors>.
 
 At the moment blocking write(2) operation is used to send I<task> to
-the I<processor>. This may slows down entire processing if I<tasks>
-are too long. So, it is recommended to use shorter I<tasks>, for
-example, filename or URI (several tens of bytes in size) instead of
-multi-megabyte content. This may be changed in the future.
+the I<processor>. This may slow down entire processing if I<tasks> are
+too long. So, it is recommended to use shorter I<tasks>, for example,
+filename or URI (several tens of bytes in size) instead of
+multi-megabyte content. Though this may be fixed in the future.
 
 =head1 AUTHOR/LICENSE
 
