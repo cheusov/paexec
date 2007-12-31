@@ -77,7 +77,7 @@ OPTIONS:\n\
   -t --transport <trans>   path to transport program\n\
 \n\
   -p --show-pid            include pid of processor to the output\n\
-  -l --show-task           include task number (0-based) to the output\n\
+  -l --show-line           include line number (0-based) to the output\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
 -n and -c are mandatory options\n\
@@ -104,11 +104,11 @@ int busy_count   = 0;
 
 pid_t *pids      = NULL;
 
-int *task_nums   = NULL;
+int *line_nums   = NULL;
 
 int max_fd    = 0;
 
-int task_num = 0;
+int line_num = 0;
 
 char *buf_stdin   = NULL;
 size_t size_stdin = 0;
@@ -117,7 +117,7 @@ char **procs    = NULL;
 int procs_count = 0;
 
 int show_pid      = 0;
-int show_task_num = 0;
+int show_line_num = 0;
 
 void init (void)
 {
@@ -136,7 +136,7 @@ void init (void)
 
 	busy     = xmalloc (procs_count * sizeof (*busy));
 
-	task_nums = xmalloc (procs_count * sizeof (*task_nums));
+	line_nums = xmalloc (procs_count * sizeof (*line_nums));
 
 	/* stdin */
 	buf_stdin = xmalloc (BUFSIZE);
@@ -194,7 +194,7 @@ void send_to_node (void)
 
 	busy [n]      = 1;
 	size_out [n]  = 0;
-	task_nums [n] = task_num;
+	line_nums [n] = line_num;
 
 	++busy_count;
 
@@ -204,8 +204,8 @@ void send_to_node (void)
 
 void print_line (int num, int offs)
 {
-	if (show_task_num){
-		printf ("%d ", task_nums [num]);
+	if (show_line_num){
+		printf ("%d ", line_nums [num]);
 	}
 	if (show_pid){
 		printf ("%d ", (int) pids [num]);
@@ -259,7 +259,7 @@ void loop (void)
 
 						i = -1;
 
-						++task_num;
+						++line_num;
 					}
 				}
 
@@ -448,7 +448,7 @@ void process_args (int *argc, char ***argv)
 		{ "version",   0, 0, 'V' },
 		{ "debug",     0, 0, 'd' },
 		{ "show-pid",  0, 0, 'p' },
-		{ "show-task", 0, 0, 'l' },
+		{ "show-line", 0, 0, 'l' },
 		{ "procs",     1, 0, 'n' },
 		{ "cmd",       1, 0, 'c' },
 		{ "transport", 1, 0, 't' },
@@ -483,7 +483,7 @@ void process_args (int *argc, char ***argv)
 				show_pid = 1;
 				break;
 			case 'l':
-				show_task_num = 1;
+				show_line_num = 1;
 				break;
 			default:
 				usage ();
@@ -553,8 +553,8 @@ void free_memory (void)
 	if (pids)
 		xfree (pids);
 
-	if (task_nums)
-		xfree (task_nums);
+	if (line_nums)
+		xfree (line_nums);
 }
 
 int main (int argc, char **argv)
