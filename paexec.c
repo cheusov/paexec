@@ -76,8 +76,9 @@ OPTIONS:\n\
   -c --cmd <command>       path to command\n\
   -t --transport <trans>   path to transport program\n\
 \n\
-  -p --show-pid            include pid of processor to the output\n\
+  -r --show-proc           include processor id (or number) to the output\n\
   -l --show-line           include line number (0-based) to the output\n\
+  -p --show-pid            include pid of processor to the output\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
 -n and -c are mandatory options\n\
@@ -118,6 +119,7 @@ int procs_count = 0;
 
 int show_pid      = 0;
 int show_line_num = 0;
+int show_proc     = 0;
 
 void init (void)
 {
@@ -204,6 +206,12 @@ void send_to_node (void)
 
 void print_line (int num, int offs)
 {
+	if (show_proc){
+		if (procs && procs [num])
+			printf ("%s ", procs [num]);
+		else
+			printf ("%d ", num);
+	}
 	if (show_line_num){
 		printf ("%d ", line_nums [num]);
 	}
@@ -446,16 +454,21 @@ void process_args (int *argc, char ***argv)
 	struct option longopts [] = {
 		{ "help",      0, 0, 'h' },
 		{ "version",   0, 0, 'V' },
-		{ "debug",     0, 0, 'd' },
-		{ "show-pid",  0, 0, 'p' },
-		{ "show-line", 0, 0, 'l' },
+
 		{ "procs",     1, 0, 'n' },
 		{ "cmd",       1, 0, 'c' },
 		{ "transport", 1, 0, 't' },
+
+		{ "show-proc", 0, 0, 'r' },
+		{ "show-line", 0, 0, 'l' },
+		{ "show-pid",  0, 0, 'p' },
+
+		{ "debug",     0, 0, 'd' },
+
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVvpln:c:t:", longopts, NULL),
+	while (c = getopt_long (*argc, *argv, "hVvrlpn:c:t:", longopts, NULL),
 		   c != EOF)
 	{
 		switch (c) {
@@ -484,6 +497,9 @@ void process_args (int *argc, char ***argv)
 				break;
 			case 'l':
 				show_line_num = 1;
+				break;
+			case 'r':
+				show_proc = 1;
 				break;
 			default:
 				usage ();
