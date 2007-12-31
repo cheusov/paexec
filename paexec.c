@@ -336,9 +336,10 @@ void loop (void)
 		}
 
 		/* stdin */
-		FD_CLR (0, &rset);
 		if (!end_of_stdin && busy_count != nodes_count){
 			FD_SET (0, &rset);
+		}else{
+			FD_CLR (0, &rset);
 		}
 
 		/* fd_out */
