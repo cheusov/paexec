@@ -86,6 +86,17 @@ Display help information.
 
 Display version information.
 
+=item B<-c>|B<--cmd> I<command>
+
+Path to I<command>
+
+=item B<-n>|B<--procs> I<processors|+number>
+
+List of processors (e.g. hostnames) separated by space character or (+
+nonation) a number of processors.
+
+Path to I<command>
+
 =item B<-d>|B<--debug>
 
 Turn on a debugging mode (for debugging purposes only)

@@ -76,10 +76,10 @@ OPTIONS:\n\
   -p --show-pid            include pid of processor to the output\n\
   -l --show-task           include task number (0-based) to the output\n\
 \n\
-  -n --nodes <nodes|+num>  list of cluster nodes|number of nodes\n\
-  -c --cmd <command>       path to program\n\
-  -t --transport <trans>   path to the transport program\n\
--n, -c and -t is mandatory option\n\
+  -n --procs <procs|+num>  list of processors|number of processors\n\
+  -c --cmd <command>       path to command\n\
+  -t --transport <trans>   path to transport program\n\
+-n and -c are mandatory options\n\
 ");
 }
 
