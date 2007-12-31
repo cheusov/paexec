@@ -222,6 +222,8 @@ void loop (void)
 	int ret          = 0;
 	int cnt          = 0;
 	int i, j;
+	int new_sz       = 0;
+	char *buf_out_i  = 0;
 
 	FD_ZERO (&rset);
 
@@ -274,14 +276,16 @@ void loop (void)
 		/* fd_out */
 		for (i=0; i < nodes_count; ++i){
 			if (FD_ISSET (fd_out [i], &rset)){
+				buf_out_i = buf_out [i];
+
 				cnt = xread (fd_out [i],
-							 buf_out [i] + size_out [i],
+							 buf_out_i + size_out [i],
 							 BUFSIZE - size_out [i]);
 
 				if (verbose){
-					buf_out [i] [size_out [i] + cnt] = 0;
+					buf_out_i [size_out [i] + cnt] = 0;
 					printf ("cnt = %d\n", cnt);
-					printf ("buf_out [%d] = %s\n", i, buf_out [i]);
+					printf ("buf_out [%d] = %s\n", i, buf_out_i);
 					printf ("size_out [%d] = %d\n", i, (int) size_out [i]);
 				}
 
@@ -292,10 +296,10 @@ void loop (void)
 				printed = 0;
 				cnt += size_out [i];
 				for (j=size_out [i]; j < cnt; ++j){
-					if (buf_out [i] [j] == '\n'){
-						buf_out [i] [j] = 0;
+					if (buf_out_i [j] == '\n'){
+						buf_out_i [j] = 0;
 
-						if (!buf_out [i][printed]){
+						if (printed == j){
 							assert (busy [i] == 1);
 
 							busy [i] = 0;
@@ -315,9 +319,15 @@ void loop (void)
 					}
 				}
 
-				memmove (buf_out [i],
-						 buf_out [i] + printed,
-						 size_out [i] = cnt - printed);
+				if (printed){
+					new_sz = cnt - printed;
+
+					memmove (buf_out_i,
+							 buf_out_i + printed,
+							 new_sz);
+
+					size_out [i] = new_sz;
+				}
 
 				if (size_out [i] == BUFSIZE){
 					err_fatal (NULL, "Too long line!\n");
