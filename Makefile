@@ -4,6 +4,9 @@ PREFIX?=/usr/local
 BINDIR?=${PREFIX}/bin
 MANDIR?=${PREFIX}/man
 
+POD2MAN?=		pod2man
+POD2HTML?=		pod2html
+
 INST_DIR?=	${INSTALL} -d
 
 ############################################################
@@ -17,8 +20,6 @@ MAALIB?=	-lmaa
 
 LDADD+=		$(MAALIB)
 
-MKMAN=		no
-
 CPPFLAGS+=	-DPAEXEC_VERSION='"${VERSION}"'
 
 ############################################################
@@ -31,6 +32,12 @@ install-dirs:
 	$(INST_DIR) ${DESTDIR}${MANDIR}/cat1
 .endif
 .endif
+
+paexec.1 : paexec.pod
+	$(POD2MAN) -s 1 -r 'AWK Wrapper' -n paexec \
+	   -c 'PAEXEC manual page' paexec.pod > $@
+paexec.html : paexec.pod
+	$(POD2HTML) --infile=paexec.pod --outfile=$@
 
 ##################################################
 

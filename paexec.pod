@@ -1,0 +1,145 @@
+=head1 NAME
+
+paexec - wrapper for AWK interpreter
+
+=head1 SYNOPSIS
+
+B<paexec> I<[options]>
+
+=head1 DESCRIPTION
+
+Suppose you have a looooong list of AUTONOMOUS tasks that need to be
+done, for example, you want to convert thousands of .wav audio files
+.ogg format.  Also suppose that multiple CPUs (processors) are
+available, e.g. multi-CPU SMP system (or modern multikernel CPU) or a
+cluster consisting of individual computers connected with a network or
+via internet. B<paexec> can efficiently does this work for you, that
+is B<paexec> efficiently distribute different tasks to different
+machines (or CPUs), and can receive results of processing from them
+(if any) and send it to stdout for further processing.
+
+There are several notions that should be defined: I<task>, I<command>,
+I<transport>, I<processor>.
+
+I<Tasks> are read by B<paexec> from stdin and are represented as one
+line of text, i.e. one line - one task. There is no limit on the size
+of task (a number of symbols in in).
+
+I<Processor> - remote computer or CPU identifier, for example CPU
+ordinal number or computer's DNS name like node12.cluster.company.com.
+
+I<Command> - program that reads one-line task from stdin and sends
+multiline output text to stdout where empty line means
+JOB_IS_DONE__I_AM_READY_FOR_THE_NEXT_ONE. After sending an empty line
+to stdout the I<command> MUST FLUSH stdout. Remember that empty line
+MUST NOT appears in general result lines. Otherwise B<paexec> may hang
+because of deadlock.
+
+I<Transport> - special program that helps to run I<command> on the remote
+I<processor>. It takes the I<processor> as its first argument and
+I<command> with its arguments as the rest.  Good example is
+'/usr/bin/ssh'. '/usr/bin/ssh -x' or 'rsh' are also allowed.
+
+Algorithm (to better understand how paexec really works):
+
+   run_command_on_each_processor
+   mark_all_processors_free
+   while !end_of_stdin or not_all_processors_are_free
+      while there_is_free_processor/i and !end_of_stdin
+         task = read_task_from_stdin
+         send_task_to_processor(task, i)
+         mark_processor_as_busy(i)
+      end
+      while result_line_from_processor_is_ready/i
+         result = read_result_line_from_processor(i)
+         send_line_to_stdout(result)
+         if is_empty_line(result)
+            # end of job
+            mark_processor_as_free(i)
+         end
+      end
+   end
+   close_command_on_each_processor
+
+Note that program that do your actual job is run on the remote
+processor once at startup.
+
+Also note that output contains result lines (obtained from different
+I<processor+commands>) in a mixed order. That is, first line of output
+may contain result line obtain from the first I<processor>, the second
+line of output - from the second I<processor>, but the third output
+line may contain result line from the first I<processor> again. It is
+also not garanteed that the first line of output will be from the
+first I<processor> or from the first I<task>. All output lines are
+output as soon as they are ready. B<paexec> works this way for
+the efficiently reasons.
+
+=head1 OPTIONS
+
+=over 6
+
+=item B<-h>|B<--help>
+
+Display help information.
+
+=item B<-V>|B<--version>
+
+Display version information.
+
+=item B<-d>|B<--debug>
+
+Turn on a debugging mode (for debugging purposes only)
+
+=item B<-p>|B<--show-pid>
+
+Include pid of paexec's subprocess that communicates with the remove
+I<processor+command> to the output. Pid appears in the output before
+the actual result line and space character is used as a separator.
+
+=item B<-l>|B<--show-task>
+
+Include task number (0-based) to the output. It appears before pid, in
+case I<-p> is also applied. Space is used as a separator.
+
+=back
+
+=head1 DETAILS/INTERNALS
+
+accept(2) system call and non-blocking read(2) operation is used to
+read tasks from stdin and result lines from remote processors.
+
+At the moment blocking write(2) operation is used to send I<task> to
+the I<processor>. This may slows down entire processing if I<tasks>
+are too long. So, it is recommended to use shorter I<tasks>, for
+example, filename or URI (several tens of bytes in size) instead of
+multi-megabyte content. This may be changed in the future.
+
+=head1 AUTHOR/LICENSE
+
+Copyright (c) 2007-2008, Aleksey Cheusov <vle@gmx.net>
+
+Permission to use, copy, modify, distribute and sell this software
+and its documentation for any purpose is hereby granted without
+fee, provided that the above copyright notice appear in all copies
+and that both that copyright notice and this permission notice
+appear in supporting documentation.  I make no
+representations about the suitability of this software for any
+purpose.  It is provided "as is" without express or implied
+warranty.
+
+=head1 BUGS/FEEDBACK
+
+Please send any comments, questions, bug reports etc. to me by e-mail
+or (even better) register them at sourceforge project home.  Feature
+requests are also welcomed.
+
+=head1 HOME
+
+L<http://sourceforge.net/projects/paexec>
+
+=head1 SEE ALSO
+L<accept(2)>
+L<read(2)>
+L<write(2)>
+L<ssh(1)>
+L<rsh(1)>
