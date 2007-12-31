@@ -200,7 +200,7 @@ void send_to_node (void)
 	xwrite (fd_in [n], "\n", 1);
 }
 
-void print_line (int num)
+void print_line (int num, int offs)
 {
 	if (show_task_num){
 		printf ("%d ", task_nums [num]);
@@ -209,17 +209,18 @@ void print_line (int num)
 		printf ("%d ", (int) pids [num]);
 	}
 
-	printf ("%s\n", buf_out [num]);
+	printf ("%s\n", buf_out [num] + offs);
 }
 
 void loop (void)
 {
 	fd_set rset;
 
-	int ret = 0;
-	int end_of_stdin = 0;
-	int cnt = 0;
+	int printed  = 0;
 
+	int end_of_stdin = 0;
+	int ret          = 0;
+	int cnt          = 0;
 	int i, j;
 
 	FD_ZERO (&rset);
@@ -288,17 +289,14 @@ void loop (void)
 					err_fatal (__func__, "Unexpected eof\n");
 				}
 
-				for (j=0; j < cnt; ++j){
-					if (buf_out [i] [size_out [i] + j] == '\n'){
-						buf_out [i] [size_out [i] + j] = 0;
+				printed = 0;
+				cnt += size_out [i];
+				for (j=size_out [i]; j < cnt; ++j){
+					if (buf_out [i] [j] == '\n'){
+						buf_out [i] [j] = 0;
 
-						if (!buf_out [i] [0]){
+						if (!buf_out [i][printed]){
 							assert (busy [i] == 1);
-							if (cnt != 1){
-								err_fatal (
-									NULL,
-									"extra data from processor obtained, no data should follow an empty line");
-							}
 
 							busy [i] = 0;
 							--busy_count;
@@ -311,20 +309,16 @@ void loop (void)
 							break;
 						}
 
-						print_line (i);
+						print_line (i, printed);
 
-						memmove (buf_out [i],
-								 buf_out [i] + size_out [i] + j + 1,
-								 cnt - j - 1);
-
-						size_out [i] = 0;
-						cnt         -= j + 1;
-
-						j = -1;
+						printed = j + 1;
 					}
 				}
 
-				size_out [i] += cnt;
+				memmove (buf_out [i],
+						 buf_out [i] + printed,
+						 size_out [i] = cnt - printed);
+
 				if (size_out [i] == BUFSIZE){
 					err_fatal (NULL, "Too long line!\n");
 				}
