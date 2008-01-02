@@ -29,17 +29,17 @@ resort (){
 }
 
 printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-runtest -l -t ./paexec_notransport -c ./task_toupper \
+runtest -l -t ./paexec_notransport -c ../examples/toupper_task \
     -n '1 2 3 4 5 6 7 8 9' | resort
 
 printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-runtest -l -p -t ./paexec_notransport -c ./task_toupper -n '+2' |
+runtest -l -p -t ./paexec_notransport -c ../examples/toupper_task -n '+2' |
 resort | gawk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}'
 
 printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-runtest -l -c ./task_all_substrings \
+runtest -l -c ../examples/all_substr_task \
     -n '1 2 3 4 5 6 7 8 9' | resort
 
 printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-runtest -l -c ./task_all_substrings -n '+9' |
+runtest -l -c ../examples/all_substr_task -n '+9' |
 resort

@@ -11,7 +11,7 @@ paexec - processes the list of autonomous tasks in parallel
 ======= args: --help
 paexec - processes the list of autonomous tasks in parallel
 =================================================================
-======= args: -l -t ./paexec_notransport -c ./task_toupper -n 1 2 3 4 5 6 7 8 9
+======= args: -l -t ./paexec_notransport -c ../examples/toupper_task -n 1 2 3 4 5 6 7 8 9
 0 A
 1 BB
 2 CCC
@@ -19,7 +19,7 @@ paexec - processes the list of autonomous tasks in parallel
 4 EEEEE
 5 FFFFFF
 =================================================================
-======= args: -l -p -t ./paexec_notransport -c ./task_toupper -n +2
+======= args: -l -p -t ./paexec_notransport -c ../examples/toupper_task -n +2
 0 pid A
 1 pid BB
 2 pid CCC
@@ -27,7 +27,7 @@ paexec - processes the list of autonomous tasks in parallel
 4 pid EEEEE
 5 pid FFFFFF
 =================================================================
-======= args: -l -c ./task_all_substrings -n 1 2 3 4 5 6 7 8 9
+======= args: -l -c ../examples/all_substr_task -n 1 2 3 4 5 6 7 8 9
 0 substr[1,1]=a
 1 substr[1,1]=b
 1 substr[1,2]=bb
@@ -85,7 +85,7 @@ paexec - processes the list of autonomous tasks in parallel
 5 substr[5,2]=ff
 5 substr[6,1]=f
 =================================================================
-======= args: -l -c ./task_all_substrings -n +9
+======= args: -l -c ../examples/all_substr_task -n +9
 0 substr[1,1]=a
 1 substr[1,1]=b
 1 substr[1,2]=bb

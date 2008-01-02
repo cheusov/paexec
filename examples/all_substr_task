@@ -1,6 +1,8 @@
 #!/usr/bin/awk -f
 
 {
+	# here we print all not empty substrings
+	# of the input string (our task)
 	len=length($0)
 	for (i=1; i <= len; ++i){
 		for (j=i; j <= len; ++j){
@@ -9,6 +11,9 @@
 		}
 	}
 
-	print ""          # end of task marker
-	fflush()          # end of task MUST BE FLUSHED!!!
+	# print end of task marker here
+	print ""
+
+	# end of task MUST BE FLUSHED!!!
+	fflush()
 }
