@@ -140,7 +140,7 @@ Turn on a debugging mode (for debugging purposes only)
 
 =head1 DETAILS/INTERNALS
 
-accept(2) system call and non-blocking read(2) are used to read
+select(2) system call and non-blocking read(2) are used to read
 I<tasks> from stdin and result lines from I<processors>.
 
 At the moment blocking write(2) operation is used to send I<task> to
