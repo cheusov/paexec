@@ -2,7 +2,7 @@
 
 {
 	# here we print all not empty substrings
-	# of the input string (our task)
+	# of the input string (this is our task)
 	len=length($0)
 	for (i=1; i <= len; ++i){
 		for (j=i; j <= len; ++j){
