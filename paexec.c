@@ -282,6 +282,10 @@ void loop (void)
 				}
 
 				size_stdin += cnt;
+
+				if (size_stdin == BUFSIZE){
+					err_fatal (NULL, "Too long line read from stdin!\n");
+				}
 			}else{
 				end_of_stdin = 1;
 				for (i=0; i < procs_count; ++i){
@@ -350,7 +354,7 @@ void loop (void)
 				}
 
 				if (size_out [i] == BUFSIZE){
-					err_fatal (NULL, "Too long line!\n");
+					err_fatal (NULL, "Too long line read from processor!\n");
 				}
 			}
 		}
