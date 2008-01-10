@@ -106,7 +106,13 @@ Display version information.
 
 Command with its arguments
 
-=item B<-n>|B<--procs> I<processors|+number>
+=item B<-t>|B<--transport> I<transport>
+
+Transport command
+
+=item B<-n>|B<--procs> I<processors>
+
+=item B<-n>|B<--procs> I<+number>
 
 List of processors (e.g. hostnames) separated by space character or (+
 nonation) a number of processors.
@@ -138,14 +144,25 @@ Turn on a debugging mode (for debugging purposes only)
 
 =back
 
+=head1 EXAMPLES
+
+=over 6
+
+ paexec -t '/usr/bin/ssh -x' --procs 'host1 host2 host3' \
+        -l -c ~/bin/all_substr_task
+
+ paexec -n +4 -c ~/bin/oggenc_wrapper
+
+=back
+
 =head1 DETAILS/INTERNALS
 
 select(2) system call and non-blocking read(2) are used to read
 I<tasks> from stdin and result lines from I<processors>.
 
-At the moment blocking write(2) operation is used to send I<task> to
-the I<processor>. This may slow down entire processing if I<tasks> are
-too long. So, it is recommended to use shorter I<tasks>, for example,
+At the moment blocking write(2) is used to send I<task> to the
+I<processor>. This may slow down an entire processing if I<tasks> are
+too big. So, it is recommended to use shorter I<tasks>, for example,
 filename or URI (several tens of bytes in size) instead of
 multi-megabyte content. Though this may be fixed in the future.
 
