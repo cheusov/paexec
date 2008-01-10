@@ -9,14 +9,14 @@ POD2HTML?=		pod2html
 
 INST_DIR?=	${INSTALL} -d
 
+MAALIB?=	-lmaa
+
 ############################################################
 
 PROG=		paexec
 SRCS=		paexec.c wrappers.c nonblock_helpers.c
 
 VERSION=	0.6.0
-
-MAALIB?=	-lmaa
 
 LDADD+=		$(MAALIB)
 
