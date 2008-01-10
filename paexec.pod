@@ -58,7 +58,7 @@ I<processors> finish their job.
 More formally (to better understand how paexec works):
 
    run_command_on_each_processor
-   mark_all_processors_free
+   mark_all_processors_as_free
    while not(end_of_stdin) or not(all_processors_are_free)
       while there_is_free_processor/i and not(end_of_stdin)
          task = read_task_from_stdin
@@ -153,6 +153,8 @@ Turn on a debugging mode (for debugging purposes only)
         -l -c ~/bin/complex_task
 
  paexec -n +4 -c ~/bin/oggenc_wrapper
+
+ For other examples, see examples/ directory
 
 =back
 
