@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# obtains all substrings in parallel
+# subprocesses are run on the same host where paexec is run
+../../paexec -lp -c "`pwd`/all_substr_cmd" -n +3 <<EOF
+dictd  is  a  server  for  the Dictionary Server Protocol (DICT).
+The book is red.
+The table is black.
+The sun is shining.
+What a pretty girl!
+EOF
