@@ -27,6 +27,10 @@
 #include "config.h"
 #endif
 
+#ifndef NO_PORTABHACKS_H
+#include "portabhacks.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,28 +48,6 @@
 #ifndef PAEXEC_VERSION
 #define PAEXEC_VERSION "x.y.z"
 #endif
-
-/***********************************************************
-  No, I don't want to use overbloated autoconf.
-*/
-#ifndef NO_HARDCODE
-
-#ifdef __linux__
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#include <getopt.h>
-#endif
-
-#if defined( __NetBSD__) || defined(sun)
-#include <getopt.h>
-#endif
-
-#endif /* NO_HARDCODE */
-
-/*
-  End of getopt_long tricks
-***********************************************************/
 
 #define DMALLOC_FUNC_CHECK
 #include <maa.h>
