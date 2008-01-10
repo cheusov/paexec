@@ -478,7 +478,7 @@ void process_args (int *argc, char ***argv)
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVvrlpn:c:t:", longopts, NULL),
+	while (c = getopt_long (*argc, *argv, "hVdvrlpn:c:t:", longopts, NULL),
 		   c != EOF)
 	{
 		switch (c) {
