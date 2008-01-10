@@ -79,41 +79,41 @@ OPTIONS:\n\
 }
 
 /* arguments */
-char *arg_procs     = NULL;
-char *arg_cmd       = NULL;
-char *arg_transport = NULL;
-int debug = 0;
+static char *arg_procs     = NULL;
+static char *arg_cmd       = NULL;
+static char *arg_transport = NULL;
+static int debug = 0;
 
 /**/
-int *fd_in       = NULL;
-int *fd_out      = NULL;
+static int *fd_in       = NULL;
+static int *fd_out      = NULL;
 
-char **buf_out   = NULL;
+static char **buf_out   = NULL;
 
-size_t *size_out = NULL;
+static size_t *size_out = NULL;
 
-int *busy        = NULL;
-int busy_count   = 0;
+static int *busy        = NULL;
+static int busy_count   = 0;
 
-pid_t *pids      = NULL;
+static pid_t *pids      = NULL;
 
-int *line_nums   = NULL;
+static int *line_nums   = NULL;
 
-int max_fd    = 0;
+static int max_fd    = 0;
 
-int line_num = 0;
+static int line_num = 0;
 
-char *buf_stdin   = NULL;
-size_t size_stdin = 0;
+static char *buf_stdin   = NULL;
+static size_t size_stdin = 0;
 
-char **procs    = NULL;
-int procs_count = 0;
+static char **procs    = NULL;
+static int procs_count = 0;
 
-int show_pid      = 0;
-int show_line_num = 0;
-int show_proc     = 0;
+static int show_pid      = 0;
+static int show_line_num = 0;
+static int show_proc     = 0;
 
-int max_bufsize = BUFSIZE;
+static int max_bufsize = BUFSIZE;
 
 void init (void)
 {
