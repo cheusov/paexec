@@ -3,7 +3,11 @@
 set -e
 
 while read fn; do # we obtain .c files from stdin
-    if ${CC} ${CPPFLAGS} ${CFLAGS} -c -o ${fn%%.c}.o ${fn}; then
+    log1=${fn%%.c}.log1
+    log2=${fn%%.c}.log2
+    obj=${fn%%.c}.o
+
+    if ${CC} ${CPPFLAGS} ${CFLAGS} -c -o $obj ${fn} > $log1 2> $log2; then
 	echo "done: $fn"
     else
 	echo "failed: $fn"
