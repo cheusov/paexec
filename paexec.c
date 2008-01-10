@@ -55,7 +55,7 @@
 #include "wrappers.h"
 #include "nonblock_helpers.h"
 
-void usage ()
+static void usage ()
 {
 	printf ("\
 paexec - processes the list of autonomous tasks in parallel\n\
@@ -115,7 +115,7 @@ static int show_proc     = 0;
 
 static int max_bufsize = BUFSIZE;
 
-void init (void)
+static void init (void)
 {
 	int i;
 	char full_cmd [2000];
@@ -175,7 +175,7 @@ void init (void)
 	nonblock (0);
 }
 
-int find_free_node (void)
+static int find_free_node (void)
 {
 	int i;
 	for (i=0; i < procs_count; ++i){
@@ -186,7 +186,7 @@ int find_free_node (void)
 	err_fatal (NULL, "internal error: there is no free node\n");
 }
 
-void send_to_node (void)
+static void send_to_node (void)
 {
 	int n = find_free_node ();
 
@@ -204,7 +204,7 @@ void send_to_node (void)
 	xwrite (fd_in [n], "\n", 1);
 }
 
-void print_line (int num, int offs)
+static void print_line (int num, int offs)
 {
 	if (show_proc){
 		if (procs && procs [num])
@@ -222,7 +222,7 @@ void print_line (int num, int offs)
 	printf ("%s\n", buf_out [num] + offs);
 }
 
-void loop (void)
+static void loop (void)
 {
 	fd_set rset;
 
@@ -387,7 +387,7 @@ void loop (void)
 	}
 }
 
-void split_procs (void)
+static void split_procs (void)
 {
 	char *last = NULL;
 	char *p = arg_procs;
@@ -451,7 +451,7 @@ void split_procs (void)
 	}
 }
 
-void process_args (int *argc, char ***argv)
+static void process_args (int *argc, char ***argv)
 {
 	int c;
 
@@ -522,14 +522,14 @@ void process_args (int *argc, char ***argv)
 	}
 }
 
-void log_to_file (void)
+static void log_to_file (void)
 {
 	char logfile [2000] = "logfile";
 
 	log_file ("paexec", logfile);
 }
 
-void free_memory (void)
+static void free_memory (void)
 {
 	int i;
 
