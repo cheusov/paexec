@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+while read fn; do # we obtain .c files from stdin
+    if ${CC} ${CPPFLAGS} ${CFLAGS} -c -o ${fn%%.c}.o ${fn}; then
+	echo "done: $fn"
+    else
+	echo "failed: $fn"
+    fi
+
+    echo '' # end of job
+done
