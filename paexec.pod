@@ -22,9 +22,7 @@ There are several notions that should be defined: I<task>, I<command>,
 I<transport>, I<processor>.
 
 I<Tasks> are read by B<paexec> from stdin and are represented as one
-line of text, i.e. one input line - one task. There is no limit on the
-size of task (a number of symbols in in) but it is recomended not to make
-it too long (see DETAILS section below).
+line of text, i.e. one input line - one task.
 
 I<Processor> identifier - remote computer or CPU identifier, for
 example CPU ordinal number or computer's DNS name like
@@ -191,6 +189,24 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 LIMITATIONS
+
+Currently the length of task and result line is limited at compile
+time to BUFSIZE constant, see Makefile. Though this may be fixed in
+the future. An environment variable I<PAEXEC_BUFSIZE> overrides this
+default.
+
+=head1 ENVIRONMENT
+
+=over 6
+
+=item I<PAEXEC_BUFSIZE>
+
+Overrides the compile time limitation on the length of the task and
+the result line size.
+
+=back
 
 =head1 BUGS/FEEDBACK
 

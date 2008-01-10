@@ -131,10 +131,18 @@ int show_pid      = 0;
 int show_line_num = 0;
 int show_proc     = 0;
 
+int max_bufsize = BUFSIZE;
+
 void init (void)
 {
 	int i;
 	char full_cmd [2000];
+	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
+
+	/* BUFSIZE */
+	if (env_bufsize){
+		max_bufsize = atoi (env_bufsize);
+	}
 
 	/* arrays */
 	pids  = xmalloc (procs_count * sizeof (*pids));
@@ -151,11 +159,11 @@ void init (void)
 	line_nums = xmalloc (procs_count * sizeof (*line_nums));
 
 	/* stdin */
-	buf_stdin = xmalloc (BUFSIZE);
+	buf_stdin = xmalloc (max_bufsize);
 
 	/* in/out */
 	for (i=0; i < procs_count; ++i){
-		buf_out [i] = xmalloc (BUFSIZE);
+		buf_out [i] = xmalloc (max_bufsize);
 
 		size_out [i] = 0;
 
@@ -256,7 +264,7 @@ void loop (void)
 
 		/* stdin */
 		if (FD_ISSET (0, &rset)){
-			cnt = xread (0, buf_stdin + size_stdin, 1 /*BUFSIZE - size_stdin*/);
+			cnt = xread (0, buf_stdin + size_stdin, 1 /*max_bufsize - size_stdin*/);
 			if (cnt){
 				for (i=0; i < cnt; ++i){
 					if (buf_stdin [size_stdin + i] == '\n'){
@@ -283,7 +291,7 @@ void loop (void)
 
 				size_stdin += cnt;
 
-				if (size_stdin == BUFSIZE){
+				if (size_stdin == max_bufsize){
 					err_fatal (NULL, "Too long line read from stdin!\n");
 				}
 			}else{
@@ -304,7 +312,7 @@ void loop (void)
 
 				cnt = xread (fd_out [i],
 							 buf_out_i + size_out [i],
-							 BUFSIZE - size_out [i]);
+							 max_bufsize - size_out [i]);
 
 				if (debug){
 					buf_out_i [size_out [i] + cnt] = 0;
@@ -353,7 +361,7 @@ void loop (void)
 					size_out [i] = new_sz;
 				}
 
-				if (size_out [i] == BUFSIZE){
+				if (size_out [i] == max_bufsize){
 					err_fatal (NULL, "Too long line read from processor!\n");
 				}
 			}
