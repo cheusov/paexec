@@ -1,8 +1,0 @@
-#!/usr/bin/awk -f
-
-{
-	print toupper($0) # simple task
-
-	print ""          # end of task marker
-	fflush()          # end of task MUST BE FLUSHED!!!
-}

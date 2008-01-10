@@ -1,0 +1,12 @@
+#!/usr/bin/awk -f
+
+{
+	# we MUST not produce an empty line for generic data
+	printf " "
+
+	# works fine for empty input too
+	print toupper($0)
+
+	print ""          # end of task marker
+	fflush()          # end of task MUST BE FLUSHED!!!
+}
