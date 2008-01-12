@@ -393,12 +393,15 @@ static void split_procs (void)
 	char *p = arg_procs;
 	char c;
 	int i;
+	long cnt;
 
 	if (arg_procs [0] == '+'){
 		/* "+NUM" format */
-		procs_count = strtol (arg_procs + 1, NULL, 10);
-		if (procs_count == LONG_MAX)
+		cnt = strtol (arg_procs + 1, NULL, 10);
+		if (cnt == LONG_MAX)
 			err_fatal_errno ("split_procs", "invalid option -n:");
+
+		procs_count = (int) cnt;
 
 		if (arg_transport){
 			procs = xmalloc (procs_count * sizeof (procs [0]));
