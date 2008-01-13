@@ -15,6 +15,9 @@ MAALIB?=	-lmaa
 # maximum length of result line (line read from command's stdout)
 BUFSIZE?=	4096
 
+# directory with runawk sources
+SRCROOT?=		${.PARSEDIR}
+
 ############################################################
 
 PROG=		paexec
@@ -55,6 +58,8 @@ test : paexec
 	fi
 
 ############################################################
+.PATH: ${SRCROOT}
+
 .include "Makefile.cvsdist"
 
 .include <bsd.prog.mk>
