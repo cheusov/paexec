@@ -7,13 +7,13 @@ MANDIR?=${PREFIX}/man
 POD2MAN?=		pod2man
 POD2HTML?=		pod2html
 
-INST_DIR?=	${INSTALL} -d
+INST_DIR?=		${INSTALL} -d
 
-MAALIB?=	-lmaa
+MAALIB?=		-lmaa
 
 # maximum length of task (line read from paexec's stdin)
 # maximum length of result line (line read from command's stdout)
-BUFSIZE?=	4096
+BUFSIZE?=		4096
 
 # directory with runawk sources
 SRCROOT?=		${.PARSEDIR}
