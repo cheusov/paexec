@@ -232,7 +232,6 @@ static void loop (void)
 	int ret          = 0;
 	int cnt          = 0;
 	int i, j;
-	int new_sz       = 0;
 	char *buf_out_i  = 0;
 
 	FD_ZERO (&rset);
@@ -334,14 +333,14 @@ static void loop (void)
 				}
 
 				if (printed){
-					new_sz = cnt - printed;
+					cnt -= printed;
 
 					memmove (buf_out_i,
 							 buf_out_i + printed,
-							 new_sz);
-
-					size_out [i] = new_sz;
+							 cnt);
 				}
+				
+				size_out [i] = cnt;
 
 				if (size_out [i] == max_bufsize){
 					err_fatal (NULL, "Too long line read from processor!\n");
