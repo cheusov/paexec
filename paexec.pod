@@ -1,6 +1,6 @@
 =head1 NAME
 
-paexec - process a list of jobs in parallel
+paexec - parallel executor
 
 =head1 SYNOPSIS
 
@@ -10,7 +10,7 @@ B<paexec> I<[options]>
 
 Suppose you have a long list of AUTONOMOUS tasks that need to be
 done, for example, you want to convert thousands of .wav audio files
-to .ogg format.  Also suppose that multiple CPUs (processors) are
+to .ogg format.  Also suppose that multiple CPUs are
 available, e.g. multi-CPU SMP system (or modern multikernel CPU) or a
 cluster consisting of individual computers connected to the network or
 internet. B<paexec> can efficiently do this work, that
@@ -19,12 +19,12 @@ processors (or computers), receives the results of processing from them
 and sends these results to stdout.
 
 There are several notions that should be defined: I<task>, I<command>,
-I<transport>, I<processor>.
+I<transport>, I<node>.
 
 I<Tasks> are read by B<paexec> from stdin and are represented as one
 line of text, i.e. one input line - one task.
 
-I<Processor> identifier - remote computer or CPU identifier, for
+I<node> identifier - remote computer or CPU identifier, for
 example CPU ordinal number or computer's DNS name like
 node12.cluster.company.com.
 
@@ -36,54 +36,54 @@ MUST NOT appears in general result lines. Otherwise B<paexec> may hang
 because of deadlock.
 
 I<Transport> - special program that helps to run I<command> on the
-I<processor>. It takes the I<processor> identifier as its first
+I<node>. It takes the I<node> identifier as its first
 argument and I<command> with its arguments as the rest.  For example,
 is '/usr/bin/ssh'. Both I<transport> and I<command> may 
 be specified with their arguments, i.e. '/usr/bin/ssh -x' is allowed
 as a I<transport> program.
 
-Algorithm. I<Commands> are run on each I<processor> with a help of
+Algorithm. I<Commands> are run on each I<node> with a help of
 I<transport> program. Then, I<tasks> are read from stdin line-by-line
 (one task per line)
-and are sent to free I<processor> (exactly one task per process at
+and are sent to free I<node> (exactly one task per node at
 a time). At the same time result lines are read from I<commands's>
 stdout and are output to B<paexec's> stdout. When an empty line is
-obtained from the I<processor> (this means that I<processor> finished
+obtained from the I<node> (this means that I<node> finished
 its job) it is marked as free and becomes ready for the next
 job. These steps repeat until the end of stdin is reached and all
-I<processors> finish their job.
+I<nodes> finish their job.
 
 More formally (to better understand how paexec works):
 
-   run_command_on_each_processor
-   mark_all_processors_as_free
-   while not(end_of_stdin) or not(all_processors_are_free)
-      while there_is_free_processor/i and not(end_of_stdin)
+   run_command_on_each_node
+   mark_all_nodes_as_free
+   while not(end_of_stdin) or not(all_nodes_are_free)
+      while there_is_free_node/i and not(end_of_stdin)
          task = read_task_from_stdin
-         send_task_to_processor(task, i)
-         mark_processor_as_busy(i)
+         send_task_to_node(task, i)
+         mark_node_as_busy(i)
       end
-      while result_line_from_processor_is_available/i
-         result = read_result_line_from_processor(i)
+      while result_line_from_node_is_available/i
+         result = read_result_line_from_node(i)
          send_line_to_stdout(result)
          if is_empty_line(result)
             # end of job
-            mark_processor_as_free(i)
+            mark_node_as_free(i)
          end
       end
    end
-   close_command_on_each_processor
+   close_command_on_each_node
 
-Note that I<command> that do your actual job is run on the remote
-processor once at startup, it is not restarted for every job.
+Note that I<command> that does your actual task is run once (per node),
+it is not restarted for every task.
 
 Also note that output contains result lines (obtained from different
-I<processors>) in the mixed order. That is, the first line of the
-output may contain a result line obtain from the first I<processor>,
-the second line of output - from the second I<processor>, but the
-third output line may contain result line from the first I<processor>
+I<nodes>) in the mixed order. That is, the first line of the
+output may contain a result line obtain from the first I<node>,
+the second line of output - from the second I<node>, but the
+third output line may contain result line from the first I<node>
 again. It is also not garanteed that the first line of output will be
-from the first I<processor> or from the first I<task>. All result
+from the first I<node> or from the first I<task>. All result
 lines are output as soon as they are read by B<paexec>, i.e as soon as
 they are ready to be output. B<paexec> works this way for the
 efficiency reasons.  You can play with I<-l> and I<-k> options to see
@@ -109,19 +109,19 @@ Command with its arguments
 
 Transport command
 
-=item B<-n>|B<--procs> I<processors>
+=item B<-n>|B<--nodes> I<nodes>
 
-=item B<-n>|B<--procs> I<+number>
+=item B<-n>|B<--nodes> I<+number>
 
-List of processors (e.g. hostnames) separated by space character or (+
-nonation) a number of processors.
+List of nodes (e.g. hostnames) separated by space character or (+
+nonation) a number of nodes.
 
 Path to I<command>
 
 =item B<-r>|B<--show-proc>
 
-Include processor identifier or processor number (0-based) to the
-output, i.e. id/number of processor that produces this particular
+Include node identifier or node number (0-based) to the
+output, i.e. id/number of node that produces this particular
 output line.  This identifier or number appears before line number if
 I<-l> is also applied. Space character is used as a separator.
 
@@ -134,7 +134,7 @@ if I<-p> is also applied. Space character is used as a separator.
 =item B<-p>|B<--show-pid>
 
 Include pid of paexec's subprocess that communicates with
-I<processor+command> to the output. Pid prepands the actual result
+I<node+command> to the output. Pid prepands the actual result
 line. Space character is used as a separator.
 
 =item B<-d>|B<--debug>
@@ -159,10 +159,10 @@ Turn on a debugging mode (for debugging purposes only)
 =head1 DETAILS/INTERNALS
 
 select(2) system call and non-blocking read(2) are used to read
-I<tasks> from stdin and result lines from I<processors>.
+I<tasks> from stdin and result lines from I<nodes>.
 
 At the moment blocking write(2) is used to send I<task> to the
-I<processor>. This may slow down an entire processing if I<tasks> are
+I<node>. This may slow down an entire processing if I<tasks> are
 too big. So, it is recommended to use shorter I<tasks>, for example,
 filename or URI (several tens of bytes in size) instead of
 multi-megabyte content. Though this may be fixed in the future.

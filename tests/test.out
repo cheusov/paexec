@@ -6,10 +6,10 @@ xxx
 xxx
 =================================================================
 ======= args: -h
-paexec - processes the list of autonomous tasks in parallel
+paexec - parallel executor
 =================================================================
 ======= args: --help
-paexec - processes the list of autonomous tasks in parallel
+paexec - parallel executor
 =================================================================
 ======= args: -l -t ./paexec_notransport -c ../examples/toupper/toupper_cmd -n 1 2 3 4 5 6 7 8 9
 0 A

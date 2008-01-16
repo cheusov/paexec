@@ -58,19 +58,20 @@
 static void usage ()
 {
 	printf ("\
-paexec - processes the list of autonomous tasks in parallel\n\
+paexec - parallel executor\n\
+         processes the list of autonomous tasks in parallel\n\
 usage: paexec [OPTIONS] [files...]\n\
 OPTIONS:\n\
   -h --help                give this help\n\
   -V --version             show version\n\
 \n\
-  -n --procs <procs|+num>  list of processors|number of processors\n\
+  -n --nodes <nodes|+num>  list of nodes|number of subprocesses\n\
   -c --cmd <command>       path to command\n\
   -t --transport <trans>   path to transport program\n\
 \n\
-  -r --show-proc           include processor id (or number) to the output\n\
+  -r --show-node           include node (or number) to the output\n\
   -l --show-line           include line number (0-based) to the output\n\
-  -p --show-pid            include pid of processor to the output\n\
+  -p --show-pid            include pid of subprocess to the output\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
 -n and -c are mandatory options\n\
@@ -79,7 +80,7 @@ OPTIONS:\n\
 }
 
 /* arguments */
-static char *arg_procs     = NULL;
+static char *arg_nodes     = NULL;
 static char *arg_cmd       = NULL;
 static char *arg_transport = NULL;
 static int debug = 0;
@@ -106,12 +107,12 @@ static int line_num = 0;
 static char *buf_stdin   = NULL;
 static size_t size_stdin = 0;
 
-static char **procs    = NULL;
-static int procs_count = 0;
+static char **nodes    = NULL;
+static int nodes_count = 0;
 
 static int show_pid      = 0;
 static int show_line_num = 0;
-static int show_proc     = 0;
+static int show_node     = 0;
 
 static int max_bufsize = BUFSIZE;
 
@@ -127,24 +128,24 @@ static void init (void)
 	}
 
 	/* arrays */
-	pids  = xmalloc (procs_count * sizeof (*pids));
+	pids  = xmalloc (nodes_count * sizeof (*pids));
 
-	fd_in  = xmalloc (procs_count * sizeof (*fd_in));
-	fd_out = xmalloc (procs_count * sizeof (*fd_out));
+	fd_in  = xmalloc (nodes_count * sizeof (*fd_in));
+	fd_out = xmalloc (nodes_count * sizeof (*fd_out));
 
-	buf_out = xmalloc (procs_count * sizeof (*buf_out));
+	buf_out = xmalloc (nodes_count * sizeof (*buf_out));
 
-	size_out = xmalloc (procs_count * sizeof (*size_out));
+	size_out = xmalloc (nodes_count * sizeof (*size_out));
 
-	busy     = xmalloc (procs_count * sizeof (*busy));
+	busy     = xmalloc (nodes_count * sizeof (*busy));
 
-	line_nums = xmalloc (procs_count * sizeof (*line_nums));
+	line_nums = xmalloc (nodes_count * sizeof (*line_nums));
 
 	/* stdin */
 	buf_stdin = xmalloc (max_bufsize);
 
 	/* in/out */
-	for (i=0; i < procs_count; ++i){
+	for (i=0; i < nodes_count; ++i){
 		buf_out [i] = xmalloc (max_bufsize);
 
 		size_out [i] = 0;
@@ -153,7 +154,7 @@ static void init (void)
 
 		if (arg_transport)
 			snprintf (full_cmd, sizeof (full_cmd), "%s %s %s",
-					  arg_transport, procs [i], arg_cmd);
+					  arg_transport, nodes [i], arg_cmd);
 		else
 			snprintf (full_cmd, sizeof (full_cmd), "%s", arg_cmd);
 
@@ -178,7 +179,7 @@ static void init (void)
 static int find_free_node (void)
 {
 	int i;
-	for (i=0; i < procs_count; ++i){
+	for (i=0; i < nodes_count; ++i){
 		if (!busy [i])
 			return i;
 	}
@@ -206,9 +207,9 @@ static void send_to_node (void)
 
 static void print_line (int num, int offs)
 {
-	if (show_proc){
-		if (procs && procs [num])
-			printf ("%s ", procs [num]);
+	if (show_node){
+		if (nodes && nodes [num])
+			printf ("%s ", nodes [num]);
 		else
 			printf ("%d ", num);
 	}
@@ -277,7 +278,7 @@ static void loop (void)
 				}
 			}else{
 				end_of_stdin = 1;
-				for (i=0; i < procs_count; ++i){
+				for (i=0; i < nodes_count; ++i){
 					if (!busy [i]){
 						xclose (fd_in [i]);
 						fd_in [i] = -1;
@@ -287,7 +288,7 @@ static void loop (void)
 		}
 
 		/* fd_out */
-		for (i=0; i < procs_count; ++i){
+		for (i=0; i < nodes_count; ++i){
 			if (FD_ISSET (fd_out [i], &rset)){
 				buf_out_i = buf_out [i];
 
@@ -343,20 +344,20 @@ static void loop (void)
 				size_out [i] = cnt;
 
 				if (size_out [i] == max_bufsize){
-					err_fatal (NULL, "Too long line read from processor!\n");
+					err_fatal (NULL, "Too long line read from node!\n");
 				}
 			}
 		}
 
 		/* stdin */
-		if (!end_of_stdin && busy_count != procs_count){
+		if (!end_of_stdin && busy_count != nodes_count){
 			FD_SET (0, &rset);
 		}else{
 			FD_CLR (0, &rset);
 		}
 
 		/* fd_out */
-		for (i=0; i < procs_count; ++i){
+		for (i=0; i < nodes_count; ++i){
 			if (busy [i]){
 				FD_SET (fd_out [i], &rset);
 			}else{
@@ -367,7 +368,7 @@ static void loop (void)
 		if (debug){
 			printf ("busy_count = %d\n", busy_count);
 			printf ("end_of_stdin = %d\n", end_of_stdin);
-			for (i=0; i < procs_count; ++i){
+			for (i=0; i < nodes_count; ++i){
 				printf ("busy [%d]=%d\n", i, busy [i]);
 			}
 		}
@@ -381,41 +382,41 @@ static void loop (void)
 		printf ("wait for childs\n");
 	}
 
-	for (i=0; i < procs_count; ++i){
+	for (i=0; i < nodes_count; ++i){
 		pr_wait (pids [i]);
 	}
 }
 
-static void split_procs (void)
+static void split_nodes (void)
 {
 	char *last = NULL;
-	char *p = arg_procs;
+	char *p = arg_nodes;
 	char c;
 	int i;
 	long cnt;
 
-	if (arg_procs [0] == '+'){
+	if (arg_nodes [0] == '+'){
 		/* "+NUM" format */
-		cnt = strtol (arg_procs + 1, NULL, 10);
+		cnt = strtol (arg_nodes + 1, NULL, 10);
 		if (cnt == LONG_MAX)
-			err_fatal_errno ("split_procs", "invalid option -n:");
+			err_fatal_errno ("split_nodes", "invalid option -n:");
 
-		procs_count = (int) cnt;
+		nodes_count = (int) cnt;
 
 		if (arg_transport){
-			procs = xmalloc (procs_count * sizeof (procs [0]));
+			nodes = xmalloc (nodes_count * sizeof (nodes [0]));
 
-			for (i=0; i < procs_count; ++i){
+			for (i=0; i < nodes_count; ++i){
 				char num [50];
 				snprintf (num, sizeof (num), "%d", i);
-				procs [i] = xstrdup (num);
+				nodes [i] = xstrdup (num);
 			}
 		}
 
 		return;
 	}
 
-	/* "node1 procs2 ..." format */
+	/* "node1 nodes2 ..." format */
 	for (;;){
 		c = *p;
 
@@ -428,13 +429,13 @@ static void split_procs (void)
 				if (last){
 					*p = 0;
 
-					++procs_count;
+					++nodes_count;
 
-					procs = xrealloc (
-						procs,
-						procs_count * sizeof (*procs));
+					nodes = xrealloc (
+						nodes,
+						nodes_count * sizeof (*nodes));
 
-					procs [procs_count - 1] = xstrdup (last);
+					nodes [nodes_count - 1] = xstrdup (last);
 
 					last = NULL;
 				}
@@ -461,11 +462,11 @@ static void process_args (int *argc, char ***argv)
 		{ "help",      0, 0, 'h' },
 		{ "version",   0, 0, 'V' },
 
-		{ "procs",     1, 0, 'n' },
+		{ "nodes",     1, 0, 'n' },
 		{ "cmd",       1, 0, 'c' },
 		{ "transport", 1, 0, 't' },
 
-		{ "show-proc", 0, 0, 'r' },
+		{ "show-node", 0, 0, 'r' },
 		{ "show-line", 0, 0, 'l' },
 		{ "show-pid",  0, 0, 'p' },
 
@@ -490,7 +491,7 @@ static void process_args (int *argc, char ***argv)
 				debug = 1;
 				break;
 			case 'n':
-				arg_procs = xstrdup (optarg);
+				arg_nodes = xstrdup (optarg);
 				break;
 			case 'c':
 				arg_cmd = xstrdup (optarg);
@@ -505,7 +506,7 @@ static void process_args (int *argc, char ***argv)
 				show_line_num = 1;
 				break;
 			case 'r':
-				show_proc = 1;
+				show_node = 1;
 				break;
 			default:
 				usage ();
@@ -513,8 +514,8 @@ static void process_args (int *argc, char ***argv)
 		}
 	}
 
-	if (arg_procs){
-		split_procs ();
+	if (arg_nodes){
+		split_nodes ();
 	}else{
 		err_fatal (NULL, "-n option is mandatory!\n");
 	}
@@ -535,8 +536,8 @@ static void free_memory (void)
 {
 	int i;
 
-	if (arg_procs)
-		xfree (arg_procs);
+	if (arg_nodes)
+		xfree (arg_nodes);
 
 	if (arg_transport)
 		xfree (arg_transport);
@@ -544,11 +545,11 @@ static void free_memory (void)
 	if (arg_cmd)
 		xfree (arg_cmd);
 
-	if (procs){
-		for (i=0; i < procs_count; ++i){
-			xfree (procs [i]);
+	if (nodes){
+		for (i=0; i < nodes_count; ++i){
+			xfree (nodes [i]);
 		}
-		xfree (procs);
+		xfree (nodes);
 	}
 
 	if (fd_in)
@@ -560,7 +561,7 @@ static void free_memory (void)
 		xfree (buf_stdin);
 
 	if (buf_out){
-		for (i=0; i < procs_count; ++i){
+		for (i=0; i < nodes_count; ++i){
 			xfree (buf_out [i]);
 		}
 		xfree (buf_out);
@@ -589,9 +590,9 @@ int main (int argc, char **argv)
 	process_args (&argc, &argv);
 
 	if (debug){
-		printf ("procs_count = %d\n", procs_count);
-		for (i=0; i < procs_count; ++i){
-			printf ("procs [%d]=%s\n", i, procs [i]);
+		printf ("nodes_count = %d\n", nodes_count);
+		for (i=0; i < nodes_count; ++i){
+			printf ("nodes [%d]=%s\n", i, nodes [i]);
 		}
 		printf ("cmd = %s\n", arg_cmd);
 	}
