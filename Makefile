@@ -43,9 +43,9 @@ install-dirs:
 
 paexec.1 : paexec.pod
 	$(POD2MAN) -s 1 -r 'AWK Wrapper' -n paexec \
-	   -c 'PAEXEC manual page' paexec.pod > $@
+	   -c 'PAEXEC manual page' ${.ALLSRC} > ${.TARGET}
 paexec.html : paexec.pod
-	$(POD2HTML) --infile=paexec.pod --outfile=$@
+	$(POD2HTML) --infile=${.ALLSRC} --outfile=${.TARGET}
 
 ##################################################
 
