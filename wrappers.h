@@ -40,4 +40,4 @@ void xfree(void *ptr);
 int xclose (int fd);
 char *xstrdup (char *s);
 
-#endif // _WRAPPERS_H_
+#endif /* _WRAPPERS_H_ */

@@ -13,4 +13,4 @@
 #include <unistd.h>
 #endif
 
-#endif // _PORTABHACKS_H_
+#endif /* _PORTABHACKS_H_ */

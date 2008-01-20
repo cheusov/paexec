@@ -29,4 +29,4 @@ typedef void (*line_putter_t) (char *, void *);
 /* returns 1 if eof happens */
 int put_until_emptyline (int fd, line_putter_t putter, void *data);
 
-#endif // _NONBLOCK_HELPERS_H_
+#endif /* _NONBLOCK_HELPERS_H_ */
