@@ -26,7 +26,7 @@ licence:                                                   MIT license
    See example section below
 
 1) "libmaa" library is required to build paexec. It is a part of
-   "dict" project http://sourceforge.net/project/dict
+   "dict" project http://sourceforge.net/projects/dict
 
    Quick samle of building:
 
