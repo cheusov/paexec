@@ -31,7 +31,7 @@ licence:                                                   MIT license
    Quick samle of building:
 
        gzip -dc /home/cheusov/downloads/dictd-X.Y.Z.tar.gz  | tar -xf-
-       cd dictd/libmaa
+       cd dictd-X-Y-Z/libmaa
        ./configure
        make
        make install
