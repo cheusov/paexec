@@ -11,7 +11,6 @@ project's home page:            http://sourceforge.net/projects/paexec
 
 licence:                                                   MIT license
 
-
 ======================================================================
 
                              INSTALLATION
@@ -26,23 +25,34 @@ licence:                                                   MIT license
 
    See example section below
 
-1) Uncompress tarball you've downloaded like this
+1) "libmaa" library is required to build paexec. It is a part of
+   "dict" project http://sourceforge.net/project/dict
+
+   Quick samle of building:
+
+       gzip -dc /home/cheusov/downloads/dictd-X.Y.Z.tar.gz  | tar -xf-
+       cd dictd/libmaa
+       ./configure
+       make
+       make install
+
+2) Uncompress paexec tarball you've downloaded like this
    gzip -dc paexec-X-Y-Z.tar.gz | tar -xf-
 
-2) cd paexec-X-Y-Z
+3) cd paexec-X-Y-Z
 
-3) make
+4) make
 
-4) (optional!) make install-dirs
+5) (optional!) make install-dirs
 
-5) make install
+6) make install
 
 There are a lot of Makefile variables that can be changed during
-installation.  paexec's own variables (All they are at the begining of
-Makefile):
+building and installation.
+paexec's own variables (All they are at the begining of Makefile):
 
- PREFIX         - where paexec is installed to
- LIBMAA         - linker option for linking "maa" library
+  PREFIX         - where paexec is installed to
+  LIBMAA         - linker option for linking "maa" library
 
 BSD make's variables (most commonly used,
 for all others - see make's documentation and .mk files)
@@ -56,13 +66,13 @@ for all others - see make's documentation and .mk files)
  MANOWN - man page owner
  MANGRP - man page group
 
-Example:
+Example of building and installing:
    env CC=gcc \
        PREFIX=/home/cheusov/local \
-       LDFLAGS='-L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib' \
+       CPPFLAGS='-I/usr/pkg/include' \
+       LDFLAGS='-L/usr/pkg/lib' \
        LDADD=-lextralib \
        CFLAGS='-Werror -Wall' \
-       CPPFLAGS=-I/usr/pkg/include \
        BINOWN=cheusov \
        BINGRP=users \
        MANOWN=cheusov \
