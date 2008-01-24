@@ -24,6 +24,7 @@ PROG=		paexec
 SRCS=		paexec.c wrappers.c nonblock_helpers.c
 
 VERSION=	0.6.0
+TARBALL?=	${PROG}
 
 LDADD+=		$(MAALIB)
 
