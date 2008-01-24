@@ -26,7 +26,7 @@ cvsdist:
 ChangeLog:
 	@(echo "***** Making new ChangeLog..."; \
 	rm -f ChangeLog; \
-	AWK=gawk rcs2log -i 2 -r -d'2008-01-24<' . \
+	AWK=gawk rcs2log -i 2 -r -d'2008-01-25<' . \
 	| sed -e 's,/cvsroot/[^/]*/,,g' \
 	      -e 's,cheusov@[^>]*,vle@gmx.net,g' \
 	      -e 's,author  <[^>]*,Aleksey Cheusov <vle@gmx.net,g' \
