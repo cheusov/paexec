@@ -23,8 +23,7 @@ SRCROOT?=		${.PARSEDIR}
 PROG=		paexec
 SRCS=		paexec.c wrappers.c nonblock_helpers.c
 
-VERSION=	0.6.0
-TARBALL?=	${PROG}
+VERSION=	0.6.test
 
 LDADD+=		$(MAALIB)
 
@@ -61,6 +60,6 @@ test : paexec
 ############################################################
 .PATH: ${SRCROOT}
 
-.include "Makefile.cvsdist"
+.sinclude "Makefile.cvsdist"
 
 .include <bsd.prog.mk>
