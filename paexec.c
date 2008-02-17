@@ -49,7 +49,6 @@
 #define PAEXEC_VERSION "x.y.z"
 #endif
 
-#define DMALLOC_FUNC_CHECK
 #include <maa.h>
 
 #include "wrappers.h"

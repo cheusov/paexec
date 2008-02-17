@@ -105,34 +105,6 @@ ssize_t xwrite (int fd, const void *buf, size_t count)
 	return ret;
 }
 
-void *xmalloc (size_t s)
-{
-	void *p = malloc (s);
-	if (!p){
-		log_error ("", "malloc failed: %s\n", strerror (errno));
-		exit (1);
-	}
-
-	return p;
-}
-
-void *xrealloc (void *p, size_t s)
-{
-	p = realloc (p, s);
-	if (!p){
-		log_error ("", "realloc failed: %s\n", strerror (errno));
-		exit (1);
-	}
-
-	return p;
-}
-
-void xfree(void *ptr)
-{
-	if (ptr)
-		free (ptr);
-}
-
 int xclose (int fd)
 {
 	int ret;
@@ -146,15 +118,4 @@ int xclose (int fd)
 	}
 
 	return ret;
-}
-
-char *xstrdup (char *s)
-{
-	char *p = strdup (s);
-	if (!p){
-		log_error ("", "strdup failed: %s\n", strerror (errno));
-		exit (1);
-	}
-
-	return p;
 }
