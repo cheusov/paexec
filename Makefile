@@ -20,6 +20,8 @@ SRCROOT?=		${.PARSEDIR}
 
 ############################################################
 
+WARNS=		4
+
 PROG=		paexec
 SRCS=		paexec.c wrappers.c nonblock_helpers.c
 

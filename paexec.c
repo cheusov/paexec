@@ -55,7 +55,7 @@
 #include "wrappers.h"
 #include "nonblock_helpers.h"
 
-static void usage ()
+static void usage (void)
 {
 	printf ("\
 paexec - parallel executor\n\
@@ -523,13 +523,6 @@ static void process_args (int *argc, char ***argv)
 	if (!arg_cmd){
 		err_fatal (NULL, "-c option is mandatory!\n");
 	}
-}
-
-static void log_to_file (void)
-{
-	char logfile [2000] = "logfile";
-
-	log_file ("paexec", logfile);
 }
 
 static void free_memory (void)

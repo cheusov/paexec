@@ -84,14 +84,16 @@ ssize_t xread (int fd, void *buf, size_t nbytes)
 ssize_t xwrite (int fd, const void *buf, size_t count)
 {
 	ssize_t ret = 0;
+	const char *b = (const char *) buf;
+
 	while (count){
 		do {
-			ret = write (fd, buf, count);
+			ret = write (fd, b, count);
 		}while (ret == -1 && errno == EINTR);
 
 		if (ret > 0){
 			count -= ret;
-			buf   += ret;
+			b     += ret;
 		}
 	}
 
