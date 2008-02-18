@@ -29,6 +29,8 @@
 #include "wrappers.h"
 #include "nonblock_helpers.h"
 
+#include <maa.h>
+
 static size_t linebuf_size = 0;
 static char *linebuf       = NULL;
 
