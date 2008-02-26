@@ -386,34 +386,30 @@ static void loop (void)
 	}
 }
 
-static void split_nodes (void)
+static void split_nodes__plus_notation (void)
+{
+	int i;
+
+	nodes_count = (int) strtol (arg_nodes + 1, NULL, 10);
+	if (nodes_count == LONG_MAX)
+		err_fatal_errno ("split_nodes", "invalid option -n:");
+
+	if (arg_transport){
+		nodes = xmalloc (nodes_count * sizeof (nodes [0]));
+
+		for (i=0; i < nodes_count; ++i){
+			char num [50];
+			snprintf (num, sizeof (num), "%d", i);
+			nodes [i] = xstrdup (num);
+		}
+	}
+}
+
+static void split_nodes__list (void)
 {
 	char *last = NULL;
 	char *p = arg_nodes;
 	char c;
-	int i;
-	long cnt;
-
-	if (arg_nodes [0] == '+'){
-		/* "+NUM" format */
-		cnt = strtol (arg_nodes + 1, NULL, 10);
-		if (cnt == LONG_MAX)
-			err_fatal_errno ("split_nodes", "invalid option -n:");
-
-		nodes_count = (int) cnt;
-
-		if (arg_transport){
-			nodes = xmalloc (nodes_count * sizeof (nodes [0]));
-
-			for (i=0; i < nodes_count; ++i){
-				char num [50];
-				snprintf (num, sizeof (num), "%d", i);
-				nodes [i] = xstrdup (num);
-			}
-		}
-
-		return;
-	}
 
 	/* "node1 nodes2 ..." format */
 	for (;;){
@@ -451,6 +447,21 @@ static void split_nodes (void)
 
 		++p;
 	}
+}
+
+static void split_nodes (void)
+{
+	if (arg_nodes [0] == '+'){
+		/* "+NUM" format */
+		split_nodes__plus_notation ();
+	}else{
+		/* list of nodes */
+		split_nodes__list ();
+	}
+
+	/* final check */
+	if (nodes_count == 0)
+		err_fatal ("split_nodes", "invalid option -n:\n");
 }
 
 static void process_args (int *argc, char ***argv)
