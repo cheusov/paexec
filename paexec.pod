@@ -154,7 +154,7 @@ Turn on a debugging mode (for debugging purposes only)
 
 =over 6
 
- paexec -t '/usr/bin/ssh -x' --procs 'host1 host2 host3' \
+ paexec -t '/usr/bin/ssh -x' --nodes 'host1 host2 host3' \
         -l -c ~/bin/complex_task
 
  paexec -n +4 -c ~/bin/oggenc_wrapper
