@@ -1,4 +1,20 @@
 ======================================================================
+Version 0.7.0, by Aleksey Cheusov, Tue, 26 Feb 2008 23:57:15 +0200
+
+   new -e|--eot option implemented.
+   It prints and end-of-task marker (an empty line) to stdout.
+   See manual page.
+
+   WARNS=4 to see compilation warnings.
+   several gcc warnings fixed.
+
+   fixed: '-n +0' and '-n ""' now fails with error message.
+
+   minor fix in man page
+
+   minor clean-ups
+
+======================================================================
 Version 0.6.0, by Aleksey Cheusov, Thu, 24 Jan 2008 21:31:26 +0200
 
     First publicly available release

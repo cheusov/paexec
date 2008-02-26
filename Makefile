@@ -20,12 +20,14 @@ SRCROOT?=		${.PARSEDIR}
 
 ############################################################
 
+DIRTHDAY=	2008-01-25
+
 WARNS=		4
 
 PROG=		paexec
 SRCS=		paexec.c wrappers.c nonblock_helpers.c
 
-VERSION=	0.6.test
+VERSION=	0.7.0
 
 LDADD+=		$(MAALIB)
 
