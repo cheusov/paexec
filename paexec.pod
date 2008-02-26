@@ -127,7 +127,8 @@ I<-l> is also applied. Space character is used as a separator.
 
 =item B<-l>|B<--show-line>
 
-Include line number (0-based) to the output, i.e. line number from
+Include a 0-based task number (input line number) to the output,
+i.e. line number from
 which this particular output line was produced.  It appears before pid
 if I<-p> is also applied. Space character is used as a separator.
 
@@ -136,6 +137,12 @@ if I<-p> is also applied. Space character is used as a separator.
 Include pid of paexec's subprocess that communicates with
 I<node+command> to the output. Pid prepands the actual result
 line. Space character is used as a separator.
+
+=item B<-e>|B<--eot>
+
+When end-of-task marker is obtained from node, an empty line is
+printed to stdout. This option may be useful together with I<-l>
+and/or I<-r>.
 
 =item B<-d>|B<--debug>
 

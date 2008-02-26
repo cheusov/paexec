@@ -69,8 +69,10 @@ OPTIONS:\n\
   -t --transport <trans>   path to transport program\n\
 \n\
   -r --show-node           include node (or number) to the output\n\
-  -l --show-line           include line number (0-based) to the output\n\
+  -l --show-line           include 0-based task number (input line number)\n\
+                           to the output\n\
   -p --show-pid            include pid of subprocess to the output\n\
+  -e --eot                 put an empty line when end-of-task is reached\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
 -n and -c are mandatory options\n\
@@ -112,6 +114,7 @@ static int nodes_count = 0;
 static int show_pid      = 0;
 static int show_line_num = 0;
 static int show_node     = 0;
+static int show_eot      = 0;
 
 static int max_bufsize = BUFSIZE;
 
@@ -313,6 +316,7 @@ static void loop (void)
 						buf_out_i [j] = 0;
 
 						if (printed == j){
+							/* end of task marker */
 							assert (busy [i] == 1);
 
 							busy [i] = 0;
@@ -321,6 +325,11 @@ static void loop (void)
 							if (end_of_stdin){
 								xclose (fd_in [i]);
 								fd_in [i] = -1;
+							}
+
+							if (show_eot){
+								/* an empty line means end-of-task */
+								print_line (i, printed);
 							}
 
 							break;
@@ -479,13 +488,14 @@ static void process_args (int *argc, char ***argv)
 		{ "show-node", 0, 0, 'r' },
 		{ "show-line", 0, 0, 'l' },
 		{ "show-pid",  0, 0, 'p' },
+		{ "eot",       0, 0, 'e' },
 
 		{ "debug",     0, 0, 'd' },
 
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpn:c:t:", longopts, NULL),
+	while (c = getopt_long (*argc, *argv, "hVdvrlpen:c:t:", longopts, NULL),
 		   c != EOF)
 	{
 		switch (c) {
@@ -517,6 +527,9 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 'r':
 				show_node = 1;
+				break;
+			case 'e':
+				show_eot = 1;
 				break;
 			default:
 				usage ();
