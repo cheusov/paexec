@@ -400,7 +400,7 @@ static void split_nodes__plus_notation (void)
 	int i;
 
 	nodes_count = (int) strtol (arg_nodes + 1, NULL, 10);
-	if (nodes_count == LONG_MAX)
+	if (nodes_count == (int) LONG_MAX)
 		err_fatal_errno ("split_nodes", "invalid option -n:");
 
 	if (arg_transport){
