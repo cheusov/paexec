@@ -72,7 +72,12 @@ OPTIONS:\n\
   -l --show-line           include 0-based task number (input line number)\n\
                            to the output\n\
   -p --show-pid            include pid of subprocess to the output\n\
+\n\
   -e --eot                 put an empty line when end-of-task is reached\n\
+  -E --eot-flush           implies -e and flushes stdout\n\
+\n\
+  -i --i2o                 put task to stdout\n\
+  -I --i2o-flush           implies -i and flushes stdout\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
 -n and -c are mandatory options\n\
@@ -114,7 +119,12 @@ static int nodes_count = 0;
 static int show_pid      = 0;
 static int show_line_num = 0;
 static int show_node     = 0;
-static int show_eot      = 0;
+
+static int print_eot      = 0;
+static int flush_eot      = 0;
+
+static int print_i2o      = 0;
+static int flush_i2o      = 0;
 
 static int max_bufsize = BUFSIZE;
 
@@ -258,6 +268,13 @@ static void loop (void)
 							printf ("stdin: %s\n", buf_stdin);
 						}
 
+						if (print_i2o){
+							puts (buf_stdin);
+							if (flush_i2o){
+								fflush (stdout);
+							}
+						}
+
 						send_to_node ();
 
 						memmove (buf_stdin,
@@ -327,9 +344,12 @@ static void loop (void)
 								fd_in [i] = -1;
 							}
 
-							if (show_eot){
+							if (print_eot){
 								/* an empty line means end-of-task */
 								print_line (i, printed);
+								if (flush_eot){
+									fflush (stdout);
+								}
 							}
 
 							break;
@@ -488,14 +508,19 @@ static void process_args (int *argc, char ***argv)
 		{ "show-node", 0, 0, 'r' },
 		{ "show-line", 0, 0, 'l' },
 		{ "show-pid",  0, 0, 'p' },
+
 		{ "eot",       0, 0, 'e' },
+		{ "eot-flush", 0, 0, 'E' },
+
+		{ "i2o",       0, 0, 'i' },
+		{ "i2o-flush", 0, 0, 'I' },
 
 		{ "debug",     0, 0, 'd' },
 
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpen:c:t:", longopts, NULL),
+	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIn:c:t:", longopts, NULL),
 		   c != EOF)
 	{
 		switch (c) {
@@ -529,7 +554,18 @@ static void process_args (int *argc, char ***argv)
 				show_node = 1;
 				break;
 			case 'e':
-				show_eot = 1;
+				print_eot = 1;
+				break;
+			case 'E':
+				print_eot = 1;
+				flush_eot = 1;
+				break;
+			case 'i':
+				print_i2o = 1;
+				break;
+			case 'I':
+				print_i2o = 1;
+				flush_i2o = 1;
 				break;
 			default:
 				usage ();
