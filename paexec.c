@@ -199,6 +199,24 @@ static int find_free_node (void)
 	err_fatal (NULL, "internal error: there is no free node\n");
 }
 
+static void print_line (int num, const char *line)
+{
+	if (show_node){
+		if (nodes && nodes [num])
+			printf ("%s ", nodes [num]);
+		else
+			printf ("%d ", num);
+	}
+	if (show_line_num){
+		printf ("%d ", line_nums [num]);
+	}
+	if (show_pid){
+		printf ("%d ", (int) pids [num]);
+	}
+
+	printf ("%s\n", line);
+}
+
 static void send_to_node (void)
 {
 	int n = find_free_node ();
@@ -215,24 +233,13 @@ static void send_to_node (void)
 
 	xwrite (fd_in [n], buf_stdin, strlen (buf_stdin));
 	xwrite (fd_in [n], "\n", 1);
-}
 
-static void print_line (int num, int offs)
-{
-	if (show_node){
-		if (nodes && nodes [num])
-			printf ("%s ", nodes [num]);
-		else
-			printf ("%d ", num);
+	if (print_i2o){
+		print_line (n, buf_stdin);
+		if (flush_i2o){
+			fflush (stdout);
+		}
 	}
-	if (show_line_num){
-		printf ("%d ", line_nums [num]);
-	}
-	if (show_pid){
-		printf ("%d ", (int) pids [num]);
-	}
-
-	printf ("%s\n", buf_out [num] + offs);
 }
 
 static void loop (void)
@@ -266,13 +273,6 @@ static void loop (void)
 
 						if (debug){
 							printf ("stdin: %s\n", buf_stdin);
-						}
-
-						if (print_i2o){
-							puts (buf_stdin);
-							if (flush_i2o){
-								fflush (stdout);
-							}
 						}
 
 						send_to_node ();
@@ -346,7 +346,7 @@ static void loop (void)
 
 							if (print_eot){
 								/* an empty line means end-of-task */
-								print_line (i, printed);
+								print_line (i, buf_out [i] + printed);
 								if (flush_eot){
 									fflush (stdout);
 								}
@@ -355,7 +355,7 @@ static void loop (void)
 							break;
 						}
 
-						print_line (i, printed);
+						print_line (i, buf_out [i] + printed);
 
 						printed = j + 1;
 					}
