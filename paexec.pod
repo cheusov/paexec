@@ -118,7 +118,7 @@ nonation) a number of nodes.
 
 Path to I<command>
 
-=item B<-r>|B<--show-proc>
+=item B<-r>|B<--show-node>
 
 Include node identifier or node number (0-based) to the
 output, i.e. id/number of node that produces this particular
