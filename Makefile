@@ -27,7 +27,7 @@ WARNS=		4
 PROG=		paexec
 SRCS=		paexec.c wrappers.c nonblock_helpers.c
 
-VERSION=	0.7.0
+VERSION=	0.8.0
 
 LDADD+=		$(MAALIB)
 

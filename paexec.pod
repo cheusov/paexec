@@ -148,6 +148,23 @@ and/or I<-r>.
 
 Turn on a debugging mode (for debugging purposes only)
 
+=item B<-i>|B<--i2o>
+
+Copy input lines (i.e. tasks) to stdout.
+
+=item B<-I>|B<--i2o-flush>
+
+Imply B<-i> and flushes stdout.
+
+=item B<-e>|B<--eot>
+
+Print an empty line to stdout when end-of-task marker is read from
+processor.
+
+=item B<-E>|B<--eot-flush>
+
+Imply B<-e> and flushes stdout.
+
 =back
 
 =head1 EXAMPLES
@@ -158,6 +175,33 @@ Turn on a debugging mode (for debugging purposes only)
         -l -c ~/bin/complex_task
 
  paexec -n +4 -c ~/bin/oggenc_wrapper
+
+ paexec -EI -lr -n 'host1 host2 host3' \
+                -c command -t /usr/bin/rsh |
+ awk '
+ ! ($2 in seen) {
+     seen [$2] = 0
+
+     node     = $1
+     task_num = $2
+
+     $1 = $2 = ""
+     $0 = substr($0, 3)
+
+     printf "task #%s (\"%s\") started on host \"%s\"\n", task_num, $0, node
+     next
+ }
+
+ NF == 2 {
+     printf "task #%s done\n", $2
+     next
+ }
+
+ {
+     task_num = $2
+     $1 = $2 = ""
+     print $0 > ("result." task_num ".txt")
+ }'
 
  For other examples, see examples/ directory
 

@@ -73,10 +73,10 @@ OPTIONS:\n\
                            to the output\n\
   -p --show-pid            include pid of subprocess to the output\n\
 \n\
-  -e --eot                 put an empty line when end-of-task is reached\n\
+  -e --eot                 print an empty line when end-of-task is reached\n\
   -E --eot-flush           implies -e and flushes stdout\n\
 \n\
-  -i --i2o                 put task to stdout\n\
+  -i --i2o                 copy input lines (i.e. tasks) to stdout\n\
   -I --i2o-flush           implies -i and flushes stdout\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
