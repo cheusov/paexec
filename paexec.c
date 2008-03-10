@@ -56,7 +56,7 @@
 
 static void usage (void)
 {
-	printf ("\
+	fprintf (stderr, "\
 paexec - parallel executor\n\
          processes the list of autonomous tasks in parallel\n\
 usage: paexec [OPTIONS] [files...]\n\
