@@ -58,7 +58,7 @@ test : paexec
 	@echo 'running tests...'; \
 	if cd tests && ./test.sh > _test.res && diff -u test.out _test.res; \
 	then echo '   succeeded'; \
-	else echo '   failed'; \
+	else echo '   failed'; false; \
 	fi
 
 ############################################################
