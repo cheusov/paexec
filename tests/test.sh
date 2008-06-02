@@ -9,7 +9,7 @@ runtest (){
 }
 
 cut_version (){
-    awk 'NR <= 2 {print $0} NR == 3 {print "xxx"}'
+    awk '$1 == "paexec" {$2 = "x.y.x"} {print}'
 }
 
 cut_help (){
@@ -19,8 +19,8 @@ cut_help (){
 runtest -V        | cut_version
 runtest --version | cut_version
 
-runtest -h        | cut_help
-runtest --help    | cut_help
+runtest -h 2>&1     | cut_help
+runtest --help 2>&1 | cut_help
 
 resort (){
     awk '{print $1, NR, $0}' |

@@ -1,9 +1,9 @@
 =================================================================
 ======= args: -V
-xxx
+paexec x.y.x written by Aleksey Cheusov
 =================================================================
 ======= args: --version
-xxx
+paexec x.y.x written by Aleksey Cheusov
 =================================================================
 ======= args: -h
 paexec - parallel executor
