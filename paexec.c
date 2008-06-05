@@ -95,9 +95,9 @@ static int debug = 0;
 static int *fd_in       = NULL;
 static int *fd_out      = NULL;
 
-static char **buf_out   = NULL;
-
-static size_t *size_out = NULL;
+static char **buf_out      = NULL;
+static size_t *bufsize_out = NULL;
+static size_t *size_out    = NULL;
 
 static int *busy        = NULL;
 static int busy_count   = 0;
@@ -110,8 +110,9 @@ static int max_fd    = 0;
 
 static int line_num = 0;
 
-static char *buf_stdin   = NULL;
-static size_t size_stdin = 0;
+static char *buf_stdin      = NULL;
+static size_t bufsize_stdin = 0;
+static size_t size_stdin    = 0;
 
 static char **nodes    = NULL;
 static int nodes_count = 0;
@@ -139,15 +140,17 @@ static void init (void)
 		max_bufsize = atoi (env_bufsize);
 	}
 
+	bufsize_stdin = max_bufsize;
+
 	/* arrays */
 	pids  = xmalloc (nodes_count * sizeof (*pids));
 
 	fd_in  = xmalloc (nodes_count * sizeof (*fd_in));
 	fd_out = xmalloc (nodes_count * sizeof (*fd_out));
 
-	buf_out = xmalloc (nodes_count * sizeof (*buf_out));
-
-	size_out = xmalloc (nodes_count * sizeof (*size_out));
+	buf_out     = xmalloc (nodes_count * sizeof (*buf_out));
+	bufsize_out = xmalloc (nodes_count * sizeof (*bufsize_out));
+	size_out    = xmalloc (nodes_count * sizeof (*size_out));
 
 	busy     = xmalloc (nodes_count * sizeof (*busy));
 
@@ -159,6 +162,7 @@ static void init (void)
 	/* in/out */
 	for (i=0; i < nodes_count; ++i){
 		buf_out [i] = xmalloc (max_bufsize);
+		bufsize_out [i] = max_bufsize;
 
 		size_out [i] = 0;
 
@@ -265,7 +269,7 @@ static void loop (void)
 
 		/* stdin */
 		if (FD_ISSET (0, &rset)){
-			cnt = xread (0, buf_stdin + size_stdin, 1 /*max_bufsize - size_stdin*/);
+			cnt = xread (0, buf_stdin + size_stdin, 1 /*bufsize_stdin - size_stdin*/);
 			if (cnt){
 				for (i=0; i < cnt; ++i){
 					if (buf_stdin [size_stdin + i] == '\n'){
@@ -292,8 +296,9 @@ static void loop (void)
 
 				size_stdin += cnt;
 
-				if (size_stdin == max_bufsize){
-					err_fatal (NULL, "Too long line read from stdin!\n");
+				if (size_stdin == bufsize_stdin){
+					bufsize_stdin *= 2;
+					buf_stdin = xrealloc (buf_stdin, bufsize_stdin);
 				}
 			}else{
 				end_of_stdin = 1;
@@ -313,7 +318,7 @@ static void loop (void)
 
 				cnt = xread (fd_out [i],
 							 buf_out_i + size_out [i],
-							 max_bufsize - size_out [i]);
+							 bufsize_out [i] - size_out [i]);
 
 				if (debug){
 					buf_out_i [size_out [i] + cnt] = 0;
@@ -371,8 +376,9 @@ static void loop (void)
 				
 				size_out [i] = cnt;
 
-				if (size_out [i] == max_bufsize){
-					err_fatal (NULL, "Too long line read from node!\n");
+				if (size_out [i] == bufsize_out [i]){
+					bufsize_out [i] *= 2;
+					buf_out [i] = xrealloc (buf_out [i], bufsize_out [i]);
 				}
 			}
 		}

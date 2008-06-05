@@ -56,7 +56,7 @@ paexec.html : paexec.pod
 .PHONY : test
 test : paexec
 	@echo 'running tests...'; \
-	if cd tests && ./test.sh > _test.res && diff -u test.out _test.res; \
+	if cd tests && ./test.sh; \
 	then echo '   succeeded'; \
 	else echo '   failed'; false; \
 	fi
