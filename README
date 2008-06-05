@@ -15,37 +15,40 @@ licence:                                                   MIT license
 
                              INSTALLATION
 
-0) BSD make is required. I name it just 'make' but its real name may
-   vary.  bmake and pmake are possible names.
+0) BSD make is required. I name it 'bmake' but its real name may
+   vary.  pmake or just make are possible variants.
 
    If you need to change the default building options,
-   run make like this
+   run bmake like this
 
-     env [YOUR_ASSIGNMENTS] make <target>
+     env [YOUR_ASSIGNMENTS] bmake <target>
 
    See example section below
 
 1) "libmaa" library is required to build paexec. It is a part of
    "dict" project http://sourceforge.net/projects/dict
 
-   Quick samle of building:
+   Quick sample of building:
 
        gzip -dc /home/cheusov/downloads/dictd-X.Y.Z.tar.gz  | tar -xf-
        cd dictd-X-Y-Z/libmaa
        ./configure
-       make
-       make install
+       gmake
+       gmake install
+
+   NOTE: gmake is GNU make here! Under most Linux distros
+   it is named make.
 
 2) Uncompress paexec tarball you've downloaded like this
    gzip -dc paexec-X-Y-Z.tar.gz | tar -xf-
 
 3) cd paexec-X-Y-Z
 
-4) make
+4) bmake
 
-5) (optional!) make install-dirs
+5) (optional!) bmake install-dirs
 
-6) make install
+6) bmake install
 
 There are a lot of Makefile variables that can be changed during
 building and installation.
@@ -66,11 +69,14 @@ for all others - see make's documentation and .mk files)
  MANOWN - man page owner
  MANGRP - man page group
 
-Example of building and installing:
-   env CC=gcc \
+Examples of building and installing:
+
+ 1)  bmake all install-dirs install
+
+ 2)  env CC=icc \
        PREFIX=/home/cheusov/local \
        CPPFLAGS='-I/usr/pkg/include' \
-       LDFLAGS='-L/usr/pkg/lib' \
+       LDFLAGS='-L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib' \
        LDADD=-lextralib \
        CFLAGS='-Werror -Wall' \
        BINOWN=cheusov \
@@ -78,4 +84,19 @@ Example of building and installing:
        MANOWN=cheusov \
        MANGRP=users \
        MKCATPAGES=no \
-          make -s all install-dirs install
+          bmake -s all install-dirs install
+
+ 3)  paexec needs the non-portable getopt_long(3) present in
+     *BSD and Linux OSes. If it is absent in your OS,
+     you can build paexec like the following.
+
+     echo '#include <getopt.h>' > ./config.h
+
+     env \
+       CPPFLAGS='-DNO_PORTABHACKS_H=1 -DHAVE_CONFIG_H=1' \
+       LDFLAGS='-lnbcompat' \
+          bmake -s all install-dirs install
+
+     where libnbcompat is a NetBSD's portability library
+
+     NOTE: No, I'll not use autotools
