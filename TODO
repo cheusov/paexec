@@ -1,2 +1,4 @@
 non-blocking write(2) for sending task to processors
 avoid using read(<df>, <buf>, 1)
+
+change BUFSIZE description in paexec.1
