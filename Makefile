@@ -15,7 +15,7 @@ MAALIB?=		-lmaa
 # maximum length of result line (line read from command's stdout)
 BUFSIZE?=		4096
 
-# directory with runawk sources
+# directory with paexec sources
 SRCROOT?=		${.PARSEDIR}
 
 ############################################################
@@ -46,7 +46,7 @@ install-dirs:
 .endif
 
 paexec.1 : paexec.pod
-	$(POD2MAN) -s 1 -r 'AWK Wrapper' -n paexec \
+	$(POD2MAN) -s 1 -r 'parallel executor' -n paexec \
 	   -c 'PAEXEC manual page' ${.ALLSRC} > ${.TARGET}
 paexec.html : paexec.pod
 	$(POD2HTML) --infile=${.ALLSRC} --outfile=${.TARGET}
