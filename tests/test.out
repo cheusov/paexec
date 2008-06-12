@@ -142,3 +142,6 @@ paexec - parallel executor
 5 substr[5,1]=f
 5 substr[5,2]=ff
 5 substr[6,1]=f
+1 =================================================================
+1 ======= args: -c ../tests/big_result_cmd -n +9
+100000 1234567890-=QWERTYUIOP[]ASDFGHJKL;ZXCVBNM,./ZAQWSXCDERFVBGTYHNMJUIK,.LO
