@@ -99,4 +99,6 @@ Examples of building and installing:
 
      where libnbcompat is a NetBSD's portability library
 
+     Of course, you can also use any other implementation of getopt_long.
+
      NOTE: No, I'll not use autotools
