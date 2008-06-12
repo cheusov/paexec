@@ -241,21 +241,15 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-=head1 LIMITATIONS
-
-Currently the length of task and result line is limited at compile
-time to BUFSIZE constant, see Makefile. Though this may be fixed in
-the future. An environment variable I<PAEXEC_BUFSIZE> overrides this
-default.
-
 =head1 ENVIRONMENT
 
 =over 6
 
 =item I<PAEXEC_BUFSIZE>
 
-Overrides the compile time limitation on the length of the task and
-the result line size.
+Overrides the compile time I<initial> size for internal buffers used
+to store tasks and the result lines. Versions of B<paexec> prior to
+0.9.0 used this value as a I<maximum> buffer size.
 
 =back
 
@@ -270,8 +264,8 @@ requests are also welcomed.
 L<http://sourceforge.net/projects/paexec>
 
 =head1 SEE ALSO
+L<ssh(1)>
+L<rsh(1)>
 L<accept(2)>
 L<read(2)>
 L<write(2)>
-L<ssh(1)>
-L<rsh(1)>
