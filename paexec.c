@@ -127,7 +127,7 @@ static int flush_eot      = 0;
 static int print_i2o      = 0;
 static int flush_i2o      = 0;
 
-static int max_bufsize = BUFSIZE;
+static int initial_bufsize = BUFSIZE;
 
 static void init (void)
 {
@@ -137,10 +137,10 @@ static void init (void)
 
 	/* BUFSIZE */
 	if (env_bufsize){
-		max_bufsize = atoi (env_bufsize);
+		initial_bufsize = atoi (env_bufsize);
 	}
 
-	bufsize_stdin = max_bufsize;
+	bufsize_stdin = initial_bufsize;
 
 	/* arrays */
 	pids  = xmalloc (nodes_count * sizeof (*pids));
@@ -157,12 +157,12 @@ static void init (void)
 	line_nums = xmalloc (nodes_count * sizeof (*line_nums));
 
 	/* stdin */
-	buf_stdin = xmalloc (max_bufsize);
+	buf_stdin = xmalloc (initial_bufsize);
 
 	/* in/out */
 	for (i=0; i < nodes_count; ++i){
-		buf_out [i] = xmalloc (max_bufsize);
-		bufsize_out [i] = max_bufsize;
+		buf_out [i] = xmalloc (initial_bufsize);
+		bufsize_out [i] = initial_bufsize;
 
 		size_out [i] = 0;
 
