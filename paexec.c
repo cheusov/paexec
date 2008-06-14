@@ -168,7 +168,7 @@ static void init (void)
 
 		busy [i] = 0;
 
-		if (arg_transport)
+		if (arg_transport && arg_transport [0])
 			snprintf (full_cmd, sizeof (full_cmd), "%s %s %s",
 					  arg_transport, nodes [i], arg_cmd);
 		else

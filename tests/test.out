@@ -19,7 +19,39 @@ paexec - parallel executor
 4 EEEEE
 5 FFFFFF
 =================================================================
+======= args: -l -t -c ../examples/toupper/toupper_cmd -n 1 2 3 4 5 6 7 8 9
+0 A
+1 BB
+2 CCC
+3 DDDD
+4 EEEEE
+5 FFFFFF
+=================================================================
+======= args: -l -c ../examples/toupper/toupper_cmd -n 1 2 3 4 5 6 7 8 9
+0 A
+1 BB
+2 CCC
+3 DDDD
+4 EEEEE
+5 FFFFFF
+=================================================================
 ======= args: -l -p -t ./paexec_notransport -c ../examples/toupper/toupper_cmd -n +2
+0 pid A
+1 pid BB
+2 pid CCC
+3 pid DDDD
+4 pid EEEEE
+5 pid FFFFFF
+=================================================================
+======= args: -l -p -t -c ../examples/toupper/toupper_cmd -n +2
+0 pid A
+1 pid BB
+2 pid CCC
+3 pid DDDD
+4 pid EEEEE
+5 pid FFFFFF
+=================================================================
+======= args: -l -p -c ../examples/toupper/toupper_cmd -n +2
 0 pid A
 1 pid BB
 2 pid CCC
