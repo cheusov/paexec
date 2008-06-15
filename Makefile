@@ -19,6 +19,7 @@ BUFSIZE?=		4096
 SRCROOT?=		${.PARSEDIR}
 
 ############################################################
+.include "Makefile.version"
 
 BIRTHDATE=	2008-01-25
 
@@ -26,8 +27,6 @@ WARNS=		4
 
 PROG=		paexec
 SRCS=		paexec.c wrappers.c nonblock_helpers.c
-
-VERSION=	0.8.0
 
 LDADD+=		$(MAALIB)
 

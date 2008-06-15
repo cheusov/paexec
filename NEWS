@@ -1,4 +1,30 @@
 ======================================================================
+Version 0.9.0, by Aleksey Cheusov, Sun, 15 Jun 2008 10:23:52 +0300
+
+   -t '' means "no transport". This significantly simplifies writing
+   shell scripts with paexec. Added: tests for this case.
+
+   paexec has no limited internal buffers anymore. All they are
+   resized automatically as it is needed. PAEXEC_BUFSIZE environment
+   variable sets an *initial* buffer size, not *maximum* one.
+
+   README: notes about non-standard function getopt_long, and advice
+   how to build paexec on platforms with no getopt_long support
+   (JP-UX, Solaris etc.).
+
+   More regressions tests
+
+   paexec.1: minor corrections.
+
+   'make test' fix: In case regression test fails, 'make test' exits
+   with non-zero exit status.
+
+   paexec can be built with ancient version pmake-1.45 (found in som
+   Linux distributions).
+
+   paexec -h|--help outputs messages to stderr - my new religion :-)
+
+======================================================================
 Version 0.8.0, by Aleksey Cheusov, Tue,  4 Mar 2008 00:32:56 +0200
 
    New options implemented: -E, -i and -I
