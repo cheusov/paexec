@@ -1,2 +1,9 @@
-non-blocking write(2) for sending task to processors
-avoid using read(<df>, <buf>, 1)
+- support for unreliable connection.
+  That is paexec should restart tasks on another hosts
+  in case connection is lost.
+
+- resort paexec's output
+
+- non-blocking write(2) for sending task to processors
+
+- avoid using read(0, <buf>, 1)
