@@ -8,9 +8,9 @@ Version 0.9.0, by Aleksey Cheusov, Sun, 15 Jun 2008 10:23:52 +0300
    resized automatically as it is needed. PAEXEC_BUFSIZE environment
    variable sets an *initial* buffer size, not *maximum* one.
 
-   README: notes about non-standard function getopt_long, and advice
+   README: note about non-standard function getopt_long, and advice
    how to build paexec on platforms with no getopt_long support
-   (JP-UX, Solaris etc.).
+   (HP-UX, Solaris etc.).
 
    More regressions tests
 
