@@ -1,9 +1,17 @@
-- support for unreliable connection.
-  That is paexec should restart tasks on another hosts
-  in case connection is lost.
+Currently if error happens while talking to slave host/CPU, paexec
+exits with error immediately. That is an error of read(2) and
+write(2) operations are fatal. This may happen if slave host's OS
+hangs up, command-program segfaults, connection is lost etc.
+  TODO:
+    1) if such bad things happen paexec shell mark appropriate tasks
+       "needs to be rerun" and resend them to another slave host/CPU
+    2) rerun failed command on "bad" host after timeout
 
-- resort paexec's output
+tasks as a "partially ordered set" of tasks. Each task may fail or
+succeed. Failure of the task shell mark all dependent tasks as failed.
 
-- non-blocking write(2) for sending task to processors
+non-blocking write(2) for sending task to slave hosts/CPUs.
 
-- avoid using read(0, <buf>, 1)
+avoid using read(0, <buf>, 1) for reading tasks from stdin
+
+command for resorting output of "paexec -l"
