@@ -31,6 +31,7 @@
 #include "portabhacks.h"
 #endif
 
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,6 +39,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <limits.h>
+#include <signal.h>
 
 /***********************************************************/
 
@@ -328,6 +330,16 @@ static void loop (void)
 				}
 
 				if (!cnt){
+					for (i=0; i < nodes_count; ++i){
+						if (pids [i] > 0){
+							kill (pids [i], SIGTERM);
+						}
+					}
+					for (i=0; i < nodes_count; ++i){
+						if (pids [i] > 0){
+							pr_wait (pids [i]);
+						}
+					}
 					err_fatal (__func__, "Unexpected eof\n");
 				}
 
@@ -417,7 +429,9 @@ static void loop (void)
 	}
 
 	for (i=0; i < nodes_count; ++i){
-		pr_wait (pids [i]);
+		if (pids [i] > 0){
+			pr_wait (pids [i]);
+		}
 	}
 }
 
