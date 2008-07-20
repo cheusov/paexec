@@ -163,6 +163,10 @@ static void init (void)
 
 	/* in/out */
 	for (i=0; i < nodes_count; ++i){
+		pids [i] = -1;
+	}
+
+	for (i=0; i < nodes_count; ++i){
 		buf_out [i] = xmalloc (initial_bufsize);
 		bufsize_out [i] = initial_bufsize;
 
@@ -194,6 +198,26 @@ static void init (void)
 	nonblock (0);
 }
 
+static void kill_childs (void)
+{
+	int i;
+	for (i=0; i < nodes_count; ++i){
+		if (pids [i] > 0){
+			kill (pids [i], SIGTERM);
+		}
+	}
+}
+
+static void wait_for_childs (void)
+{
+	int i;
+	for (i=0; i < nodes_count; ++i){
+		if (pids [i] > 0){
+			pr_wait (pids [i]);
+		}
+	}
+}
+
 static int find_free_node (void)
 {
 	int i;
@@ -201,6 +225,9 @@ static int find_free_node (void)
 		if (!busy [i])
 			return i;
 	}
+
+	kill_childs ();
+	wait_for_childs ();
 
 	err_fatal (NULL, "internal error: there is no free node\n");
 }
@@ -330,16 +357,9 @@ static void loop (void)
 				}
 
 				if (!cnt){
-					for (i=0; i < nodes_count; ++i){
-						if (pids [i] > 0){
-							kill (pids [i], SIGTERM);
-						}
-					}
-					for (i=0; i < nodes_count; ++i){
-						if (pids [i] > 0){
-							pr_wait (pids [i]);
-						}
-					}
+					kill_childs ();
+					wait_for_childs ();
+
 					err_fatal (__func__, "Unexpected eof\n");
 				}
 
@@ -428,11 +448,7 @@ static void loop (void)
 		printf ("wait for childs\n");
 	}
 
-	for (i=0; i < nodes_count; ++i){
-		if (pids [i] > 0){
-			pr_wait (pids [i]);
-		}
-	}
+	wait_for_childs ();
 }
 
 static void split_nodes__plus_notation (void)
