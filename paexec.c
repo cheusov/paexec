@@ -163,7 +163,7 @@ static void init (void)
 
 	/* in/out */
 	for (i=0; i < nodes_count; ++i){
-		pids [i] = -1;
+		pids [i] = (pid_t) -1;
 	}
 
 	for (i=0; i < nodes_count; ++i){
@@ -214,8 +214,17 @@ static void wait_for_childs (void)
 	for (i=0; i < nodes_count; ++i){
 		if (pids [i] > 0){
 			pr_wait (pids [i]);
+			pids [i] = (pid_t) -1;
 		}
 	}
+}
+
+static void exit_with_error (const char *routine, const char *msg)
+{
+	kill_childs ();
+	wait_for_childs ();
+
+	err_fatal (routine, msg);
 }
 
 static int find_free_node (void)
@@ -226,10 +235,8 @@ static int find_free_node (void)
 			return i;
 	}
 
-	kill_childs ();
-	wait_for_childs ();
-
-	err_fatal (NULL, "internal error: there is no free node\n");
+	exit_with_error (NULL, "internal error: there is no free node\n");
+	return -1;
 }
 
 static void print_line (int num, const char *line)
@@ -357,10 +364,7 @@ static void loop (void)
 				}
 
 				if (!cnt){
-					kill_childs ();
-					wait_for_childs ();
-
-					err_fatal (__func__, "Unexpected eof\n");
+					exit_with_error (__func__, "Unexpected eof\n");
 				}
 
 				printed = 0;
