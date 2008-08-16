@@ -293,6 +293,7 @@ static void loop (void)
 	int cnt          = 0;
 	int i, j;
 	char *buf_out_i  = 0;
+	char *NL_found   = NULL;
 
 	FD_ZERO (&rset);
 
@@ -305,31 +306,8 @@ static void loop (void)
 
 		/* stdin */
 		if (FD_ISSET (0, &rset)){
-			cnt = xread (0, buf_stdin + size_stdin, 1 /*bufsize_stdin - size_stdin*/);
+			cnt = xread (0, buf_stdin + size_stdin, bufsize_stdin - size_stdin);
 			if (cnt){
-				for (i=0; i < cnt; ++i){
-					if (buf_stdin [size_stdin + i] == '\n'){
-						buf_stdin [size_stdin + i] = 0;
-
-						if (debug){
-							printf ("stdin: %s\n", buf_stdin);
-						}
-
-						send_to_node ();
-
-						memmove (buf_stdin,
-								 buf_stdin + size_stdin + i + 1,
-								 cnt - i - 1);
-
-						size_stdin = 0;
-						cnt        -= i + 1;
-
-						i = -1;
-
-						++line_num;
-					}
-				}
-
 				size_stdin += cnt;
 
 				if (size_stdin == bufsize_stdin){
@@ -345,6 +323,23 @@ static void loop (void)
 					}
 				}
 			}
+		}
+
+		NL_found = memchr (buf_stdin, '\n', size_stdin);
+		if (NL_found && busy_count < nodes_count){
+			*NL_found = 0;
+
+			if (debug){
+				printf ("stdin: %s\n", buf_stdin);
+			}
+
+			send_to_node ();
+
+			++NL_found;
+			size_stdin -= NL_found - buf_stdin;
+			memmove (buf_stdin, NL_found, size_stdin);
+
+			++line_num;
 		}
 
 		/* fd_out */
@@ -420,7 +415,8 @@ static void loop (void)
 		}
 
 		/* stdin */
-		if (!end_of_stdin && busy_count != nodes_count){
+		NL_found = memchr (buf_stdin, '\n', size_stdin);
+		if (!end_of_stdin && !NL_found && busy_count < nodes_count){
 			FD_SET (0, &rset);
 		}else{
 			FD_CLR (0, &rset);
