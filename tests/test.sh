@@ -83,7 +83,7 @@ do_test (){
     awk '{$1 = $1; print $0}'
 }
 
-for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14; do
+for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
     printf "PAEXEC_BUFSIZE=%d:\n" $PAEXEC_BUFSIZE
     export PAEXEC_BUFSIZE
 
