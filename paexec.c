@@ -138,12 +138,30 @@ static int poset_of_tasks  = 0;
 static hsh_HashTable tasks;
 static int tasks_count = 1; /* 0 - special meaning, not task ID */
 static const char ** id2task = NULL;
+static int remained_tasks_count = 0;
 
 static int *arcs_from = NULL;
 static int *arcs_to   = NULL;
 static int arcs_count = 0;
 
 static int *tasks_graph_deg = NULL;
+
+static char *current_task = NULL;
+static size_t current_task_sz = 0;
+
+static char *NL_found = NULL;
+static int end_of_stdin = 0;
+
+static void close_all_ins (void)
+{
+	int i;
+	for (i=0; i < nodes_count; ++i){
+		if (!busy [i]){
+			xclose (fd_in [i]);
+			fd_in [i] = -1;
+		}
+	}
+}
 
 static void delete_task (int task)
 {
@@ -152,11 +170,13 @@ static void delete_task (int task)
 		if (arcs_from [i] == task){
 			--tasks_graph_deg [arcs_to [i]];
 			assert (tasks_graph_deg [arcs_to [i]] >= -1);
-
-//			arcs_from [i] = -1;
 		}
 	}
-	tasks_graph_deg [task] = -1;
+	assert (tasks_graph_deg [task] == -1);
+	--remained_tasks_count;
+	end_of_stdin = (remained_tasks_count == 0);
+	if (end_of_stdin)
+		close_all_ins ();
 }
 
 static void delete_task_rec (int task)
@@ -171,7 +191,18 @@ static void delete_task_rec (int task)
 	}
 }
 
-static int get_new_task (void)
+static const char * get_new_task_from_stdin (void)
+{
+	NL_found = memchr (buf_stdin, '\n', size_stdin);
+	if (!NL_found)
+		return NULL;
+
+	*NL_found = 0;
+
+	return buf_stdin;
+}
+
+static const char * get_new_task_from_graph (void)
 {
 	/* topological sort of task graph */
 	int i;
@@ -182,8 +213,9 @@ static int get_new_task (void)
 
 		switch (tasks_graph_deg [i]){
 			case 0:
-				delete_task (i);
-				return i;
+				line_num = i;
+				tasks_graph_deg [i] = -1;
+				return id2task [i];
 				break;
 			case -1:
 				break;
@@ -192,11 +224,40 @@ static int get_new_task (void)
 		}
 	}
 
-	if (!empty){
-		err_fatal ("get_new_task", "cycle detected in the tasks graph");
+	return NULL;
+}
+
+static const char *get_new_task (void)
+{
+	const char *task = NULL;
+	size_t task_len = 0;
+
+	if (poset_of_tasks)
+		task = get_new_task_from_graph ();
+	else
+		task = get_new_task_from_stdin ();
+
+	if (!task)
+		return NULL;
+
+	task_len = strlen (task);
+
+	if (task_len >= current_task_sz){
+		current_task_sz = task_len+1;
+		current_task = (char *) xrealloc (current_task, current_task_sz);
 	}
 
-	return -1;
+	strcpy (current_task, task);
+
+	if (!poset_of_tasks){
+		++NL_found;
+		size_stdin -= NL_found - buf_stdin;
+		memmove (buf_stdin, NL_found, size_stdin);
+
+		++line_num;
+	}
+
+	return current_task;
 }
 
 static int add_task (const char *s)
@@ -208,6 +269,7 @@ static int add_task (const char *s)
 		hsh_insert (tasks, s, (const void *) tasks_count);
 
 		++tasks_count;
+		++remained_tasks_count;
 
 		id2task = (const char **) xrealloc (
 			id2task, tasks_count * sizeof (*id2task));
@@ -223,7 +285,6 @@ static void init (void)
 	char full_cmd [2000];
 	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
 	char buf [BUFSIZE];
-	int t;
 
 	/* BUFSIZE */
 	if (env_bufsize){
@@ -248,6 +309,7 @@ static void init (void)
 
 	/* stdin */
 	buf_stdin = xmalloc (initial_bufsize);
+	buf_stdin [0] = 0;
 
 	/* in/out */
 	for (i=0; i < nodes_count; ++i){
@@ -326,16 +388,6 @@ static void init (void)
 		for (i=0; i < arcs_count; ++i){
 			++tasks_graph_deg [arcs_to [i]];
 		}
-
-		assert (tasks_graph_deg [6] == 0);
-		delete_task_rec (6);
-//		assert (tasks_graph_deg [1] == 0);
-//		delete_task_rec (1);
-		while (t = get_new_task (), t != -1){
-			fprintf (stderr, "task %d %s\n", t, id2task [t]);
-		}
-
-		exit (88);
 	}else{
 		/* completely independent tasks */
 		nonblock (0);
@@ -355,6 +407,11 @@ static void kill_childs (void)
 static void wait_for_childs (void)
 {
 	int i;
+
+	if (debug){
+		printf ("wait for childs\n");
+	}
+
 	for (i=0; i < nodes_count; ++i){
 		if (pids [i] > 0){
 			pr_wait (pids [i]);
@@ -415,11 +472,11 @@ static void send_to_node (void)
 
 	++busy_count;
 
-	xwrite (fd_in [n], buf_stdin, strlen (buf_stdin));
+	xwrite (fd_in [n], current_task, strlen (current_task));
 	xwrite (fd_in [n], "\n", 1);
 
 	if (print_i2o){
-		print_line (n, buf_stdin);
+		print_line (n, current_task);
 		if (flush_i2o){
 			fflush (stdout);
 		}
@@ -432,18 +489,20 @@ static void loop (void)
 
 	int printed  = 0;
 
-	int end_of_stdin = 0;
 	int ret          = 0;
 	int cnt          = 0;
 	int i, j;
 	char *buf_out_i  = 0;
-	char *NL_found   = NULL;
 
 	FD_ZERO (&rset);
 
-	FD_SET (0, &rset);
+	if (!poset_of_tasks)
+		FD_SET (0, &rset);
 
-	while (ret = xselect (max_fd+1, &rset, NULL, NULL, NULL), ret > 0){
+	while (
+		(poset_of_tasks && busy_count == 0) ||
+		(ret = xselect (max_fd+1, &rset, NULL, NULL, NULL)) >= 0)
+	{
 		if (debug){
 			printf ("select ret=%d\n", ret);
 		}
@@ -460,30 +519,13 @@ static void loop (void)
 				}
 			}else{
 				end_of_stdin = 1;
-				for (i=0; i < nodes_count; ++i){
-					if (!busy [i]){
-						xclose (fd_in [i]);
-						fd_in [i] = -1;
-					}
-				}
+				close_all_ins ();
 			}
 		}
 
-		NL_found = memchr (buf_stdin, '\n', size_stdin);
-		if (NL_found && busy_count < nodes_count){
-			*NL_found = 0;
-
-			if (debug){
-				printf ("stdin: %s\n", buf_stdin);
-			}
-
-			send_to_node ();
-
-			++NL_found;
-			size_stdin -= NL_found - buf_stdin;
-			memmove (buf_stdin, NL_found, size_stdin);
-
-			++line_num;
+		if (busy_count < nodes_count){
+			if (get_new_task ())
+				send_to_node ();
 		}
 
 		/* fd_out */
@@ -515,6 +557,9 @@ static void loop (void)
 						if (printed == j){
 							/* end of task marker */
 							assert (busy [i] == 1);
+
+							if (poset_of_tasks)
+								delete_task (line_nums [i]);
 
 							busy [i] = 0;
 							--busy_count;
@@ -559,11 +604,13 @@ static void loop (void)
 		}
 
 		/* stdin */
-		NL_found = memchr (buf_stdin, '\n', size_stdin);
-		if (!end_of_stdin && !NL_found && busy_count < nodes_count){
-			FD_SET (0, &rset);
-		}else{
-			FD_CLR (0, &rset);
+		if (!poset_of_tasks){
+			NL_found = memchr (buf_stdin, '\n', size_stdin);
+			if (!end_of_stdin && !NL_found && busy_count < nodes_count){
+				FD_SET (0, &rset);
+			}else{
+				FD_CLR (0, &rset);
+			}
 		}
 
 		/* fd_out */
@@ -588,10 +635,6 @@ static void loop (void)
 			break;
 	}
 
-	if (debug){
-		printf ("wait for childs\n");
-	}
-
 	wait_for_childs ();
 }
 
@@ -603,14 +646,12 @@ static void split_nodes__plus_notation (void)
 	if (nodes_count == (int) LONG_MAX)
 		err_fatal_errno ("split_nodes", "invalid option -n:");
 
-	if (arg_transport){
-		nodes = xmalloc (nodes_count * sizeof (nodes [0]));
+	nodes = xmalloc (nodes_count * sizeof (nodes [0]));
 
-		for (i=0; i < nodes_count; ++i){
-			char num [50];
-			snprintf (num, sizeof (num), "%d", i);
-			nodes [i] = xstrdup (num);
-		}
+	for (i=0; i < nodes_count; ++i){
+		char num [50];
+		snprintf (num, sizeof (num), "%d", i);
+		nodes [i] = xstrdup (num);
 	}
 }
 
