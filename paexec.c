@@ -81,6 +81,8 @@ OPTIONS:\n\
   -i --i2o                 copy input lines (i.e. tasks) to stdout\n\
   -I --i2o-flush           implies -i and flushes stdout\n\
 \n\
+  -s --pos                 partially ordered set of tasks is given on stdin\n\
+\n\
   -d --debug               debug mode, for debugging only\n\
 -n and -c are mandatory options\n\
 \n\
@@ -91,7 +93,6 @@ OPTIONS:\n\
 static char *arg_nodes     = NULL;
 static char *arg_cmd       = NULL;
 static char *arg_transport = NULL;
-static int debug = 0;
 
 /**/
 static int *fd_in       = NULL;
@@ -131,11 +132,98 @@ static int flush_i2o      = 0;
 
 static int initial_bufsize = BUFSIZE;
 
+static int debug           = 0;
+
+static int poset_of_tasks  = 0;
+static hsh_HashTable tasks;
+static int tasks_count = 1; /* 0 - special meaning, not task ID */
+static const char ** id2task = NULL;
+
+static int *arcs_from = NULL;
+static int *arcs_to   = NULL;
+static int arcs_count = 0;
+
+static int *tasks_graph_deg = NULL;
+
+static void delete_task (int task)
+{
+	int i;
+	for (i=0; i < arcs_count; ++i){
+		if (arcs_from [i] == task){
+			--tasks_graph_deg [arcs_to [i]];
+			assert (tasks_graph_deg [arcs_to [i]] >= -1);
+
+//			arcs_from [i] = -1;
+		}
+	}
+	tasks_graph_deg [task] = -1;
+}
+
+static void delete_task_rec (int task)
+{
+	int i;
+	delete_task (task);
+
+	for (i=0; i < arcs_count; ++i){
+		if (arcs_from [i] == task){
+			delete_task_rec (arcs_to [i]);
+		}
+	}
+}
+
+static int get_new_task (void)
+{
+	/* topological sort of task graph */
+	int i;
+	int empty = 1;
+
+	for (i=1; i < tasks_count; ++i){
+		assert (tasks_graph_deg [i] >= -1);
+
+		switch (tasks_graph_deg [i]){
+			case 0:
+				delete_task (i);
+				return i;
+				break;
+			case -1:
+				break;
+			default:
+				empty = 0;
+		}
+	}
+
+	if (!empty){
+		err_fatal ("get_new_task", "cycle detected in the tasks graph");
+	}
+
+	return -1;
+}
+
+static int add_task (const char *s)
+{
+	const void *p = hsh_retrieve (tasks, s);
+	if (p){
+		return (int) p;
+	}else{
+		hsh_insert (tasks, s, (const void *) tasks_count);
+
+		++tasks_count;
+
+		id2task = (const char **) xrealloc (
+			id2task, tasks_count * sizeof (*id2task));
+		id2task [tasks_count-1] = s;
+
+		return tasks_count-1;
+	}
+}
+
 static void init (void)
 {
 	int i;
 	char full_cmd [2000];
 	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
+	char buf [BUFSIZE];
+	int t;
 
 	/* BUFSIZE */
 	if (env_bufsize){
@@ -195,7 +283,63 @@ static void init (void)
 		}
 	}
 
-	nonblock (0);
+	if (poset_of_tasks){
+		/* partially ordered set of tasks */
+		tasks = hsh_create (NULL, NULL);
+
+		/* reading all tasks with their dependancies */
+		while (fgets (buf, sizeof (buf), stdin)){
+			size_t len = strlen (buf);
+			char *sep = strchr (buf, '\t');
+			int id1, id2;
+			char *s1, *s2;
+
+			if (len > 0 && buf [len-1] == '\n'){
+				buf [len-1] = 0;
+			}
+
+			if (sep){
+				*sep = 0;
+				s2 = xstrdup (sep+1);
+				id2 = add_task (s2);
+			}
+			s1 = xstrdup (buf);
+			id1 = add_task (s1);
+
+			if (sep){
+				++arcs_count;
+				arcs_from = (int *) xrealloc (arcs_from,
+											  arcs_count * sizeof (*arcs_from));
+				arcs_to = (int *) xrealloc (arcs_to,
+											arcs_count * sizeof (*arcs_to));
+
+				arcs_from [arcs_count-1] = id1;
+				arcs_to [arcs_count-1]   = id2;
+			}
+		}
+
+		/* degree for each task */
+		tasks_graph_deg = (int *) xmalloc (
+			tasks_count * sizeof (*tasks_graph_deg));
+		memset (tasks_graph_deg, 0, tasks_count * sizeof (*tasks_graph_deg));
+
+		for (i=0; i < arcs_count; ++i){
+			++tasks_graph_deg [arcs_to [i]];
+		}
+
+		assert (tasks_graph_deg [6] == 0);
+		delete_task_rec (6);
+//		assert (tasks_graph_deg [1] == 0);
+//		delete_task_rec (1);
+		while (t = get_new_task (), t != -1){
+			fprintf (stderr, "task %d %s\n", t, id2task [t]);
+		}
+
+		exit (88);
+	}else{
+		/* completely independent tasks */
+		nonblock (0);
+	}
 }
 
 static void kill_childs (void)
@@ -551,12 +695,14 @@ static void process_args (int *argc, char ***argv)
 		{ "i2o",       0, 0, 'i' },
 		{ "i2o-flush", 0, 0, 'I' },
 
+		{ "pos",       0, 0, 's' },
+
 		{ "debug",     0, 0, 'd' },
 
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIn:c:t:", longopts, NULL),
+	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIn:c:t:s", longopts, NULL),
 		   c != EOF)
 	{
 		switch (c) {
@@ -602,6 +748,9 @@ static void process_args (int *argc, char ***argv)
 			case 'I':
 				print_i2o = 1;
 				flush_i2o = 1;
+				break;
+			case 's':
+				poset_of_tasks = 1;
 				break;
 			default:
 				usage ();
@@ -666,6 +815,10 @@ static void free_memory (void)
 
 	if (line_nums)
 		xfree (line_nums);
+
+	if (poset_of_tasks){
+		hsh_destroy (tasks);
+	}
 }
 
 int main (int argc, char **argv)
