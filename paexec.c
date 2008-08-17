@@ -109,6 +109,8 @@ static pid_t *pids      = NULL;
 
 static int *line_nums   = NULL;
 
+static int *ret_codes   = NULL;
+
 static int max_fd    = 0;
 
 static int line_num = 0;
@@ -152,6 +154,9 @@ static size_t current_task_sz = 0;
 static char *NL_found = NULL;
 static int end_of_stdin = 0;
 
+static const char *poset_success = "success";
+static const char *poset_failure = "failure";
+
 static void close_all_ins (void)
 {
 	int i;
@@ -163,7 +168,7 @@ static void close_all_ins (void)
 	}
 }
 
-static void delete_task (int task)
+static void delete_task (int task, int print_task)
 {
 	int i;
 	for (i=0; i < arcs_count; ++i){
@@ -172,17 +177,25 @@ static void delete_task (int task)
 			assert (tasks_graph_deg [arcs_to [i]] >= -1);
 		}
 	}
-	assert (tasks_graph_deg [task] == -1);
+
+	assert (tasks_graph_deg [task] == -1 || tasks_graph_deg [task] == 0);
+	tasks_graph_deg [task] = -1;
+
 	--remained_tasks_count;
+
 	end_of_stdin = (remained_tasks_count == 0);
 	if (end_of_stdin)
 		close_all_ins ();
+
+	if (print_task){
+		printf ("%s ", id2task [task]);
+	}
 }
 
 static void delete_task_rec (int task)
 {
 	int i;
-	delete_task (task);
+	delete_task (task, 1);
 
 	for (i=0; i < arcs_count; ++i){
 		if (arcs_from [i] == task){
@@ -307,6 +320,8 @@ static void init (void)
 
 	line_nums = xmalloc (nodes_count * sizeof (*line_nums));
 
+	ret_codes = xmalloc (nodes_count * sizeof (*ret_codes));
+
 	/* stdin */
 	buf_stdin = xmalloc (initial_bufsize);
 	buf_stdin [0] = 0;
@@ -323,6 +338,8 @@ static void init (void)
 		size_out [i] = 0;
 
 		busy [i] = 0;
+
+		ret_codes [i] = -1;
 
 		if (arg_transport && arg_transport [0])
 			snprintf (full_cmd, sizeof (full_cmd), "%s %s %s",
@@ -352,7 +369,7 @@ static void init (void)
 		/* reading all tasks with their dependancies */
 		while (fgets (buf, sizeof (buf), stdin)){
 			size_t len = strlen (buf);
-			char *sep = strchr (buf, '\t');
+			char *sep = strchr (buf, ' ');
 			int id1, id2;
 			char *s1, *s2;
 
@@ -440,7 +457,7 @@ static int find_free_node (void)
 	return -1;
 }
 
-static void print_line (int num, const char *line)
+static void print_header (int num)
 {
 	if (show_node){
 		if (nodes && nodes [num])
@@ -454,7 +471,11 @@ static void print_line (int num, const char *line)
 	if (show_pid){
 		printf ("%d ", (int) pids [num]);
 	}
+}
 
+static void print_line (int num, const char *line)
+{
+	print_header (num);
 	printf ("%s\n", line);
 }
 
@@ -493,6 +514,8 @@ static void loop (void)
 	int cnt          = 0;
 	int i, j;
 	char *buf_out_i  = 0;
+
+	const char *curr_line = NULL;
 
 	FD_ZERO (&rset);
 
@@ -554,12 +577,11 @@ static void loop (void)
 					if (buf_out_i [j] == '\n'){
 						buf_out_i [j] = 0;
 
+						curr_line = buf_out [i] + printed;
+
 						if (printed == j){
 							/* end of task marker */
 							assert (busy [i] == 1);
-
-							if (poset_of_tasks)
-								delete_task (line_nums [i]);
 
 							busy [i] = 0;
 							--busy_count;
@@ -569,15 +591,43 @@ static void loop (void)
 								fd_in [i] = -1;
 							}
 
+							/* an empty line means end-of-task */
+							if (poset_of_tasks){
+								switch (ret_codes [i]){
+									case 0:
+										print_header (i);
+										delete_task_rec (line_nums [i]);
+										printf ("\n");
+										break;
+									case 1:
+										delete_task (line_nums [i], 0);
+										break;
+									case -1:
+										print_line (i, "?");
+										break;
+									default:
+										abort ();
+								}
+							}
+
 							if (print_eot){
-								/* an empty line means end-of-task */
-								print_line (i, buf_out [i] + printed);
+								print_line (i, curr_line);
 								if (flush_eot){
 									fflush (stdout);
 								}
 							}
 
 							break;
+						}
+
+						if (poset_of_tasks){
+							if (!strcmp (curr_line, poset_success)){
+								ret_codes [i] = 1;
+							}else if (!strcmp (curr_line, poset_failure)){
+								ret_codes [i] = 0;
+							}else{
+								ret_codes [i] = -1;
+							}
 						}
 
 						print_line (i, buf_out [i] + printed);
@@ -856,6 +906,9 @@ static void free_memory (void)
 
 	if (line_nums)
 		xfree (line_nums);
+
+	if (ret_codes)
+		xfree (ret_codes);
 
 	if (poset_of_tasks){
 		hsh_destroy (tasks);
