@@ -177,3 +177,24 @@ paexec - parallel executor
 1 =================================================================
 1 ======= args: -c ../tests/big_result_cmd -n +9
 100000 1234567890-=QWERTYUIOP[]ASDFGHJKL;ZXCVBNM,./ZAQWSXCDERFVBGTYHNMJUIK,.LO
+=================================================================
+======= args: -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10
+2 1
+2 success
+1 0.5
+1 success
+3 0.333333
+3 success
+4 0.25
+4 success
+5 0.2
+5 success
+6 Cannot calculate 1/0
+6 failure
+6 0 7 8 9 
+10 0.1
+10 success
+11 0.0909091
+11 success
+12 0.0833333
+12 success
