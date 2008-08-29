@@ -111,7 +111,7 @@ static int *line_nums   = NULL;
 
 static int *ret_codes   = NULL;
 
-static int max_fd    = 0;
+static int max_fd   = 0;
 
 static int line_num = 0;
 
@@ -161,7 +161,7 @@ static void close_all_ins (void)
 {
 	int i;
 	for (i=0; i < nodes_count; ++i){
-		if (!busy [i]){
+		if (!busy [i] && fd_in [i] != -1){
 			xclose (fd_in [i]);
 			fd_in [i] = -1;
 		}
@@ -215,29 +215,30 @@ static const char * get_new_task_from_stdin (void)
 	return buf_stdin;
 }
 
-static const char * get_new_task_from_graph (void)
+static int get_new_task_num_from_graph (void)
 {
-	/* topological sort of task graph */
 	int i;
-	int empty = 1;
 
 	for (i=1; i < tasks_count; ++i){
 		assert (tasks_graph_deg [i] >= -1);
 
-		switch (tasks_graph_deg [i]){
-			case 0:
-				line_num = i;
-				tasks_graph_deg [i] = -1;
-				return id2task [i];
-				break;
-			case -1:
-				break;
-			default:
-				empty = 0;
-		}
+		if (tasks_graph_deg [i] == 0)
+			return i;
 	}
 
-	return NULL;
+	return -1;
+}
+
+static const char * get_new_task_from_graph (void)
+{
+	/* topological sort of task graph */
+	int num = get_new_task_num_from_graph ();
+	if (num == -1)
+		return NULL;
+
+	line_num = num;
+	tasks_graph_deg [num] = -1;
+	return id2task [num];
 }
 
 static const char *get_new_task (void)
@@ -378,14 +379,17 @@ static void init (void)
 			}
 
 			if (sep){
+				/* task2(to) */
 				*sep = 0;
 				s2 = xstrdup (sep+1);
 				id2 = add_task (s2);
 			}
+			/* task1(from) */
 			s1 = xstrdup (buf);
 			id1 = add_task (s1);
 
 			if (sep){
+				/* (from,to) pair */
 				++arcs_count;
 				arcs_from = (int *) xrealloc (arcs_from,
 											  arcs_count * sizeof (*arcs_from));
@@ -517,21 +521,32 @@ static void loop (void)
 
 	const char *curr_line = NULL;
 
+	if (poset_of_tasks && tasks_count == 1){
+		/* no tasks */
+		close_all_ins ();
+		wait_for_childs ();
+		return;
+	}
+
 	FD_ZERO (&rset);
 
 	if (!poset_of_tasks)
 		FD_SET (0, &rset);
 
-	while (
-		(poset_of_tasks && busy_count == 0) ||
-		(ret = xselect (max_fd+1, &rset, NULL, NULL, NULL)) >= 0)
+	while (ret = -777,
+		   (poset_of_tasks
+			&& busy_count < nodes_count
+			&& get_new_task_num_from_graph () != -1) ||
+		   (ret = xselect (max_fd+1, &rset, NULL, NULL, NULL)) >= 0)
 	{
+		/* ret == -777 means select(2) was not called */
+
 		if (debug){
 			printf ("select ret=%d\n", ret);
 		}
 
 		/* stdin */
-		if (FD_ISSET (0, &rset)){
+		if (ret != -777 && FD_ISSET (0, &rset)){
 			cnt = xread (0, buf_stdin + size_stdin, bufsize_stdin - size_stdin);
 			if (cnt){
 				size_stdin += cnt;
@@ -546,13 +561,11 @@ static void loop (void)
 			}
 		}
 
-		if (busy_count < nodes_count){
-			if (get_new_task ())
-				send_to_node ();
-		}
+		if (busy_count < nodes_count && get_new_task ())
+			send_to_node ();
 
 		/* fd_out */
-		for (i=0; i < nodes_count; ++i){
+		for (i=0; ret != -777 && i < nodes_count; ++i){
 			if (FD_ISSET (fd_out [i], &rset)){
 				buf_out_i = buf_out [i];
 
@@ -643,7 +656,7 @@ static void loop (void)
 							 buf_out_i + printed,
 							 cnt);
 				}
-				
+
 				size_out [i] = cnt;
 
 				if (size_out [i] == bufsize_out [i]){
@@ -681,10 +694,14 @@ static void loop (void)
 		}
 
 		/* exit ? */
+		if (poset_of_tasks)
+			end_of_stdin = (remained_tasks_count == 0);
+
 		if (!busy_count && end_of_stdin)
 			break;
 	}
 
+	close_all_ins ();
 	wait_for_childs ();
 }
 
