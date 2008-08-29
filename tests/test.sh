@@ -82,7 +82,7 @@ do_test (){
     head -n 100 |
     awk '{$1 = $1; print $0}'
 
-    # test for partially ordered set of tasks (-s option)
+    # tests for partially ordered set of tasks (-s option)
     runtest -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 <<EOF
 1 2
 2 3
@@ -96,6 +96,9 @@ do_test (){
 10 11
 11 12
 EOF
+
+    # -s and no input
+    runtest -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 < /dev/null
 }
 
 for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
