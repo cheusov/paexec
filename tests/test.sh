@@ -93,7 +93,7 @@ do_test (){
     awk '{$1 = $1; print $0}'
 
     # tests for partially ordered set of tasks (-s option)
-    runtest -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 <<EOF
+    runtest -e -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 <<EOF
 1 2
 2 3
 3 4
