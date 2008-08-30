@@ -46,7 +46,7 @@ Algorithm. I<Commands> are run on each I<node> with a help of
 I<transport> program. Then, I<tasks> are read from stdin line-by-line
 (one task per line)
 and are sent to free I<node> (exactly one task per node at
-a time). At the same time result lines are read from I<commands's>
+a time). At the same time result lines are read from I<command's>
 stdout and are output to B<paexec's> stdout. When an empty line is
 obtained from the I<node> (this means that I<node> finished
 its job) it is marked as free and becomes ready for the next
@@ -82,7 +82,7 @@ I<nodes>) in the mixed order. That is, the first line of the
 output may contain a result line obtain from the first I<node>,
 the second line of output - from the second I<node>, but the
 third output line may contain result line from the first I<node>
-again. It is also not garanteed that the first line of output will be
+again. It is also not guaranteed that the first line of output will be
 from the first I<node> or from the first I<task>. All result
 lines are output as soon as they are read by B<paexec>, i.e as soon as
 they are ready to be output. B<paexec> works this way for the
@@ -114,7 +114,7 @@ Transport command
 =item B<-n>|B<--nodes> I<+number>
 
 List of nodes (e.g. hostnames) separated by space character or (+
-nonation) a number of nodes.
+notation) a number of nodes.
 
 Path to I<command>
 
@@ -135,7 +135,7 @@ if I<-p> is also applied. Space character is used as a separator.
 =item B<-p>|B<--show-pid>
 
 Include pid of paexec's subprocess that communicates with
-I<node+command> to the output. Pid prepands the actual result
+I<node+command> to the output. Pid prepends the actual result
 line. Space character is used as a separator.
 
 =item B<-e>|B<--eot>
@@ -164,6 +164,40 @@ processor.
 =item B<-E>|B<--eot-flush>
 
 Imply B<-e> and flushes stdout.
+
+=item B<-s>|B<--pos>
+
+Partially ordered set of tasks are read from stdin.
+
+Instead of autonomous tasks, graph of the tasks is read from stdin.
+In this mode every task can either FAIL or SUCCEED.
+As always an empty line output by I<command> means I<end of task>.
+The line before it shows an EXIT STATUS of the task.
+The word "failure" means failure, "success" - success.
+See examples/1_div_x/1_div_X_cmd for the sample.
+An input line (paexec's stdin) should contain
+either single task without spaces inside
+or two tasks separated by single space character,
+e.g. task1<SPC>task2. task1<SPC>task2 line means that task1 must be done
+before task2 and it is mandatory, that is if task1 I<fail> all dependent
+tasks (including task2) are also failed recursively.
+Tasks having dependencies are not started until all dependencies
+are not successfully done (succeeded).
+
+ Sample of the graph of tasks
+
+   textproc/dictem
+   devel/glib2
+   devel/libjudy
+   devel/autoconf wip/libmaa
+   devel/gmake wip/libmaa
+   wip/libmaa wip/dict-server
+   wip/libmaa wip/dict-client
+   devel/m4 wip/dict-server
+   devel/byacc wip/dict-server
+   devel/byacc wip/dict-client
+   devel/flex wip/dict-server
+   devel/flex wip/dict-client
 
 =back
 
