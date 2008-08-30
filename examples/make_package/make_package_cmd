@@ -1,0 +1,8 @@
+#!/usr/bin/awk -f
+
+{
+	print $0
+	print "success"
+	print "" # end of task marker
+	fflush()
+}
