@@ -199,6 +199,7 @@ paexec - parallel executor
 =================================================================
 ======= args: -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10
 =================================================================
+======= args: -s -c ../examples/make_package/make_package_cmd -n +4
 ======= make package test!!!
 ok
 ok

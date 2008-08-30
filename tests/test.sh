@@ -128,6 +128,7 @@ EOF
 
     cat <<EOF
 =================================================================
+======= args: -s -c ../examples/make_package/make_package_cmd -n +4
 ======= make package test!!!
 EOF
 
