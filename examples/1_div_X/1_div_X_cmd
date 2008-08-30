@@ -2,11 +2,11 @@
 
 {
 	if ($1 != 0){
-		print 1/$1
-		print "success"
+		print "1/" $1 "=" 1/$1
+		print "success" # an exit status line for 'paexec -s...'
 	}else{
 		print "Cannot calculate 1/0"
-		print "failure"
+		print "failure" # an exit status line for 'paexec -s...'
 	}
 
 	print "" # end of task marker
