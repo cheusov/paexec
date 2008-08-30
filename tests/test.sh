@@ -71,6 +71,12 @@ do_test (){
     runtest -l -c ../examples/all_substr/all_substr_cmd -n '+9' |
     resort
 
+    # no input
+    runtest -c ../examples/all_substr/all_substr_cmd -n +3 < /dev/null
+
+    # bad command + no input
+    runtest -l -c /path/to/bad/prog -n +3 < /dev/null
+
     # bi-i-i-i-i-i-ig result
     awk '
     BEGIN {
