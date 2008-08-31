@@ -381,6 +381,8 @@ ok9
 ok10
 ok11
 ok12
+ok20
+ok21
 ok100
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +4
@@ -396,4 +398,6 @@ ok10
 ok11
 ok12
 ok13
+ok20
+ok21
 ok100

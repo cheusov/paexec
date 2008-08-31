@@ -179,14 +179,13 @@ static void delete_task (int task, int print_task)
 			if (tasks_graph_deg [to] > 0)
 				--tasks_graph_deg [to];
 		}
-		if (to == task){
-			arcs_to [i] = arcs_from [i] = -1;
-		}
 	}
 
-	tasks_graph_deg [task] = -1;
+	if (tasks_graph_deg [task] >= -1){
+		tasks_graph_deg [task] = -2;
 
-	--remained_tasks_count;
+		--remained_tasks_count;
+	}
 
 	end_of_stdin = (remained_tasks_count == 0);
 	if (end_of_stdin)
@@ -208,8 +207,7 @@ static void delete_task_rec (int task)
 	for (i=0; i < arcs_count; ++i){
 		if (arcs_from [i] == task){
 			to = arcs_to [i];
-			if (to >= 0)
-				delete_task_rec (to);
+			delete_task_rec (to);
 		}
 	}
 }
@@ -230,7 +228,7 @@ static int get_new_task_num_from_graph (void)
 	int i;
 
 	for (i=1; i < tasks_count; ++i){
-		assert (tasks_graph_deg [i] >= -1);
+		assert (tasks_graph_deg [i] >= -2);
 
 		if (tasks_graph_deg [i] == 0)
 			return i;

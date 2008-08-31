@@ -416,6 +416,13 @@ EOF
     test "`gln wip/dict-server`" = "rf" && echo ok11 || true
     test "`gln wip/dict-client`" = "rf" && echo ok12 || true
 
+    awk 'NF > 2 && $2 == "devel/flex" &&
+         /wip\/dict-server/ &&
+         /wip\/dict-client/ {print "ok20"}' _test.tmp
+    awk 'NF > 2 && $2 == "devel/byacc" &&
+         /wip\/dict-server/ &&
+         /wip\/dict-client/ {print "ok21"}' _test.tmp
+
     test "`awk 'END {print NR}' _test.tmp`" -eq 20 && echo ok100 || true
 
     # -s: gmake and autoconf fail
@@ -441,8 +448,14 @@ EOF
     test "`gln wip/dict-server`" = "rf" && echo ok12 || true
     test "`gln wip/dict-client`" = "rf" && echo ok13 || true
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 18 && echo ok100 || true
+    awk 'NF > 2 && $2 == "devel/autoconf" &&
+         /wip\/libmaa/ && /wip\/dict-server/ &&
+         /wip\/dict-client/ {print "ok20"}' _test.tmp
+    awk 'NF > 2 && $2 == "devel/gmake" &&
+         /wip\/libmaa/ && /wip\/dict-server/ &&
+         /wip\/dict-client/ {print "ok21"}' _test.tmp
 
+    test "`awk 'END {print NR}' _test.tmp`" -eq 18 && echo ok100 || true
 }
 
 for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
