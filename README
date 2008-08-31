@@ -46,13 +46,16 @@ licence:                                                   MIT license
 
 4) bmake
 
-5) (optional!) bmake install-dirs
+5) bmake test
+   If this stage fails on your system, PLEASE LET ME NOW.
 
-6) bmake install
+6) (optional!) bmake install-dirs
+
+7) bmake install
 
 There are a lot of Makefile variables that can be changed during
 building and installation.
-paexec's own variables (All they are at the begining of Makefile):
+paexec's own variables (All they are in the begining of Makefile):
 
   PREFIX         - where paexec is installed to
   LIBMAA         - linker option for linking "maa" library
