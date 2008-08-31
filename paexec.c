@@ -282,12 +282,15 @@ typedef union {
 static int add_task (const char *s)
 {
 	int_ptr_union_t r;
+
 	r.integer = 0;
 	r.ptr = hsh_retrieve (tasks, s);
 	if (r.ptr){
 		return r.integer;
 	}else{
-		hsh_insert (tasks, s, (const void *) tasks_count);
+		r.ptr = NULL;
+		r.integer = tasks_count;
+		hsh_insert (tasks, s, r.ptr);
 
 		++tasks_count;
 		++remained_tasks_count;
@@ -554,7 +557,7 @@ static void loop (void)
 
 		/* stdin */
 		if (ret != -777 && FD_ISSET (0, &rset)){
-			cnt = xread (0, buf_stdin + size_stdin, bufsize_stdin - size_stdin);
+			cnt = xread (0, buf_stdin + size_stdin, 1/*bufsize_stdin - size_stdin*/);
 			if (cnt){
 				size_stdin += cnt;
 
@@ -704,7 +707,7 @@ static void loop (void)
 		if (poset_of_tasks)
 			end_of_stdin = (remained_tasks_count == 0);
 
-		if (!busy_count && end_of_stdin)
+		if (!busy_count && end_of_stdin && (poset_of_tasks || !size_stdin))
 			break;
 	}
 
