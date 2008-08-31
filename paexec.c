@@ -274,11 +274,17 @@ static const char *get_new_task (void)
 	return current_task;
 }
 
+typedef union {
+	int integer;
+	const void *ptr;
+} int_ptr_union_t;
+
 static int add_task (const char *s)
 {
-	const void *p = hsh_retrieve (tasks, s);
-	if (p){
-		return (int) p;
+	int_ptr_union_t r;
+	r.ptr = hsh_retrieve (tasks, s);
+	if (r.ptr){
+		return r.integer;
 	}else{
 		hsh_insert (tasks, s, (const void *) tasks_count);
 
