@@ -170,15 +170,18 @@ static void close_all_ins (void)
 
 static void delete_task (int task, int print_task)
 {
-	int i;
+	int i, to;
+	assert (task >= 0);
+
 	for (i=0; i < arcs_count; ++i){
 		if (arcs_from [i] == task){
-			--tasks_graph_deg [arcs_to [i]];
-			assert (tasks_graph_deg [arcs_to [i]] >= -1);
+			to = arcs_to [i];
+
+			if (tasks_graph_deg [to] > 0)
+				--tasks_graph_deg [to];
 		}
 	}
 
-	assert (tasks_graph_deg [task] == -1 || tasks_graph_deg [task] == 0);
 	tasks_graph_deg [task] = -1;
 
 	--remained_tasks_count;
@@ -194,12 +197,17 @@ static void delete_task (int task, int print_task)
 
 static void delete_task_rec (int task)
 {
-	int i;
+	int i, to;
+
+	assert (task >= 0);
+
 	delete_task (task, 1);
 
 	for (i=0; i < arcs_count; ++i){
 		if (arcs_from [i] == task){
-			delete_task_rec (arcs_to [i]);
+			to = arcs_to [i];
+			if (to >= 0)
+				delete_task_rec (to);
 		}
 	}
 }
