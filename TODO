@@ -12,4 +12,6 @@ succeed. Failure of the task shell mark all dependent tasks as failed.
 
 non-blocking write(2) for sending task to slave hosts/CPUs.
 
+avoid using read(0, BUF, 1) # 1 -> <NUM> is needed
+
 command for resorting output of "paexec -l"
