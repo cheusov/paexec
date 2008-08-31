@@ -232,6 +232,8 @@ ok6
 ok7
 ok8
 ok9
+ok10
+ok11
 ok100
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__flex -n +4
@@ -245,6 +247,8 @@ ok6
 ok7
 ok8
 ok9
+ok10
+ok11
 ok100
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__libmaa -n +4
@@ -258,6 +262,8 @@ ok66
 ok7
 ok8
 ok9
+ok10
+ok11
 ok100
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__m4 -n +4
@@ -271,6 +277,7 @@ ok6
 ok7
 ok8
 ok9
+ok10
 ok100
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__libjudy -n +4
@@ -327,7 +334,10 @@ ok4
 ok5
 ok8
 ok9
+ok10
+ok11
 ok12
+ok13
 ok100
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__autoconf -n +4
@@ -339,7 +349,10 @@ ok4
 ok5
 ok8
 ok9
+ok10
+ok11
 ok12
+ok13
 ok100
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__dict-server -n +4
@@ -366,6 +379,8 @@ ok5
 ok8
 ok9
 ok10
+ok11
+ok12
 ok100
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +4
@@ -378,4 +393,7 @@ ok5
 ok8
 ok9
 ok10
+ok11
+ok12
+ok13
 ok100

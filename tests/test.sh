@@ -27,6 +27,13 @@ gln (){
     $2 == task { ln = NR; tn = $1}
     $1 == tn && $2 == "success" {print ln; exit}
     $1 == tn && $2 == "failure" {print "f"; exit}
+    $2 == "failure" {tf [$1] = 1}
+    $1 in tf {
+        for (i=3; i <= NF; ++i) {fail [$i] = 1}
+    }
+    END {
+        if (task in fail) {print "rf"}
+    }
     ' _test.tmp
 }
 
@@ -158,6 +165,9 @@ EOF
     test "`gln devel/flex`" -gt 0 && echo ok8 || true
     test "`gln devel/byacc`" = f && echo ok9 || true
 
+    test "`gln wip/dict-server`" = "rf" && echo ok10 || true
+    test "`gln wip/dict-client`" = "rf" && echo ok11 || true
+
     test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100 || true
 
     # -s: flex fails
@@ -179,6 +189,9 @@ EOF
     test "`gln devel/m4`" -gt 0 && echo ok7 || true
     test "`gln devel/byacc`" -gt 0 && echo ok8 || true
     test "`gln devel/flex`" = f && echo ok9 || true
+
+    test "`gln wip/dict-server`" = "rf" && echo ok10 || true
+    test "`gln wip/dict-client`" = "rf" && echo ok11 || true
 
     test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100 || true
 
@@ -202,6 +215,9 @@ EOF
     test "`gln devel/byacc`" -gt 0 && echo ok8 || true
     test "`gln wip/libmaa`" = f && echo ok9 || true
 
+    test "`gln wip/dict-server`" = "rf" && echo ok10 || true
+    test "`gln wip/dict-client`" = "rf" && echo ok11 || true
+
     test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100 || true
 
     # -s: m4 fails
@@ -223,6 +239,8 @@ EOF
     test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok7 || true
     test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok8 || true
     test "`gln devel/m4`" = f && echo ok9 || true
+
+    test "`gln wip/dict-server`" = "rf" && echo ok10 || true
 
     test "`awk 'END {print NR}' _test.tmp`" -eq 21 && echo ok100 || true
 
@@ -318,7 +336,11 @@ EOF
     test "`gln devel/gmake`" = f && echo ok5 || true
     test "`gln devel/m4`" -gt 0 && echo ok8 || true
     test "`gln devel/byacc`" -gt 0 && echo ok9 || true
-    test "`gln devel/flex`" -gt 0 && echo ok12 || true
+    test "`gln devel/flex`" -gt 0 && echo ok10 || true
+
+    test "`gln wip/libmaa`"      = "rf" && echo ok11 || true
+    test "`gln wip/dict-server`" = "rf" && echo ok12 || true
+    test "`gln wip/dict-client`" = "rf" && echo ok13 || true
 
     test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100 || true
 
@@ -339,7 +361,11 @@ EOF
     test "`gln devel/autoconf`" = f && echo ok5 || true
     test "`gln devel/m4`" -gt 0 && echo ok8 || true
     test "`gln devel/byacc`" -gt 0 && echo ok9 || true
-    test "`gln devel/flex`" -gt 0 && echo ok12 || true
+    test "`gln devel/flex`" -gt 0 && echo ok10 || true
+
+    test "`gln wip/libmaa`"      = "rf" && echo ok11 || true
+    test "`gln wip/dict-server`" = "rf" && echo ok12 || true
+    test "`gln wip/dict-client`" = "rf" && echo ok13 || true
 
     test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100 || true
 
@@ -387,6 +413,9 @@ EOF
     test "`gln devel/byacc`" = f && echo ok9 || true
     test "`gln devel/flex`" = f && echo ok10 || true
 
+    test "`gln wip/dict-server`" = "rf" && echo ok11 || true
+    test "`gln wip/dict-client`" = "rf" && echo ok12 || true
+
     test "`awk 'END {print NR}' _test.tmp`" -eq 20 && echo ok100 || true
 
     # -s: gmake and autoconf fail
@@ -407,6 +436,10 @@ EOF
     test "`gln devel/m4`" -gt 0 && echo ok8 || true
     test "`gln devel/byacc`" -gt 0 && echo ok9 || true
     test "`gln devel/flex`" -gt 0 && echo ok10 || true
+
+    test "`gln wip/libmaa`"      = "rf" && echo ok11 || true
+    test "`gln wip/dict-server`" = "rf" && echo ok12 || true
+    test "`gln wip/dict-client`" = "rf" && echo ok13 || true
 
     test "`awk 'END {print NR}' _test.tmp`" -eq 18 && echo ok100 || true
 
