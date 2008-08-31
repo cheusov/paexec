@@ -181,8 +181,10 @@ or two tasks separated by single space character,
 e.g. task1<SPC>task2. task1<SPC>task2 line means that task1 must be done
 before task2 and it is mandatory, that is if task1 I<fail> all dependent
 tasks (including task2) are also failed recursively.
-Tasks having dependencies are not started until all dependencies
-are not successfully done (succeeded).
+Tasks having dependencies are started only after all dependencies
+are succeeded. When a task succeeds paexec outputs "success" word
+just before end_of_task marker (see -e or -E), otherwise "failure"
+word is output followed by a list of tasks failed because of it.
 
  Sample of the graph of tasks
 
