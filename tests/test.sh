@@ -140,10 +140,10 @@ EOF
     test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok
     test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok
     test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok
-    test "`gln wip/byacc`" -lt "`gln wip/dict-client`" && echo ok
-    test "`gln wip/byacc`" -lt "`gln wip/dict-server`" && echo ok
-    test "`gln wip/flex`" -lt "`gln wip/dict-client`" && echo ok
-    test "`gln wip/flex`" -lt "`gln wip/dict-server`" && echo ok
+    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok
+    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok
+    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok
+    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok
 }
 
 for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
