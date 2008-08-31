@@ -174,11 +174,13 @@ static void delete_task (int task, int print_task)
 	assert (task >= 0);
 
 	for (i=0; i < arcs_count; ++i){
+		to = arcs_to [i];
 		if (arcs_from [i] == task){
-			to = arcs_to [i];
-
 			if (tasks_graph_deg [to] > 0)
 				--tasks_graph_deg [to];
+		}
+		if (to == task){
+			arcs_to [i] = arcs_from [i] = -1;
 		}
 	}
 

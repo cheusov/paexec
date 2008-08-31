@@ -366,6 +366,50 @@ EOF
 
     test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100 || true
 
+    # -s: flex and byacc fail
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__flex_byacc \
+	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
+
+    cat <<EOF
+=================================================================
+======= args: -l -s -c ../examples/make_package/make_package_cmd__flex_byacc -n +4
+======= make package test!!!
+EOF
+
+    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
+    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
+    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
+#    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6 || true
+#    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7 || true
+    test "`gln devel/m4`" -gt 0 && echo ok8 || true
+    test "`gln devel/byacc`" = f && echo ok9 || true
+    test "`gln devel/flex`" = f && echo ok10 || true
+
+    test "`awk 'END {print NR}' _test.tmp`" -eq 20 && echo ok100 || true
+
+    # -s: gmake and autoconf fail
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +4 \
+	> _test.tmp < ../examples/make_package/make_package_tasks
+
+    cat <<EOF
+=================================================================
+======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +4
+======= make package test!!!
+EOF
+
+    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
+    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
+    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
+    test "`gln devel/autoconf`" = f && echo ok4 || true
+    test "`gln devel/gmake`" = f && echo ok5 || true
+    test "`gln devel/m4`" -gt 0 && echo ok8 || true
+    test "`gln devel/byacc`" -gt 0 && echo ok9 || true
+    test "`gln devel/flex`" -gt 0 && echo ok10 || true
+
+    test "`awk 'END {print NR}' _test.tmp`" -eq 18 && echo ok100 || true
+
 }
 
 for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do

@@ -1,0 +1,12 @@
+#!/usr/bin/awk -f
+
+{
+	print $0
+	if ($0 ~ /^devel\/(flex|byacc)$/)
+		print "failure"
+	else
+		print "success"
+
+	print ""       # end of task marker
+	fflush()
+}
