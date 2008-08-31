@@ -186,20 +186,59 @@ are succeeded. When a task succeeds paexec outputs "success" word
 just before end_of_task marker (see -e or -E), otherwise "failure"
 word is output followed by a list of tasks failed because of it.
 
- Sample of the graph of tasks
+ Samples:
 
-   textproc/dictem
-   devel/glib2
-   devel/libjudy
-   devel/autoconf wip/libmaa
-   devel/gmake wip/libmaa
-   wip/libmaa wip/dict-server
-   wip/libmaa wip/dict-client
-   devel/m4 wip/dict-server
-   devel/byacc wip/dict-server
-   devel/byacc wip/dict-client
-   devel/flex wip/dict-server
-   devel/flex wip/dict-client
+   tasks (examples/make_package/make_package_tasks file)
+
+     textproc/dictem
+     devel/autoconf wip/libmaa
+     devel/gmake wip/libmaa
+     wip/libmaa wip/dict-server
+     wip/libmaa wip/dict-client
+     devel/m4 wip/dict-server
+     devel/byacc wip/dict-server
+     devel/byacc wip/dict-client
+     devel/flex wip/dict-server
+     devel/flex wip/dict-client
+     devel/glib2
+     devel/libjudy
+
+   command (examples/make_package/make_package_cmd__flex)
+
+     #!/usr/bin/awk -f
+     {
+        print $0
+        if ($0 == "devel/flex")
+           print "failure"
+        else
+           print "success"
+
+        print ""       # end of task marker
+        fflush()
+     }
+
+   output of "paexec -s -l -c make_package_cmd__flex -n +10 \
+              < make_package_tasks"
+
+     3 devel/autoconf
+     3 success
+     4 devel/gmake
+     4 success
+     7 devel/m4
+     7 success
+     8 devel/byacc
+     8 success
+     9 devel/flex
+     9 failure
+     9 devel/flex wip/dict-server wip/dict-client 
+     10 devel/glib2
+     10 success
+     11 devel/libjudy
+     11 success
+     1 textproc/dictem
+     1 success
+     2 wip/libmaa
+     2 success
 
 =back
 
