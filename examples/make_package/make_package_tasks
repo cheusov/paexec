@@ -1,0 +1,12 @@
+textproc/dictem
+devel/autoconf wip/libmaa
+devel/gmake wip/libmaa
+wip/libmaa wip/dict-server
+wip/libmaa wip/dict-client
+devel/m4 wip/dict-server
+devel/byacc wip/dict-server
+devel/byacc wip/dict-client
+devel/flex wip/dict-server
+devel/flex wip/dict-client
+devel/glib2
+devel/libjudy

@@ -23,7 +23,11 @@ resort (){
 }
 
 gln (){
-    awk "\$1 == \"$1\" {print NR; exit}" _test.tmp
+    awk -v task=$1 '
+    $2 == task {
+	print NR
+	exit
+    }' _test.tmp
 }
 
 do_test (){
@@ -110,40 +114,28 @@ EOF
     runtest -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 < /dev/null
 
     # -s
-    runtest -s -c ../examples/make_package/make_package_cmd -n +4 \
-	> _test.tmp <<EOF
-textproc/dictem
-devel/autoconf wip/libmaa
-devel/gmake wip/libmaa
-wip/libmaa wip/dict-server
-wip/libmaa wip/dict-client
-devel/m4 wip/dict-server
-devel/byacc wip/dict-server
-devel/byacc wip/dict-client
-devel/flex wip/dict-server
-devel/flex wip/dict-client
-devel/glib2
-devel/libjudy
-EOF
+    runtest -l -s -c ../examples/make_package/make_package_cmd -n +4 \
+	> _test.tmp < ../examples/make_package/make_package_tasks
 
     cat <<EOF
 =================================================================
-======= args: -s -c ../examples/make_package/make_package_cmd -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd -n +4
 ======= make package test!!!
 EOF
 
-    test "`gln devel/glib2`" -gt 0 && echo ok
-    test "`gln textproc/dictem`" -gt 0 && echo ok
-    test "`gln devel/libjudy`" -gt 0 && echo ok
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok
-    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok
-    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok
-    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok
-    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok
-    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok
+    test "`gln devel/glib2`" -gt 0 && echo ok || true
+    test "`gln textproc/dictem`" -gt 0 && echo ok || true
+    test "`gln devel/libjudy`" -gt 0 && echo ok || true
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok || true
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok || true
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok || true
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok || true
+    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok || true
+    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok || true
+    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok || true
+    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok || true
+    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok || true
+    test "`awk 'END {print NR}' _test.res'`" -eq 24 && echo ok || true
 }
 
 for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
