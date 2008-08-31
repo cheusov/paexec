@@ -1,0 +1,12 @@
+#!/usr/bin/awk -f
+
+{
+	print $0
+	if ($1 ~ /^(textproc\/dictem|devel\/glib2|devel\/libjudy|devel\/autoconf|devel\/gmake)$/)
+		print "failure"
+	else
+		print "success"
+
+	print ""       # end of task marker
+	fflush()
+}
