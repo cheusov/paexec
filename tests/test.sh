@@ -117,18 +117,31 @@ do_test (){
 10 11
 11 12
 EOF
+
     # -s and no input
     runtest -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 < /dev/null
 
-    # -s: all are successful
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd -n +4 \
-	> _test.tmp < ../examples/make_package/make_package_tasks
+    # -s all failed
+    runtest -s -l -c ../examples/make_package/make_package_cmd__all_failed \
+	-n +10 < /dev/null
 
+    # -s all failed
+    runtest -s -l -c ../examples/make_package/make_package_cmd__all_failed \
+	-n +5 < /dev/null
+
+    # -s all failed
+    runtest -s -l -c ../examples/make_package/make_package_cmd__all_failed \
+	-n +1 < /dev/null
+
+    # -s: all succeeded
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd -n +2
 ======= make package test!!!
 EOF
+
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd -n +2 \
+	> _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
@@ -146,14 +159,14 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 22 && echo ok100 || true
 
     # -s: byacc fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__byacc \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__byacc -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__byacc -n +3
 ======= make package test!!!
 EOF
+
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__byacc \
+	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
@@ -171,14 +184,14 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100 || true
 
     # -s: flex fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__flex \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__flex -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__flex -n +5
 ======= make package test!!!
 EOF
+
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__flex \
+	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
@@ -196,14 +209,14 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100 || true
 
     # -s: libmaa fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__libmaa \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__libmaa -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__libmaa -n +6
 ======= make package test!!!
 EOF
+
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__libmaa \
+	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
@@ -221,14 +234,14 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100 || true
 
     # -s: m4 fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__m4 \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__m4 -n +4
 ======= make package test!!!
 EOF
+
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__m4 \
+	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
@@ -245,18 +258,17 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 21 && echo ok100 || true
 
     # -s: libjudy fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__libjudy \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__libjudy -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__libjudy -n +2
 ======= make package test!!!
 EOF
 
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__libjudy \
+	-n +2 > _test.tmp < ../examples/make_package/make_package_tasks
+
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-#    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
     test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
     test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
     test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6 || true
@@ -270,17 +282,16 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100 || true
 
     # -s: dictem fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__dictem \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__dictem -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__dictem -n +3
 ======= make package test!!!
 EOF
 
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__dictem \
+	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
+
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-#    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
     test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
     test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
     test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
@@ -295,16 +306,15 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100 || true
 
     # -s: glib2 fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__glib2 \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__glib2 -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__glib2 -n +6
 ======= make package test!!!
 EOF
 
-#    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__glib2 \
+	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
+
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
     test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
     test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
@@ -320,14 +330,14 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100 || true
 
     # -s: gmake fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__gmake -n +4 \
-	> _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake -n +5
 ======= make package test!!!
 EOF
+
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__gmake -n +5 \
+	> _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
@@ -345,14 +355,14 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100 || true
 
     # -s: autoconf fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__autoconf \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__autoconf -n +4
 ======= make package test!!!
 EOF
+
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__autoconf \
+	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
@@ -370,14 +380,14 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100 || true
 
     # -s: dict-server fails
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__dict-server \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__dict-server -n +4
 ======= make package test!!!
 EOF
+
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__dict-server \
+	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
@@ -393,22 +403,20 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100 || true
 
     # -s: flex and byacc fail
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__flex_byacc \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
 ======= args: -l -s -c ../examples/make_package/make_package_cmd__flex_byacc -n +4
 ======= make package test!!!
 EOF
 
+    ../paexec -l -s -c ../examples/make_package/make_package_cmd__flex_byacc \
+	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
+
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
     test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
     test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
     test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-#    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6 || true
-#    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7 || true
     test "`gln devel/m4`" -gt 0 && echo ok8 || true
     test "`gln devel/byacc`" = f && echo ok9 || true
     test "`gln devel/flex`" = f && echo ok10 || true
@@ -426,14 +434,15 @@ EOF
     test "`awk 'END {print NR}' _test.tmp`" -eq 20 && echo ok100 || true
 
     # -s: gmake and autoconf fail
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +4 \
-	> _test.tmp < ../examples/make_package/make_package_tasks
-
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +5
 ======= make package test!!!
 EOF
+
+    ../paexec -l -s \
+	-c ../examples/make_package/make_package_cmd__gmake_autoconf \
+	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1 || true
     test "`gln textproc/dictem`" -gt 0 && echo ok2 || true

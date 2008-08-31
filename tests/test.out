@@ -205,7 +205,13 @@ paexec - parallel executor
 =================================================================
 ======= args: -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd -n +4
+======= args: -s -l -c ../examples/make_package/make_package_cmd__all_failed -n +10
+=================================================================
+======= args: -s -l -c ../examples/make_package/make_package_cmd__all_failed -n +5
+=================================================================
+======= args: -s -l -c ../examples/make_package/make_package_cmd__all_failed -n +1
+=================================================================
+======= args: -l -s -c ../examples/make_package/make_package_cmd -n +2
 ======= make package test!!!
 ok1
 ok2
@@ -221,7 +227,7 @@ ok11
 ok12
 ok100
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__byacc -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__byacc -n +3
 ======= make package test!!!
 ok1
 ok2
@@ -236,7 +242,7 @@ ok10
 ok11
 ok100
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__flex -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__flex -n +5
 ======= make package test!!!
 ok1
 ok2
@@ -251,7 +257,7 @@ ok10
 ok11
 ok100
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__libmaa -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__libmaa -n +6
 ======= make package test!!!
 ok1
 ok2
@@ -280,7 +286,7 @@ ok9
 ok10
 ok100
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__libjudy -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__libjudy -n +2
 ======= make package test!!!
 ok1
 ok2
@@ -295,7 +301,7 @@ ok11
 ok12
 ok100
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__dictem -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__dictem -n +3
 ======= make package test!!!
 ok1
 ok3
@@ -310,7 +316,7 @@ ok11
 ok12
 ok100
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__glib2 -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__glib2 -n +6
 ======= make package test!!!
 ok2
 ok3
@@ -325,7 +331,7 @@ ok11
 ok12
 ok100
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake -n +5
 ======= make package test!!!
 ok1
 ok2
@@ -385,7 +391,7 @@ ok20
 ok21
 ok100
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +4
+======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +5
 ======= make package test!!!
 ok1
 ok2
