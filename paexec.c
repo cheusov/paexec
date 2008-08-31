@@ -282,6 +282,7 @@ typedef union {
 static int add_task (const char *s)
 {
 	int_ptr_union_t r;
+	r.integer = 0;
 	r.ptr = hsh_retrieve (tasks, s);
 	if (r.ptr){
 		return r.integer;
