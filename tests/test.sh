@@ -494,7 +494,7 @@ for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
     printf "PAEXEC_BUFSIZE=%d:\n" $PAEXEC_BUFSIZE
     export PAEXEC_BUFSIZE
 
-    if do_test > _test.res && diff -H20 -u test.out _test.res; then
+    if do_test > _test.res && diff -U 20 -u test.out _test.res; then
 	true
     else
 	echo "paexec fails (PAEXEC_BUFSIZE=$PAEXEC_BUFSIZE)" 1>&2
