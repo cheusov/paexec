@@ -1,3 +1,11 @@
+-s:
+   task1 -> task2
+   task1 -> task3
+   task2 -> task4
+   task3 -> task4
+
+   In case task1 failed, task4 is output (as failed due to dependancy) twice
+
 Currently if error happens while talking to slave host/CPU, paexec
 exits with error immediately. That is an error of read(2) and
 write(2) operations are fatal. This may happen if slave host's OS

@@ -407,3 +407,9 @@ ok13
 ok20
 ok21
 ok100
+=================================================================
+======= args: -l -s -c ../examples/make_package/make_package_cmd__flex -n +5
+======= make package test!!!
+ok1
+ok2
+needs to be fixed!!!

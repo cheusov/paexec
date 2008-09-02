@@ -465,6 +465,29 @@ EOF
          /wip\/dict-client/ {print "ok21"}' _test.tmp
 
     test "`awk 'END {print NR}' _test.tmp`" -eq 18 && echo ok100 || true
+
+    # diamond-like dependancy and failure
+    cat <<EOF
+=================================================================
+======= args: -l -s -c ../examples/make_package/make_package_cmd__flex -n +5
+======= make package test!!!
+EOF
+
+    ../paexec -l -s \
+	-c ../examples/make_package/make_package_cmd__flex \
+	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks2
+
+    test "`gln devel/flex`" = f && echo ok1 || true
+
+    awk 'NF > 2 && $2 == "devel/flex" &&
+         /wip\/dict-client/ && /wip\/dict-server/ &&
+         /wip\/pkg_online/ {print "ok2"}' _test.tmp
+
+    if grep 'wip/pkg_online.*wip/pkg_online' _test.tmp > /dev/null; then
+	echo 'needs to be fixed!!!'
+    else
+	echo ok
+    fi
 }
 
 for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
