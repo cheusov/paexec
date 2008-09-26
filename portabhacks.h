@@ -8,9 +8,13 @@
 #endif
 #include <getopt.h>
 
-#else
+#elif defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
+#else // not linux and *BSD
 #include <getopt.h>
 #include <unistd.h>
-#endif
+#else
+#include <unistd.h>
+#define getopt_long(argc, argv, shrt_opts, long_opts, index) getopt(argc, argv, shrt_opts)
+#endif // endof __linux__
 
 #endif /* _PORTABHACKS_H_ */
