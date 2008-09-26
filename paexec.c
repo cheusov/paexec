@@ -608,7 +608,7 @@ static void loop (void)
 					if (buf_out_i [j] == '\n'){
 						buf_out_i [j] = 0;
 
-						curr_line = buf_out [i] + printed;
+						curr_line = buf_out_i + printed;
 
 						if (printed == j){
 							/* end of task marker */
@@ -661,7 +661,7 @@ static void loop (void)
 							}
 						}
 
-						print_line (i, buf_out [i] + printed);
+						print_line (i, curr_line);
 
 						printed = j + 1;
 					}
