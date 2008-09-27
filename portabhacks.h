@@ -5,16 +5,25 @@
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
-#endif
+#endif /*  _GNU_SOURCE */
+
 #include <getopt.h>
 
 #elif defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
-#else // not linux and *BSD
 #include <getopt.h>
 #include <unistd.h>
-#else
+#else /* neither of platforms supporting getopt_long */
 #include <unistd.h>
-#define getopt_long(argc, argv, shrt_opts, long_opts, index) getopt(argc, argv, shrt_opts)
-#endif // endof __linux__
+struct option {
+	const char *name;
+	int has_arg;
+	int *flag;
+	int val;
+};
+
+#define getopt_long(argc, argv, shrt_opts, long_opts, index) \
+	(long_opts != NULL ? getopt(argc, argv, shrt_opts) : -1)
+
+#endif /* endof __linux__ */
 
 #endif /* _PORTABHACKS_H_ */

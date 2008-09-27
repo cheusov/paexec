@@ -39,10 +39,12 @@ gln (){
 
 do_test (){
     runtest -V        | cut_version
-    runtest --version | cut_version
+#    runtest --version | cut_version
+    runtest -V | cut_version
 
     runtest -h 2>&1     | cut_help
-    runtest --help 2>&1 | cut_help
+#    runtest --help 2>&1 | cut_help
+    runtest -h 2>&1 | cut_help
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |

@@ -2,13 +2,13 @@
 ======= args: -V
 paexec x.y.x written by Aleksey Cheusov
 =================================================================
-======= args: --version
+======= args: -V
 paexec x.y.x written by Aleksey Cheusov
 =================================================================
 ======= args: -h
 paexec - parallel executor
 =================================================================
-======= args: --help
+======= args: -h
 paexec - parallel executor
 =================================================================
 ======= args: -l -t ./paexec_notransport -c ../examples/toupper/toupper_cmd -n 1 2 3 4 5 6 7 8 9
