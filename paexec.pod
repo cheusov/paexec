@@ -346,6 +346,6 @@ L<http://sourceforge.net/projects/paexec>
 =head1 SEE ALSO
 L<ssh(1)>
 L<rsh(1)>
-L<accept(2)>
+L<select(2)>
 L<read(2)>
 L<write(2)>
