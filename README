@@ -89,19 +89,20 @@ Examples of building and installing:
        MKCATPAGES=no \
           bmake -s all install-dirs install
 
- 3)  paexec needs the non-portable getopt_long(3) present in
-     *BSD and Linux OSes. If it is absent in your OS,
-     you can build paexec like the following.
+ 3)  paexec uses the non-portable getopt_long(3) present in *BSD and
+     Linux OSes. On other systems (Solaris, HP-UX, Interix etc.)
+     paexec will be build without support for long options by default.
 
-     echo '#include <getopt.h>' > ./config.h
+     But you still can support them like the following
+
+     echo '[your declarations are here]' > ./config.h
 
      env \
        CPPFLAGS='-DNO_PORTABHACKS_H=1 -DHAVE_CONFIG_H=1' \
-       LDFLAGS='-lnbcompat' \
+       LDFLAGS='-lgetopt_long' \
           bmake -s all install-dirs install
 
-     where libnbcompat is a NetBSD's portability library
-
-     Of course, you can also use any other implementation of getopt_long.
+     For example, NetBSD's portability library (libnbcompat) may be
+     used for this.
 
      NOTE: No, I'll not use autotools

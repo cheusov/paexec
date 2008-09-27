@@ -282,7 +282,9 @@ word is output followed by a list of tasks failed because of it.
 
 =back
 
-=head1 DETAILS/INTERNALS
+=head1 NOTES
+
+Depending on the system, long options may be not available.
 
 select(2) system call and non-blocking read(2) are used to read
 I<tasks> from stdin and result lines from I<nodes>.
