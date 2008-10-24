@@ -1,4 +1,41 @@
 ======================================================================
+Version 0.10.1, by Aleksey Cheusov, Sat, 25 Oct 2008 02:00:55 +0300
+
+   This version of paexec was sucessfully tested on the following
+   platforms:
+       NetBSD/x86
+       NetBSD/Alpha(64bit)
+       Linux/x86
+       Linux/x86-64
+       Interix-3.5/x86
+       FreeBSD/x86
+       Solaris-10/x86
+
+   Minor fix for rhomb-like dependencies (paexec -s).
+       Suppose A depends on (B1 and B2), (B1 and B2) depends on C.
+       If C fails, earlier paexec versions produced
+       the following output
+                failure
+                C B1 A B2 A
+       That is, A was output twice. Now it is fixed and A
+       is printed only once. New regression test for this.
+
+   By default(!) getopt_long(3) is enabled on the following platforms
+   (macro): __NetBSD__, __FreeBSD__, __OpenBSD__, __DragonFly__,
+   __linux__ and __APPLE__.  On others only short options provided by
+   getopt(3) are used. This means that long option may to not work.
+
+   fix in manual page: accept(2) -> select(2)
+
+   code clean-ups
+
+   .sinclude removed from Makefile
+
+   tests/test.sh:
+     diff -U ---> standard diff -C10
+     gawk appeared by mistake removed
+
+======================================================================
 Version 0.10.0, by Aleksey Cheusov, Sun, 31 Aug 2008 21:37:59 +0300
 
    Lots of new regression tests
