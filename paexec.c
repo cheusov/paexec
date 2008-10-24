@@ -162,6 +162,8 @@ static int end_of_stdin = 0;
 static const char *poset_success = "success";
 static const char *poset_failure = "failure";
 
+static int *deleted_tasks = NULL;
+
 static void close_all_ins (void)
 {
 	int i;
@@ -176,6 +178,7 @@ static void close_all_ins (void)
 static void delete_task (int task, int print_task)
 {
 	int i, to;
+
 	assert (task >= 0);
 
 	for (i=0; i < arcs_count; ++i){
@@ -197,11 +200,14 @@ static void delete_task (int task, int print_task)
 		close_all_ins ();
 
 	if (print_task){
-		printf ("%s ", id2task [task]);
+		if (!deleted_tasks [task]){
+			printf ("%s ", id2task [task]);
+			deleted_tasks [task] = 1;
+		}
 	}
 }
 
-static void delete_task_rec (int task)
+static void delete_task_rec2 (int task)
 {
 	int i, to;
 
@@ -212,9 +218,16 @@ static void delete_task_rec (int task)
 	for (i=0; i < arcs_count; ++i){
 		if (arcs_from [i] == task){
 			to = arcs_to [i];
-			delete_task_rec (to);
+			delete_task_rec2 (to);
 		}
 	}
+}
+
+static void delete_task_rec (int task)
+{
+	memset (deleted_tasks, 0, tasks_count * sizeof (*deleted_tasks));
+
+	delete_task_rec2 (task);
 }
 
 static const char * get_new_task_from_stdin (void)
@@ -436,6 +449,10 @@ static void init (void)
 		/* completely independent tasks */
 		nonblock (0);
 	}
+
+	/* recursive task deleting and rhomb-like dependencies */
+	if (tasks_count)
+		deleted_tasks = xmalloc (tasks_count * sizeof (*deleted_tasks));
 }
 
 static void kill_childs (void)
@@ -953,6 +970,9 @@ static void free_memory (void)
 	if (poset_of_tasks){
 		hsh_destroy (tasks);
 	}
+
+	if (deleted_tasks)
+		xfree (deleted_tasks);
 }
 
 int main (int argc, char **argv)
