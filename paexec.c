@@ -109,7 +109,12 @@ static pid_t *pids      = NULL;
 
 static int *line_nums   = NULL;
 
-static int *ret_codes   = NULL;
+typedef enum {
+	rt_undef   = -1,
+	rt_success = 0,
+	rt_failure = 1,
+} ret_code_t;
+static ret_code_t *ret_codes   = NULL;
 
 static int max_fd   = 0;
 
@@ -358,7 +363,7 @@ static void init (void)
 
 		busy [i] = 0;
 
-		ret_codes [i] = -1;
+		ret_codes [i] = rt_undef;
 
 		if (arg_transport && arg_transport [0])
 			snprintf (full_cmd, sizeof (full_cmd), "%s %s %s",
@@ -625,15 +630,15 @@ static void loop (void)
 							/* an empty line means end-of-task */
 							if (poset_of_tasks){
 								switch (ret_codes [i]){
-									case 0:
+									case rt_failure:
 										print_header (i);
 										delete_task_rec (line_nums [i]);
 										printf ("\n");
 										break;
-									case 1:
+									case rt_success:
 										delete_task (line_nums [i], 0);
 										break;
-									case -1:
+									case rt_undef:
 										print_line (i, "?");
 										break;
 									default:
@@ -653,11 +658,11 @@ static void loop (void)
 
 						if (poset_of_tasks){
 							if (!strcmp (curr_line, poset_success)){
-								ret_codes [i] = 1;
+								ret_codes [i] = rt_success;
 							}else if (!strcmp (curr_line, poset_failure)){
-								ret_codes [i] = 0;
+								ret_codes [i] = rt_failure;
 							}else{
-								ret_codes [i] = -1;
+								ret_codes [i] = rt_undef;
 							}
 						}
 
