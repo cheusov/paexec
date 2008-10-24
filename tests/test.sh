@@ -64,18 +64,18 @@ do_test (){
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p -t ./paexec_notransport \
 	-c ../examples/toupper/toupper_cmd -n '+2' |
-    resort | gawk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}'
+    resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}'
 
     # all_substr
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p -t '' \
 	-c ../examples/toupper/toupper_cmd -n '+2' |
-    resort | gawk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}'
+    resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}'
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p \
 	-c ../examples/toupper/toupper_cmd -n '+2' |
-    resort | gawk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}'
+    resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}'
 
 
 
@@ -496,7 +496,7 @@ for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
     printf "PAEXEC_BUFSIZE=%d:\n" $PAEXEC_BUFSIZE
     export PAEXEC_BUFSIZE
 
-    if do_test > _test.res && diff -U 20 -u test.out _test.res; then
+    if do_test > _test.res && diff -C10 test.out _test.res; then
 	true
     else
 	echo "paexec fails (PAEXEC_BUFSIZE=$PAEXEC_BUFSIZE)" 1>&2
