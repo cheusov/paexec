@@ -86,7 +86,7 @@ again. It is also not guaranteed that the first line of output will be
 from the first I<node> or from the first I<task>. All result
 lines are output as soon as they are read by B<paexec>, i.e as soon as
 they are ready to be output. B<paexec> works this way for the
-efficiency reasons.  You can play with I<-l> and I<-k> options to see
+efficiency reasons.  You can play with I<-l>, I<-r> and I<-p> options to see
 what happens.
 
 =head1 OPTIONS
