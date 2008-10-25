@@ -329,41 +329,122 @@ static int add_task (const char *s)
 	}
 }
 
-static void init (void)
+static void print_cycle (const int *lnk, int s, int t)
 {
-	int i;
-	char full_cmd [2000];
-	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
-	char buf [BUFSIZE];
+	int k = lnk [s * tasks_count + t];
+	if (k == s){
+		fprintf (stderr, "  %s -> %s\n", id2task [s], id2task [t]);
+	}else{
+		print_cycle (lnk, s, k);
+		print_cycle (lnk, k, t);
+	}
+}
 
-	/* BUFSIZE */
-	if (env_bufsize){
-		initial_bufsize = atoi (env_bufsize);
+static void init__check_cycles (void)
+{
+	int i, j, k;
+	int from, to;
+	int *lnk = NULL;
+
+	lnk = xmalloc (tasks_count * tasks_count * sizeof (*lnk));
+	memset (lnk, -1, tasks_count * tasks_count * sizeof (*lnk));
+
+	/* initial arcs */
+	for (i=0; i < arcs_count; ++i){
+		from = arcs_from [i];
+		to   = arcs_to [i];
+		lnk [from * tasks_count + to] = from;
 	}
 
-	bufsize_stdin = initial_bufsize;
+	/* transitive closure (algorithm by Floyd) */
+	for (k=0; k < tasks_count; ++k){
+		for (i=0; i < tasks_count; ++i){
+			for (j=0; j < tasks_count; ++j){
+				if (lnk [i * tasks_count + j] == -1 &&
+					lnk [i * tasks_count + k] >= 0 &&
+					lnk [k * tasks_count + j] >= 0)
+				{
+					lnk [i * tasks_count + j] = k;
+				}
+			}
+		}
+	}
 
-	/* arrays */
-	pids  = xmalloc (nodes_count * sizeof (*pids));
+	/* looking for cycles */
+	for (i=0; i < tasks_count; ++i){
+		if (lnk [i * tasks_count + i] >= 0){
+			fprintf (stderr, "Cyclic dependancy detected:\n");
 
-	fd_in  = xmalloc (nodes_count * sizeof (*fd_in));
-	fd_out = xmalloc (nodes_count * sizeof (*fd_out));
+			print_cycle (lnk, i, i);
 
-	buf_out     = xmalloc (nodes_count * sizeof (*buf_out));
-	bufsize_out = xmalloc (nodes_count * sizeof (*bufsize_out));
-	size_out    = xmalloc (nodes_count * sizeof (*size_out));
+			exit (1);
+		}
+	}
+}
 
-	busy     = xmalloc (nodes_count * sizeof (*busy));
+static void init__read_poset_tasks (void)
+{
+	char buf [BUFSIZE];
+	int i;
 
-	line_nums = xmalloc (nodes_count * sizeof (*line_nums));
+	if (!poset_of_tasks){
+		/* completely independent tasks */
+		nonblock (0);
+		return;
+	}
 
-	ret_codes = xmalloc (nodes_count * sizeof (*ret_codes));
+	/* partially ordered set of tasks */
+	tasks = hsh_create (NULL, NULL);
 
-	/* stdin */
-	buf_stdin = xmalloc (initial_bufsize);
-	buf_stdin [0] = 0;
+	/* reading all tasks with their dependancies */
+	while (fgets (buf, sizeof (buf), stdin)){
+		size_t len = strlen (buf);
+		char *sep = strchr (buf, ' ');
+		int id1, id2;
+		char *s1, *s2;
 
-	/* in/out */
+		if (len > 0 && buf [len-1] == '\n'){
+			buf [len-1] = 0;
+		}
+
+		if (sep){
+			/* task2(to) */
+			*sep = 0;
+			s2 = xstrdup (sep+1);
+			id2 = add_task (s2);
+		}
+		/* task1(from) */
+		s1 = xstrdup (buf);
+		id1 = add_task (s1);
+
+		if (sep){
+			/* (from,to) pair */
+			++arcs_count;
+			arcs_from = (int *) xrealloc (arcs_from,
+										  arcs_count * sizeof (*arcs_from));
+			arcs_to = (int *) xrealloc (arcs_to,
+										arcs_count * sizeof (*arcs_to));
+
+			arcs_from [arcs_count-1] = id1;
+			arcs_to [arcs_count-1]   = id2;
+		}
+	}
+
+	/* degree for each task */
+	tasks_graph_deg = (int *) xmalloc (
+		tasks_count * sizeof (*tasks_graph_deg));
+	memset (tasks_graph_deg, 0, tasks_count * sizeof (*tasks_graph_deg));
+
+	for (i=0; i < arcs_count; ++i){
+		++tasks_graph_deg [arcs_to [i]];
+	}
+}
+
+static void init__child_processes (void)
+{
+	char full_cmd [2000];
+	int i;
+
 	for (i=0; i < nodes_count; ++i){
 		pids [i] = (pid_t) -1;
 	}
@@ -398,61 +479,51 @@ static void init (void)
 			max_fd = fd_out [i];
 		}
 	}
+}
 
-	if (poset_of_tasks){
-		/* partially ordered set of tasks */
-		tasks = hsh_create (NULL, NULL);
+static void init (void)
+{
+	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
 
-		/* reading all tasks with their dependancies */
-		while (fgets (buf, sizeof (buf), stdin)){
-			size_t len = strlen (buf);
-			char *sep = strchr (buf, ' ');
-			int id1, id2;
-			char *s1, *s2;
-
-			if (len > 0 && buf [len-1] == '\n'){
-				buf [len-1] = 0;
-			}
-
-			if (sep){
-				/* task2(to) */
-				*sep = 0;
-				s2 = xstrdup (sep+1);
-				id2 = add_task (s2);
-			}
-			/* task1(from) */
-			s1 = xstrdup (buf);
-			id1 = add_task (s1);
-
-			if (sep){
-				/* (from,to) pair */
-				++arcs_count;
-				arcs_from = (int *) xrealloc (arcs_from,
-											  arcs_count * sizeof (*arcs_from));
-				arcs_to = (int *) xrealloc (arcs_to,
-											arcs_count * sizeof (*arcs_to));
-
-				arcs_from [arcs_count-1] = id1;
-				arcs_to [arcs_count-1]   = id2;
-			}
-		}
-
-		/* degree for each task */
-		tasks_graph_deg = (int *) xmalloc (
-			tasks_count * sizeof (*tasks_graph_deg));
-		memset (tasks_graph_deg, 0, tasks_count * sizeof (*tasks_graph_deg));
-
-		for (i=0; i < arcs_count; ++i){
-			++tasks_graph_deg [arcs_to [i]];
-		}
-	}else{
-		/* completely independent tasks */
-		nonblock (0);
+	/* BUFSIZE */
+	if (env_bufsize){
+		initial_bufsize = atoi (env_bufsize);
 	}
+
+	bufsize_stdin = initial_bufsize;
+
+	/* arrays */
+	pids  = xmalloc (nodes_count * sizeof (*pids));
+
+	fd_in  = xmalloc (nodes_count * sizeof (*fd_in));
+	fd_out = xmalloc (nodes_count * sizeof (*fd_out));
+
+	buf_out     = xmalloc (nodes_count * sizeof (*buf_out));
+	bufsize_out = xmalloc (nodes_count * sizeof (*bufsize_out));
+	size_out    = xmalloc (nodes_count * sizeof (*size_out));
+
+	busy     = xmalloc (nodes_count * sizeof (*busy));
+
+	line_nums = xmalloc (nodes_count * sizeof (*line_nums));
+
+	ret_codes = xmalloc (nodes_count * sizeof (*ret_codes));
+
+	/* stdin */
+	buf_stdin = xmalloc (initial_bufsize);
+	buf_stdin [0] = 0;
+
+	/* in/out */
+	init__child_processes ();
+
+	/**/
+	init__read_poset_tasks ();
 
 	/* recursive task deleting and rhomb-like dependencies */
 	if (tasks_count)
 		deleted_tasks = xmalloc (tasks_count * sizeof (*deleted_tasks));
+
+	/**/
+	init__check_cycles ();
 }
 
 static void kill_childs (void)
