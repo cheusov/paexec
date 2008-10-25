@@ -1,4 +1,12 @@
 ======================================================================
+Version 0.11.0, by Aleksey Cheusov, Sat, 25 Oct 2008 17:49:47 +0300
+
+   paexec -s: before beginning actual work an input tasks graph is
+   checked for cycles. If they are detected, paexec exits with error.
+
+   minor fix in man page
+
+======================================================================
 Version 0.10.1, by Aleksey Cheusov, Sat, 25 Oct 2008 02:00:55 +0300
 
    This version of paexec was sucessfully tested on the following
