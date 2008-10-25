@@ -5,7 +5,7 @@ set -e
 runtest (){
     printf '=================================================================\n'
     printf '======= args: %s\n' "$*"
-    ../paexec "$@"
+    ../paexec "$@" 2>&1
 }
 
 cut_version (){
@@ -490,6 +490,11 @@ EOF
     else
 	echo ok
     fi
+
+    # cycle detection
+    runtest -l -s \
+	-c ../examples/make_package/make_package_cmd \
+	-n +5 < ../examples/make_package/make_package_tasks_cycle || true
 }
 
 for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do

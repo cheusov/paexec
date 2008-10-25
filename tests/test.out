@@ -413,3 +413,9 @@ ok100
 ok1
 ok2
 ok
+=================================================================
+======= args: -l -s -c ../examples/make_package/make_package_cmd -n +5
+Cyclic dependancy detected:
+  devel/gmake -> lang/gcc
+  lang/gcc -> devel/gettext-lib
+  devel/gettext-lib -> devel/gmake
