@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 runtest (){
     printf '=================================================================\n'
     printf '======= args: %s\n' "$*"
@@ -145,20 +143,20 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd -n +2 \
 	> _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7 || true
-    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok8 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok10 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7
+    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok8
+    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9
+    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok10
+    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
+    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 22 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 22 && echo ok100
 
     # -s: byacc fails
     cat <<EOF
@@ -170,20 +168,20 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__byacc \
 	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-    test "`gln wip/libmaa`" -gt 0 && echo ok6 || true
-    test "`gln devel/m4`" -gt 0 && echo ok7 || true
-    test "`gln devel/flex`" -gt 0 && echo ok8 || true
-    test "`gln devel/byacc`" = f && echo ok9 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5
+    test "`gln wip/libmaa`" -gt 0 && echo ok6
+    test "`gln devel/m4`" -gt 0 && echo ok7
+    test "`gln devel/flex`" -gt 0 && echo ok8
+    test "`gln devel/byacc`" = f && echo ok9
 
-    test "`gln wip/dict-server`" = "rf" && echo ok10 || true
-    test "`gln wip/dict-client`" = "rf" && echo ok11 || true
+    test "`gln wip/dict-server`" = "rf" && echo ok10
+    test "`gln wip/dict-client`" = "rf" && echo ok11
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100
 
     # -s: flex fails
     cat <<EOF
@@ -195,20 +193,20 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__flex \
 	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-    test "`gln wip/libmaa`" -gt 0 && echo ok6 || true
-    test "`gln devel/m4`" -gt 0 && echo ok7 || true
-    test "`gln devel/byacc`" -gt 0 && echo ok8 || true
-    test "`gln devel/flex`" = f && echo ok9 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5
+    test "`gln wip/libmaa`" -gt 0 && echo ok6
+    test "`gln devel/m4`" -gt 0 && echo ok7
+    test "`gln devel/byacc`" -gt 0 && echo ok8
+    test "`gln devel/flex`" = f && echo ok9
 
-    test "`gln wip/dict-server`" = "rf" && echo ok10 || true
-    test "`gln wip/dict-client`" = "rf" && echo ok11 || true
+    test "`gln wip/dict-server`" = "rf" && echo ok10
+    test "`gln wip/dict-client`" = "rf" && echo ok11
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100
 
     # -s: libmaa fails
     cat <<EOF
@@ -220,20 +218,20 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__libmaa \
 	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -gt 0 && echo ok4 || true
-    test "`gln devel/gmake`" -gt 0 && echo ok5 || true
-    test "`gln devel/flex`" -gt 0 && echo ok66 || true
-    test "`gln devel/m4`" -gt 0 && echo ok7 || true
-    test "`gln devel/byacc`" -gt 0 && echo ok8 || true
-    test "`gln wip/libmaa`" = f && echo ok9 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -gt 0 && echo ok4
+    test "`gln devel/gmake`" -gt 0 && echo ok5
+    test "`gln devel/flex`" -gt 0 && echo ok66
+    test "`gln devel/m4`" -gt 0 && echo ok7
+    test "`gln devel/byacc`" -gt 0 && echo ok8
+    test "`gln wip/libmaa`" = f && echo ok9
 
-    test "`gln wip/dict-server`" = "rf" && echo ok10 || true
-    test "`gln wip/dict-client`" = "rf" && echo ok11 || true
+    test "`gln wip/dict-server`" = "rf" && echo ok10
+    test "`gln wip/dict-client`" = "rf" && echo ok11
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100
 
     # -s: m4 fails
     cat <<EOF
@@ -245,19 +243,19 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__m4 \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok6 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok7 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok8 || true
-    test "`gln devel/m4`" = f && echo ok9 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5
+    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok6
+    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok7
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok8
+    test "`gln devel/m4`" = f && echo ok9
 
-    test "`gln wip/dict-server`" = "rf" && echo ok10 || true
+    test "`gln wip/dict-server`" = "rf" && echo ok10
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 21 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 21 && echo ok100
 
     # -s: libjudy fails
     cat <<EOF
@@ -269,19 +267,19 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__libjudy \
 	-n +2 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7 || true
-    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok8 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok10 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7
+    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok8
+    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9
+    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok10
+    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
+    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100
 
     # -s: dictem fails
     cat <<EOF
@@ -293,19 +291,19 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__dictem \
 	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7 || true
-    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok8 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok10 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7
+    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok8
+    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9
+    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok10
+    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
+    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100
 
     # -s: glib2 fails
     cat <<EOF
@@ -317,19 +315,19 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__glib2 \
 	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7 || true
-    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok8 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok10 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12 || true
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-server`" && echo ok6
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7
+    test "`gln devel/m4`" -lt "`gln wip/dict-server`" && echo ok8
+    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9
+    test "`gln devel/byacc`" -lt "`gln wip/dict-server`" && echo ok10
+    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
+    test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100
 
     # -s: gmake fails
     cat <<EOF
@@ -341,20 +339,20 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__gmake -n +5 \
 	> _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -gt 0 && echo ok4 || true
-    test "`gln devel/gmake`" = f && echo ok5 || true
-    test "`gln devel/m4`" -gt 0 && echo ok8 || true
-    test "`gln devel/byacc`" -gt 0 && echo ok9 || true
-    test "`gln devel/flex`" -gt 0 && echo ok10 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -gt 0 && echo ok4
+    test "`gln devel/gmake`" = f && echo ok5
+    test "`gln devel/m4`" -gt 0 && echo ok8
+    test "`gln devel/byacc`" -gt 0 && echo ok9
+    test "`gln devel/flex`" -gt 0 && echo ok10
 
-    test "`gln wip/libmaa`"      = "rf" && echo ok11 || true
-    test "`gln wip/dict-server`" = "rf" && echo ok12 || true
-    test "`gln wip/dict-client`" = "rf" && echo ok13 || true
+    test "`gln wip/libmaa`"      = "rf" && echo ok11
+    test "`gln wip/dict-server`" = "rf" && echo ok12
+    test "`gln wip/dict-client`" = "rf" && echo ok13
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100
 
     # -s: autoconf fails
     cat <<EOF
@@ -366,20 +364,20 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__autoconf \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/gmake`" -gt 0 && echo ok4 || true
-    test "`gln devel/autoconf`" = f && echo ok5 || true
-    test "`gln devel/m4`" -gt 0 && echo ok8 || true
-    test "`gln devel/byacc`" -gt 0 && echo ok9 || true
-    test "`gln devel/flex`" -gt 0 && echo ok10 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/gmake`" -gt 0 && echo ok4
+    test "`gln devel/autoconf`" = f && echo ok5
+    test "`gln devel/m4`" -gt 0 && echo ok8
+    test "`gln devel/byacc`" -gt 0 && echo ok9
+    test "`gln devel/flex`" -gt 0 && echo ok10
 
-    test "`gln wip/libmaa`"      = "rf" && echo ok11 || true
-    test "`gln wip/dict-server`" = "rf" && echo ok12 || true
-    test "`gln wip/dict-client`" = "rf" && echo ok13 || true
+    test "`gln wip/libmaa`"      = "rf" && echo ok11
+    test "`gln wip/dict-server`" = "rf" && echo ok12
+    test "`gln wip/dict-client`" = "rf" && echo ok13
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100
 
     # -s: dict-server fails
     cat <<EOF
@@ -391,18 +389,18 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__dict-server \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-    test "`gln wip/dict-server`" = f && echo ok6 || true
-    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7 || true
-    test "`gln devel/m4`" -gt 0 && echo ok8 || true
-    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9 || true
-    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5
+    test "`gln wip/dict-server`" = f && echo ok6
+    test "`gln wip/libmaa`" -lt "`gln wip/dict-client`" && echo ok7
+    test "`gln devel/m4`" -gt 0 && echo ok8
+    test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9
+    test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100
 
     # -s: flex and byacc fail
     cat <<EOF
@@ -414,17 +412,17 @@ EOF
     ../paexec -l -s -c ../examples/make_package/make_package_cmd__flex_byacc \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4 || true
-    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5 || true
-    test "`gln devel/m4`" -gt 0 && echo ok8 || true
-    test "`gln devel/byacc`" = f && echo ok9 || true
-    test "`gln devel/flex`" = f && echo ok10 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" -lt "`gln wip/libmaa`" && echo ok4
+    test "`gln devel/gmake`" -lt "`gln wip/libmaa`" && echo ok5
+    test "`gln devel/m4`" -gt 0 && echo ok8
+    test "`gln devel/byacc`" = f && echo ok9
+    test "`gln devel/flex`" = f && echo ok10
 
-    test "`gln wip/dict-server`" = "rf" && echo ok11 || true
-    test "`gln wip/dict-client`" = "rf" && echo ok12 || true
+    test "`gln wip/dict-server`" = "rf" && echo ok11
+    test "`gln wip/dict-client`" = "rf" && echo ok12
 
     awk 'NF > 2 && $2 == "devel/flex" &&
          /wip\/dict-server/ &&
@@ -433,7 +431,7 @@ EOF
          /wip\/dict-server/ &&
          /wip\/dict-client/ {print "ok21"}' _test.tmp
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 20 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 20 && echo ok100
 
     # -s: gmake and autoconf fail
     cat <<EOF
@@ -446,18 +444,18 @@ EOF
 	-c ../examples/make_package/make_package_cmd__gmake_autoconf \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
-    test "`gln devel/glib2`" -gt 0 && echo ok1 || true
-    test "`gln textproc/dictem`" -gt 0 && echo ok2 || true
-    test "`gln devel/libjudy`" -gt 0 && echo ok3 || true
-    test "`gln devel/autoconf`" = f && echo ok4 || true
-    test "`gln devel/gmake`" = f && echo ok5 || true
-    test "`gln devel/m4`" -gt 0 && echo ok8 || true
-    test "`gln devel/byacc`" -gt 0 && echo ok9 || true
-    test "`gln devel/flex`" -gt 0 && echo ok10 || true
+    test "`gln devel/glib2`" -gt 0 && echo ok1
+    test "`gln textproc/dictem`" -gt 0 && echo ok2
+    test "`gln devel/libjudy`" -gt 0 && echo ok3
+    test "`gln devel/autoconf`" = f && echo ok4
+    test "`gln devel/gmake`" = f && echo ok5
+    test "`gln devel/m4`" -gt 0 && echo ok8
+    test "`gln devel/byacc`" -gt 0 && echo ok9
+    test "`gln devel/flex`" -gt 0 && echo ok10
 
-    test "`gln wip/libmaa`"      = "rf" && echo ok11 || true
-    test "`gln wip/dict-server`" = "rf" && echo ok12 || true
-    test "`gln wip/dict-client`" = "rf" && echo ok13 || true
+    test "`gln wip/libmaa`"      = "rf" && echo ok11
+    test "`gln wip/dict-server`" = "rf" && echo ok12
+    test "`gln wip/dict-client`" = "rf" && echo ok13
 
     awk 'NF > 2 && $2 == "devel/autoconf" &&
          /wip\/libmaa/ && /wip\/dict-server/ &&
@@ -466,7 +464,7 @@ EOF
          /wip\/libmaa/ && /wip\/dict-server/ &&
          /wip\/dict-client/ {print "ok21"}' _test.tmp
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 18 && echo ok100 || true
+    test "`awk 'END {print NR}' _test.tmp`" -eq 18 && echo ok100
 
     # diamond-like dependancy and failure
     cat <<EOF
@@ -479,7 +477,7 @@ EOF
 	-c ../examples/make_package/make_package_cmd__flex \
 	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks2
 
-    test "`gln devel/flex`" = f && echo ok1 || true
+    test "`gln devel/flex`" = f && echo ok1
 
     awk 'NF > 2 && $2 == "devel/flex" &&
          /wip\/dict-client/ && /wip\/dict-server/ &&
@@ -494,14 +492,14 @@ EOF
     # cycle detection
     runtest -l -s \
 	-c ../examples/make_package/make_package_cmd \
-	-n +5 < ../examples/make_package/make_package_tasks_cycle || true
+	-n +5 < ../examples/make_package/make_package_tasks_cycle
 }
 
 for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
     printf "PAEXEC_BUFSIZE=%d:\n" $PAEXEC_BUFSIZE
     export PAEXEC_BUFSIZE
 
-    if do_test > _test.res && diff -C10 test.out _test.res; then
+    if do_test > _test.res 2>&1 && diff -C10 test.out _test.res; then
 	true
     else
 	echo "paexec fails (PAEXEC_BUFSIZE=$PAEXEC_BUFSIZE)" 1>&2
