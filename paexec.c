@@ -512,18 +512,17 @@ static void init (void)
 	buf_stdin = xmalloc (initial_bufsize);
 	buf_stdin [0] = 0;
 
-	/* in/out */
-	init__child_processes ();
-
 	/**/
 	init__read_poset_tasks ();
 
 	/* recursive task deleting and rhomb-like dependencies */
-	if (tasks_count)
-		deleted_tasks = xmalloc (tasks_count * sizeof (*deleted_tasks));
+	deleted_tasks = xmalloc (tasks_count * sizeof (*deleted_tasks));
 
 	/**/
 	init__check_cycles ();
+
+	/* in/out */
+	init__child_processes ();
 }
 
 static void kill_childs (void)
