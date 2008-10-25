@@ -1,0 +1,7 @@
+devel/gettext-lib devel/gmake
+devel/gmake lang/gcc
+pkgtools/pkg_install-info lang/gcc
+devel/libtool-base devel/gettext-lib
+sysutils/checkperms devel/gettext-lib
+lang/gcc converters/libiconv
+lang/gcc devel/gettext-lib
