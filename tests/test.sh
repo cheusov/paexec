@@ -122,15 +122,15 @@ EOF
     runtest -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 < /dev/null
 
     # -s all failed
-    runtest -s -l -c ../examples/make_package/make_package_cmd__all_failed \
+    runtest -s -l -c '../examples/make_package/make_package_cmd__xxx_failed .' \
 	-n +10 < /dev/null
 
     # -s all failed
-    runtest -s -l -c ../examples/make_package/make_package_cmd__all_failed \
+    runtest -s -l -c '../examples/make_package/make_package_cmd__xxx_failed .' \
 	-n +5 < /dev/null
 
     # -s all failed
-    runtest -s -l -c ../examples/make_package/make_package_cmd__all_failed \
+    runtest -s -l -c '../examples/make_package/make_package_cmd__xxx_failed .' \
 	-n +1 < /dev/null
 
     # -s: all succeeded
@@ -161,11 +161,11 @@ EOF
     # -s: byacc fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__byacc -n +3
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' -n +3
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__byacc \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' \
 	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -186,11 +186,11 @@ EOF
     # -s: flex fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__flex -n +5
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' -n +5
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__flex \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' \
 	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -211,11 +211,11 @@ EOF
     # -s: libmaa fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__libmaa -n +6
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' -n +6
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__libmaa \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' \
 	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -236,11 +236,11 @@ EOF
     # -s: m4 fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__m4 -n +4
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' -n +4
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__m4 \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -260,11 +260,11 @@ EOF
     # -s: libjudy fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__libjudy -n +2
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' -n +2
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__libjudy \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' \
 	-n +2 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -284,11 +284,11 @@ EOF
     # -s: dictem fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__dictem -n +3
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' -n +3
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__dictem \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' \
 	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -308,11 +308,11 @@ EOF
     # -s: glib2 fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__glib2 -n +6
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' -n +6
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__glib2 \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' \
 	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -332,11 +332,11 @@ EOF
     # -s: gmake fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake -n +5
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__gmake -n +5 \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5 \
 	> _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -357,11 +357,11 @@ EOF
     # -s: autoconf fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__autoconf -n +4
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' -n +4
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__autoconf \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -382,11 +382,11 @@ EOF
     # -s: dict-server fails
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__dict-server -n +4
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' -n +4
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__dict-server \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -405,11 +405,11 @@ EOF
     # -s: flex and byacc fail
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__flex_byacc -n +4
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' -n +4
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd__flex_byacc \
+    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -436,12 +436,12 @@ EOF
     # -s: gmake and autoconf fail
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__gmake_autoconf -n +5
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "gmake|autoconf"' -n +5
 ======= make package test!!!
 EOF
 
     ../paexec -l -s \
-	-c ../examples/make_package/make_package_cmd__gmake_autoconf \
+	-c '../examples/make_package/make_package_cmd__xxx_failed "gmake|autoconf"' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -469,12 +469,12 @@ EOF
     # diamond-like dependancy and failure
     cat <<EOF
 =================================================================
-======= args: -l -s -c ../examples/make_package/make_package_cmd__flex -n +5
+======= args: -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' -n +5
 ======= make package test!!!
 EOF
 
     ../paexec -l -s \
-	-c ../examples/make_package/make_package_cmd__flex \
+	-c '../examples/make_package/make_package_cmd__xxx_failed flex' \
 	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks2
 
     test "`gln devel/flex`" = f && echo ok1
