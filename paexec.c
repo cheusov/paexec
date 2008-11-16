@@ -126,6 +126,7 @@ static size_t bufsize_stdin = 0;
 
 static char **nodes    = NULL;
 static int nodes_count = 0;
+static int alive_nodes_count = 0;
 
 static int show_pid      = 0;
 static int show_line_num = 0;
@@ -168,7 +169,7 @@ static void close_all_ins (void)
 	int i;
 	for (i=0; i < nodes_count; ++i){
 		if (!busy [i] && fd_in [i] != -1){
-			xclose (fd_in [i]);
+			iclose (fd_in [i]);
 			fd_in [i] = -1;
 		}
 	}
@@ -483,6 +484,13 @@ static void init__child_processes (void)
 	}
 }
 
+static void mark_node_as_dead (int node)
+{
+	pr_wait (pids [node]);
+	pids [node] = (pid_t) -1;
+	busy [node] = 0;
+}
+
 static void handler_sigchld (int dummy)
 {
 	int status;
@@ -492,7 +500,7 @@ static void handler_sigchld (int dummy)
 	while (pid = waitpid(-1, &status, WNOHANG), pid > 0){
 		for (i=0; i < nodes_count; ++i){
 			if (pids [i] == pid){
-				pids [i] = (pid_t) -1;
+				mark_node_as_dead (i);
 			}
 		}
 	}
@@ -575,8 +583,7 @@ static void wait_for_childs (void)
 
 	for (i=0; i < nodes_count; ++i){
 		if (pids [i] > 0){
-			pr_wait (pids [i]);
-			pids [i] = (pid_t) -1;
+			mark_node_as_dead (i);
 		}
 	}
 }
@@ -593,7 +600,7 @@ static int find_free_node (void)
 {
 	int i;
 	for (i=0; i < nodes_count; ++i){
-		if (!busy [i])
+		if (pids [i] > 0 && !busy [i])
 			return i;
 	}
 
@@ -673,7 +680,7 @@ static void loop (void)
 	FD_CLR (0, &rset);
 
 	while (ret = -777,
-		   (busy_count < nodes_count
+		   (busy_count < alive_nodes_count
 			&& (task = get_new_task ()) != NULL)
 		   ||
 		   (busy_count > 0
@@ -724,7 +731,7 @@ static void loop (void)
 							--busy_count;
 
 							if (end_of_stdin){
-								xclose (fd_in [i]);
+								iclose (fd_in [i]);
 								fd_in [i] = -1;
 							}
 
@@ -890,6 +897,8 @@ static void split_nodes (void)
 		split_nodes__list ();
 	}
 
+	alive_nodes_count = nodes_count;
+
 	/* final check */
 	if (nodes_count == 0)
 		err_fatal ("split_nodes", "invalid option -n:\n");
@@ -1006,7 +1015,8 @@ static void free_memory (void)
 
 	if (nodes){
 		for (i=0; i < nodes_count; ++i){
-			xfree (nodes [i]);
+			if (nodes [i])
+				xfree (nodes [i]);
 		}
 		xfree (nodes);
 	}
@@ -1021,7 +1031,8 @@ static void free_memory (void)
 
 	if (buf_out){
 		for (i=0; i < nodes_count; ++i){
-			xfree (buf_out [i]);
+			if (buf_out [i])
+				xfree (buf_out [i]);
 		}
 		xfree (buf_out);
 	}

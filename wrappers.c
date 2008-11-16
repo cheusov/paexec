@@ -104,19 +104,24 @@ ssize_t xwrite (int fd, const void *buf, size_t count)
 	return ret;
 }
 
-int xclose (int fd)
+int iclose (int fd)
 {
 	int ret;
 	do {
 		ret = close (fd);
 	}while (ret == -1 && errno == EINTR);
 
+	return ret;
+}
+
+void xclose (int fd)
+{
+	int ret = iclose (fd);
+
 	if (ret == -1){
 		log_error ("", "close failed: %s\n", strerror (errno));
 		exit (1);
 	}
-
-	return ret;
 }
 
 char * xfgetln(FILE *fp, size_t *len)
