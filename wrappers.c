@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DMALLOC_FUNC_CHECK
 #include <maa.h>
 
 #include "wrappers.h"
@@ -118,4 +117,34 @@ int xclose (int fd)
 	}
 
 	return ret;
+}
+
+char * xfgetln(FILE *fp, size_t *len)
+{
+	static char *buffer       = NULL;
+	static size_t buffer_size = 0;
+	char c;
+	size_t sz = 0;
+
+	while (c = getc (stdin), c != EOF && c != '\n'){
+		if (sz+1 >= buffer_size){
+			// +2 is enough for `c' and terminating zero
+			buffer_size = buffer_size * 3 / 2 + 2;
+			buffer = xrealloc (buffer, buffer_size);
+		}
+
+		buffer [sz++] = c;
+	}
+
+	if (ferror (stdin)){
+		log_error ("", "getc failed: %s\n", strerror (errno));
+		exit (1);
+	}
+	if (feof (stdin) && !sz){
+		return NULL;
+	}
+
+	buffer [sz] = 0;
+	*len = sz;
+	return buffer;
 }

@@ -230,26 +230,21 @@ static void delete_task_rec (int task)
 
 static const char * get_new_task_from_stdin (void)
 {
-	static char buffer [2000];
-	size_t len = 0;
+	const char *task = NULL;
+	size_t sz = 0;
+
 	if (end_of_stdin)
 		return NULL;
 
-	if (fgets (buffer, sizeof (buffer), stdin)){
-		len = strlen (buffer);
-		if (buffer [len-1] == '\n'){
-			buffer [len-1] = 0;
-			--len;
-		}
-	}else if (feof (stdin)){
+	task = xfgetln (stdin, &sz);
+
+	if (!task && feof (stdin)){
 		end_of_stdin = 1;
 		close_all_ins ();
 		return NULL;
-	}else{
-		abort ();
 	}
 
-	return buffer;
+	return task;
 }
 
 static int get_new_task_num_from_graph (void)

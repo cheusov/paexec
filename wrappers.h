@@ -35,5 +35,6 @@ int xselect (
 ssize_t xread (int fd, void *buf, size_t nbytes);
 ssize_t xwrite (int fd, const void *buf, size_t count);
 int xclose (int fd);
+char * xfgetln(FILE *fp, size_t *len);
 
 #endif /* _WRAPPERS_H_ */
