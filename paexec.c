@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 /***********************************************************/
 
@@ -482,6 +483,31 @@ static void init__child_processes (void)
 	}
 }
 
+static void handler_sigchld (int dummy)
+{
+	int status;
+	pid_t pid;
+	int i = 0;
+
+	while (pid = waitpid(-1, &status, WNOHANG), pid > 0){
+		for (i=0; i < nodes_count; ++i){
+			if (pids [i] == pid){
+				pids [i] = (pid_t) -1;
+			}
+		}
+	}
+}
+
+static void set_sigchld_handler (void)
+{
+	struct sigaction sa;
+
+	sa.sa_handler = handler_sigchld;
+	sigemptyset (&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction (SIGCHLD, &sa, NULL);
+}
+
 static void init (void)
 {
 	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
@@ -524,6 +550,9 @@ static void init (void)
 
 	/* in/out */
 	init__child_processes ();
+
+	/* SIGCHLD signal handler */
+	set_sigchld_handler ();
 }
 
 static void kill_childs (void)
