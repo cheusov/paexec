@@ -122,7 +122,6 @@ static int line_num = 0;
 
 static char *buf_stdin      = NULL;
 static size_t bufsize_stdin = 0;
-static size_t size_stdin    = 0;
 
 static char **nodes    = NULL;
 static int nodes_count = 0;
@@ -156,7 +155,6 @@ static int *tasks_graph_deg = NULL;
 static char *current_task = NULL;
 static size_t current_task_sz = 0;
 
-static char *NL_found = NULL;
 static int end_of_stdin = 0;
 
 static const char *poset_success = "success";
@@ -232,13 +230,26 @@ static void delete_task_rec (int task)
 
 static const char * get_new_task_from_stdin (void)
 {
-	NL_found = memchr (buf_stdin, '\n', size_stdin);
-	if (!NL_found)
+	static char buffer [2000];
+	size_t len = 0;
+	if (end_of_stdin)
 		return NULL;
 
-	*NL_found = 0;
+	if (fgets (buffer, sizeof (buffer), stdin)){
+		len = strlen (buffer);
+		if (buffer [len-1] == '\n'){
+			buffer [len-1] = 0;
+			--len;
+		}
+	}else if (feof (stdin)){
+		end_of_stdin = 1;
+		close_all_ins ();
+		return NULL;
+	}else{
+		abort ();
+	}
 
-	return buf_stdin;
+	return buffer;
 }
 
 static int get_new_task_num_from_graph (void)
@@ -287,13 +298,9 @@ static const char *get_new_task (void)
 		current_task = (char *) xrealloc (current_task, current_task_sz);
 	}
 
-	strcpy (current_task, task);
+	memcpy (current_task, task, task_len+1);
 
 	if (!poset_of_tasks){
-		++NL_found;
-		size_stdin -= NL_found - buf_stdin;
-		memmove (buf_stdin, NL_found, size_stdin);
-
 		++line_num;
 	}
 
@@ -389,7 +396,6 @@ static void init__read_poset_tasks (void)
 
 	if (!poset_of_tasks){
 		/* completely independent tasks */
-		nonblock (0);
 		return;
 	}
 
@@ -628,7 +634,7 @@ static void loop (void)
 	int cnt          = 0;
 	int i, j;
 	char *buf_out_i  = 0;
-
+	const char *task = NULL;
 	const char *curr_line = NULL;
 
 	if (poset_of_tasks && tasks_count == 1){
@@ -640,14 +646,14 @@ static void loop (void)
 
 	FD_ZERO (&rset);
 
-	if (!poset_of_tasks)
-		FD_SET (0, &rset);
+	FD_CLR (0, &rset);
 
 	while (ret = -777,
-		   (poset_of_tasks
-			&& busy_count < nodes_count
-			&& get_new_task_num_from_graph () != -1) ||
-		   (ret = xselect (max_fd+1, &rset, NULL, NULL, NULL)) >= 0)
+		   (busy_count < nodes_count
+			&& (task = get_new_task ()) != NULL)
+		   ||
+		   (busy_count > 0
+			&& (ret = xselect (max_fd+1, &rset, NULL, NULL, NULL)) >= 0))
 	{
 		/* ret == -777 means select(2) was not called */
 
@@ -655,23 +661,7 @@ static void loop (void)
 			printf ("select ret=%d\n", ret);
 		}
 
-		/* stdin */
-		if (ret != -777 && FD_ISSET (0, &rset)){
-			cnt = xread (0, buf_stdin + size_stdin, 1/*bufsize_stdin - size_stdin*/);
-			if (cnt){
-				size_stdin += cnt;
-
-				if (size_stdin == bufsize_stdin){
-					bufsize_stdin *= 2;
-					buf_stdin = xrealloc (buf_stdin, bufsize_stdin);
-				}
-			}else{
-				end_of_stdin = 1;
-				close_all_ins ();
-			}
-		}
-
-		if (busy_count < nodes_count && get_new_task ())
+		if (ret == -777 && task)
 			send_to_node ();
 
 		/* fd_out */
@@ -776,16 +766,6 @@ static void loop (void)
 			}
 		}
 
-		/* stdin */
-		if (!poset_of_tasks){
-			NL_found = memchr (buf_stdin, '\n', size_stdin);
-			if (!end_of_stdin && !NL_found && busy_count < nodes_count){
-				FD_SET (0, &rset);
-			}else{
-				FD_CLR (0, &rset);
-			}
-		}
-
 		/* fd_out */
 		for (i=0; i < nodes_count; ++i){
 			if (busy [i]){
@@ -807,7 +787,7 @@ static void loop (void)
 		if (poset_of_tasks)
 			end_of_stdin = (remained_tasks_count == 0);
 
-		if (!busy_count && end_of_stdin && (poset_of_tasks || !size_stdin))
+		if (!busy_count && end_of_stdin)
 			break;
 	}
 
