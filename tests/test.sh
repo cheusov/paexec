@@ -494,6 +494,18 @@ EOF
 	-c ../examples/make_package/make_package_cmd \
 	-n +5 < ../examples/make_package/make_package_tasks_cycle
 
+    # transport failure
+    runtest -s -E \
+	-t ../examples/broken_echo/transport_broken_echo -c ':' \
+	-n '1 2 3 4 5 6' <<EOF
+-1 0
+0 1
+1 2
+2 3
+3 4
+4 5
+EOF
+
     return 0
 }
 

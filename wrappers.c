@@ -65,12 +65,19 @@ int xselect (
 	return ret;
 }
 
-ssize_t xread (int fd, void *buf, size_t nbytes)
+ssize_t iread (int fd, void *buf, size_t nbytes)
 {
 	ssize_t ret;
 	do {
 		ret = read (fd, buf, nbytes);
 	}while (ret == -1 && errno == EINTR);
+
+	return ret;
+}
+
+ssize_t xread (int fd, void *buf, size_t nbytes)
+{
+	ssize_t ret = iread (fd, buf, nbytes);
 
 	if (ret == -1){
 		log_error ("", "read failed: %s\n", strerror (errno));
@@ -80,21 +87,30 @@ ssize_t xread (int fd, void *buf, size_t nbytes)
 	return ret;
 }
 
-ssize_t xwrite (int fd, const void *buf, size_t count)
+ssize_t iwrite (int fd, const void *buf, size_t count)
 {
-	ssize_t ret = 0;
-	const char *b = (const char *) buf;
+	ssize_t ret   = 0;
+	size_t c      = count;
+	const char *p = (const char *) buf;
 
-	while (count){
+	while (c){
 		do {
-			ret = write (fd, b, count);
+			ret = write (fd, p, c);
 		}while (ret == -1 && errno == EINTR);
 
-		if (ret > 0){
-			count -= ret;
-			b     += ret;
-		}
+		if (ret < 0)
+			return ret;
+
+		c -= ret;
+		p += ret;
 	}
+
+	return (ssize_t) count;
+}
+
+ssize_t xwrite (int fd, const void *buf, size_t count)
+{
+	ssize_t ret = iwrite (fd, buf, count);
 
 	if (ret == -1){
 		log_error ("", "write failed: %s\n", strerror (errno));

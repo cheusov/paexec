@@ -32,7 +32,9 @@ int xselect (
 	int nfds,
 	fd_set * readfds, fd_set * writefds,
 	fd_set * exceptfds, struct timeval * timeout);
+ssize_t iread (int fd, void *buf, size_t nbytes);
 ssize_t xread (int fd, void *buf, size_t nbytes);
+ssize_t iwrite (int fd, const void *buf, size_t count);
 ssize_t xwrite (int fd, const void *buf, size_t count);
 int iclose (int fd);
 void xclose (int fd);

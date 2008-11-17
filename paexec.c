@@ -85,6 +85,7 @@ OPTIONS:\n\
   -s --pos                 partially ordered set of tasks is given on stdin\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
+  -z --resistant           failed nodes are marked as dead\n\
 -n and -c are mandatory options\n\
 \n\
 ");
@@ -163,6 +164,8 @@ static const char *poset_success = "success";
 static const char *poset_failure = "failure";
 
 static int *deleted_tasks = NULL;
+
+static int resistant = 0;
 
 static void close_all_ins (void)
 {
@@ -486,9 +489,10 @@ static void init__child_processes (void)
 
 static void mark_node_as_dead (int node)
 {
-	pr_wait (pids [node]);
+	int status;
+	if (pids [node] > 0)
+		waitpid(pids [node], &status, WNOHANG);
 	pids [node] = (pid_t) -1;
-	busy [node] = 0;
 }
 
 static void handler_sigchld (int dummy)
@@ -588,12 +592,14 @@ static void wait_for_childs (void)
 	}
 }
 
-static void exit_with_error (const char *routine, const char *msg)
+static void exit_with_error (const char * routine, const char *msg)
 {
 	kill_childs ();
 	wait_for_childs ();
 
-	err_fatal (routine, msg);
+	/*	err_fatal (routine, msg);*/
+	fprintf (stderr, "%s\n", msg);
+	exit (1);
 }
 
 static int find_free_node (void)
@@ -644,8 +650,14 @@ static void send_to_node (void)
 
 	++busy_count;
 
-	xwrite (fd_in [n], current_task, strlen (current_task));
-	xwrite (fd_in [n], "\n", 1);
+	if (-1 == iwrite (fd_in [n], current_task, strlen (current_task)) ||
+		-1 == iwrite (fd_in [n], "\n", 1))
+	{
+		if (resistant){
+		}else{
+			err_fatal_errno ("send_to_node", "write() failed:");
+		}
+	}
 
 	if (print_i2o){
 		print_line (n, current_task);
@@ -700,19 +712,35 @@ static void loop (void)
 			if (FD_ISSET (fd_out [i], &rset)){
 				buf_out_i = buf_out [i];
 
-				cnt = xread (fd_out [i],
+				cnt = iread (fd_out [i],
 							 buf_out_i + size_out [i],
 							 bufsize_out [i] - size_out [i]);
 
-				if (debug){
+				if (debug && cnt >= 0){
 					buf_out_i [size_out [i] + cnt] = 0;
 					printf ("cnt = %d\n", cnt);
 					printf ("buf_out [%d] = %s\n", i, buf_out_i);
 					printf ("size_out [%d] = %d\n", i, (int) size_out [i]);
 				}
 
-				if (!cnt){
-					exit_with_error (__func__, "Unexpected eof\n");
+				if (cnt == -1 || cnt == 0){
+					if (resistant){
+					}else{
+						char msg [2000];
+						if (cnt == 0){
+							snprintf (
+								msg, sizeof (msg),
+								"Node %s exited unexpectedly",
+								nodes [i]);
+						}else{
+							snprintf (
+								msg, sizeof (msg),
+								"reading from node %s failed: %s",
+								nodes [i], strerror (errno));
+						}
+
+						exit_with_error ("loop", msg);
+					}
 				}
 
 				printed = 0;
@@ -930,10 +958,13 @@ static void process_args (int *argc, char ***argv)
 
 		{ "debug",     0, 0, 'd' },
 
+		{ "resistant", 0, 0, 'z' },
+
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIn:c:t:s", longopts, NULL),
+	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIzn:c:t:s",
+							longopts, NULL),
 		   c != EOF)
 	{
 		switch (c) {
@@ -982,6 +1013,9 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 's':
 				poset_of_tasks = 1;
+				break;
+			case 'z':
+				resistant = 1;
 				break;
 			default:
 				usage ();

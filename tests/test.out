@@ -419,3 +419,12 @@ Cyclic dependancy detected:
   devel/gmake -> lang/gcc
   lang/gcc -> devel/gettext-lib
   devel/gettext-lib -> devel/gmake
+=================================================================
+======= args: -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1 2 3 4 5 6
+-1
+success
+
+0
+success
+
+Node 1 exited unexpectedly
