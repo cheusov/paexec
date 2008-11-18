@@ -421,10 +421,26 @@ Cyclic dependancy detected:
   devel/gettext-lib -> devel/gmake
 =================================================================
 ======= args: -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1 2 3 4 5 6
+I'll output -1
 -1
 success
 
+I'll output 0
 0
 success
 
+I'll output 1
 Node 1 exited unexpectedly
+=================================================================
+======= args: -z -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1
+I'll output -1
+-1
+success
+
+I'll output 0
+0
+success
+
+I'll output 1
+fatal
+all nodes failed

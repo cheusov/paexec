@@ -506,6 +506,14 @@ EOF
 4 5
 EOF
 
+    # resistance to transport failure
+    runtest -z -s -E \
+	-t ../examples/broken_echo/transport_broken_echo -c ':' \
+	-n '1' <<EOF
+-1 0
+0 1
+EOF
+
     return 0
 }
 

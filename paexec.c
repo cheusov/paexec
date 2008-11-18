@@ -155,8 +155,11 @@ static int arcs_count = 0;
 
 static int *tasks_graph_deg = NULL;
 
-static char *current_task = NULL;
+static char *current_task     = NULL;
 static size_t current_task_sz = 0;
+
+static int *failed_nodes     = NULL;
+static int failed_nodes_count = 0;
 
 static char **node2task         = NULL;
 static size_t *node2task_buf_sz = NULL;
@@ -165,6 +168,7 @@ static int end_of_stdin = 0;
 
 static const char *poset_success = "success";
 static const char *poset_failure = "failure";
+static const char *poset_fatal = "fatal";
 
 static int *deleted_tasks = NULL;
 
@@ -285,11 +289,18 @@ static const char *get_new_task (void)
 {
 	const char *task = NULL;
 	size_t task_len = 0;
+	int node;
 
-	if (poset_of_tasks)
+	if (failed_nodes_count > 0){
+		node = failed_nodes [--failed_nodes_count];
+		assert (node >= 0 && node < nodes_count);
+		task = node2task [node];
+		assert (task);
+	}else if (poset_of_tasks){
 		task = get_new_task_from_graph ();
-	else
+	}else{
 		task = get_new_task_from_stdin ();
+	}
 
 	if (!task)
 		return NULL;
@@ -496,6 +507,22 @@ static void mark_node_as_dead (int node)
 	if (pids [node] > 0)
 		waitpid(pids [node], &status, WNOHANG);
 	pids [node] = (pid_t) -1;
+
+	if (busy [node]){
+		busy [node] = 0;
+		--busy_count;
+	}
+
+	if (fd_in [node] >= 0)
+		iclose (fd_in  [node]);
+	if (fd_out [node] >= 0)
+		iclose (fd_out [node]);
+
+	fd_in  [node] = -1;
+	fd_out [node] = -1;
+
+	failed_nodes [failed_nodes_count++] = node;
+	--alive_nodes_count;
 }
 
 static void handler_sigchld (int dummy)
@@ -507,7 +534,7 @@ static void handler_sigchld (int dummy)
 	while (pid = waitpid(-1, &status, WNOHANG), pid > 0){
 		for (i=0; i < nodes_count; ++i){
 			if (pids [i] == pid){
-				mark_node_as_dead (i);
+				pids [i] = (pid_t) -1;
 			}
 		}
 	}
@@ -554,6 +581,9 @@ static void init (void)
 	line_nums = xmalloc (nodes_count * sizeof (*line_nums));
 
 	ret_codes = xmalloc (nodes_count * sizeof (*ret_codes));
+
+	failed_nodes = xmalloc (nodes_count * sizeof (*failed_nodes));
+	memset (failed_nodes, -1, nodes_count * sizeof (*failed_nodes));
 
 	/* stdin */
 	buf_stdin = xmalloc (initial_bufsize);
@@ -605,6 +635,7 @@ static void exit_with_error (const char * routine, const char *msg)
 	kill_childs ();
 	wait_for_childs ();
 
+	fflush (stdout);
 	/*	err_fatal (routine, msg);*/
 	fprintf (stderr, "%s\n", msg);
 	exit (1);
@@ -686,6 +717,7 @@ static void send_to_node (void)
 
 static void loop (void)
 {
+	char msg [2000];
 	fd_set rset;
 
 	int printed  = 0;
@@ -726,7 +758,7 @@ static void loop (void)
 
 		/* fd_out */
 		for (i=0; ret != -777 && i < nodes_count; ++i){
-			if (FD_ISSET (fd_out [i], &rset)){
+			if (fd_out [i] >= 0 && FD_ISSET (fd_out [i], &rset)){
 				buf_out_i = buf_out [i];
 
 				cnt = iread (fd_out [i],
@@ -736,14 +768,23 @@ static void loop (void)
 				if (debug && cnt >= 0){
 					buf_out_i [size_out [i] + cnt] = 0;
 					printf ("cnt = %d\n", cnt);
+					printf ("fd_out [%d] = %d\n", i, fd_out [i]);
 					printf ("buf_out [%d] = %s\n", i, buf_out_i);
 					printf ("size_out [%d] = %d\n", i, (int) size_out [i]);
 				}
 
 				if (cnt == -1 || cnt == 0){
 					if (resistant){
+						FD_CLR (fd_out [i], &rset);
+						mark_node_as_dead (i);
+						print_header (i);
+						printf ("%s\n", poset_fatal);
+
+						if (alive_nodes_count == 0){
+							exit_with_error ("loop", "all nodes failed");
+						}
+						continue;
 					}else{
-						char msg [2000];
 						if (cnt == 0){
 							snprintf (
 								msg, sizeof (msg),
@@ -844,6 +885,9 @@ static void loop (void)
 
 		/* fd_out */
 		for (i=0; i < nodes_count; ++i){
+			if (fd_out [i] < 0)
+				continue;
+
 			if (busy [i]){
 				FD_SET (fd_out [i], &rset);
 			}else{
