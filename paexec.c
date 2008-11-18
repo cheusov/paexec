@@ -158,6 +158,9 @@ static int *tasks_graph_deg = NULL;
 static char *current_task = NULL;
 static size_t current_task_sz = 0;
 
+static char **node2task         = NULL;
+static size_t *node2task_buf_sz = NULL;
+
 static int end_of_stdin = 0;
 
 static const char *poset_success = "success";
@@ -537,6 +540,11 @@ static void init (void)
 	fd_in  = xmalloc (nodes_count * sizeof (*fd_in));
 	fd_out = xmalloc (nodes_count * sizeof (*fd_out));
 
+	node2task        = xmalloc (nodes_count * sizeof (*node2task));
+	node2task_buf_sz = xmalloc (nodes_count * sizeof (*node2task_buf_sz));
+	memset (node2task, 0, nodes_count * sizeof (*node2task));
+	memset (node2task_buf_sz, 0, nodes_count * sizeof (*node2task_buf_sz));
+
 	buf_out     = xmalloc (nodes_count * sizeof (*buf_out));
 	bufsize_out = xmalloc (nodes_count * sizeof (*bufsize_out));
 	size_out    = xmalloc (nodes_count * sizeof (*size_out));
@@ -639,6 +647,9 @@ static void print_line (int num, const char *line)
 static void send_to_node (void)
 {
 	int n = find_free_node ();
+	size_t task_len = strlen (current_task);
+
+	assert (n >= 0);
 
 	if (debug){
 		printf ("send to %d (pid: %d)\n", n, (int) pids [n]);
@@ -650,7 +661,13 @@ static void send_to_node (void)
 
 	++busy_count;
 
-	if (-1 == iwrite (fd_in [n], current_task, strlen (current_task)) ||
+	if (task_len >= node2task_buf_sz [n]){
+		node2task_buf_sz [n] = task_len + 1;
+		node2task [n] = xrealloc (node2task [n], node2task_buf_sz [n]);
+	}
+	memcpy (node2task [n], current_task, task_len + 1);
+
+	if (-1 == iwrite (fd_in [n], current_task, task_len) ||
 		-1 == iwrite (fd_in [n], "\n", 1))
 	{
 		if (resistant){
@@ -1070,6 +1087,16 @@ static void free_memory (void)
 		}
 		xfree (buf_out);
 	}
+
+	if (node2task){
+		for (i=0; i < nodes_count; ++i){
+			if (node2task [i])
+				xfree (node2task [i]);
+		}
+		xfree (node2task);
+	}
+	if (node2task_buf_sz)
+		xfree (node2task_buf_sz);
 
 	if (size_out)
 		xfree (size_out);
