@@ -547,7 +547,7 @@ static void set_sigchld_handler (void)
 
 	sa.sa_handler = handler_sigchld;
 	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = 0;
+	sa.sa_flags = SA_RESTART;
 	sigaction (SIGCHLD, &sa, NULL);
 }
 
