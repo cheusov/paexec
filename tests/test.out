@@ -472,13 +472,12 @@ all nodes failed
 3 I'll output 3
 3 fatal
 3 
-4 I'll output 3
-4 3
-4 success
-4 
-4 I'll output 4
 4 fatal
 4 
+5 I'll output 3
+5 3
+5 success
+5 
 5 I'll output 4
 5 4
 5 success

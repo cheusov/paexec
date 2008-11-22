@@ -712,6 +712,14 @@ static void send_to_node (void)
 		-1 == iwrite (fd_in [n], "\n", 1))
 	{
 		if (resistant){
+			mark_node_as_dead (n);
+			print_line (n, poset_fatal);
+			print_EOT (n);
+
+			if (alive_nodes_count == 0){
+				exit_with_error ("loop", "all nodes failed");
+			}
+			return;
 		}else{
 			err_fatal_errno ("send_to_node", "write() failed:");
 		}
