@@ -527,6 +527,18 @@ EOF
 5 6
 EOF
 
+    # resistance to transport failure
+    awk '
+    BEGIN {
+        for (i=1; i < 10000; ++i){
+            printf "%d", i
+        }
+        printf "\n"
+    }' |
+    runtest -z -r -s -E \
+	-t ../examples/broken_echo/transport_broken_echo -c ':' \
+	-n '4'
+
     return 0
 }
 

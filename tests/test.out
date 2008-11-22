@@ -496,3 +496,8 @@ all nodes failed
 7 6
 7 success
 7 
+=================================================================
+======= args: -z -r -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 4
+4 fatal
+4 
+all nodes failed
