@@ -443,4 +443,57 @@ success
 
 I'll output 1
 fatal
+
 all nodes failed
+=================================================================
+======= args: -z -r -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1 2 3 4 5 6 7
+1 I'll output -1
+1 -1
+1 success
+1 
+1 I'll output 0
+1 0
+1 success
+1 
+1 I'll output 1
+1 fatal
+1 
+2 I'll output 1
+2 1
+2 success
+2 
+2 I'll output 2
+2 fatal
+2 
+3 I'll output 2
+3 2
+3 success
+3 
+3 I'll output 3
+3 fatal
+3 
+4 I'll output 3
+4 3
+4 success
+4 
+4 I'll output 4
+4 fatal
+4 
+5 I'll output 4
+5 4
+5 success
+5 
+5 I'll output 5
+5 fatal
+5 
+6 I'll output 5
+6 5
+6 success
+6 
+6 I'll output 6
+6 fatal
+6 
+7 I'll output 6
+7 6
+7 success
+7 

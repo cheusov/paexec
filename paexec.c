@@ -169,7 +169,7 @@ static int end_of_stdin = 0;
 
 static const char *poset_success = "success";
 static const char *poset_failure = "failure";
-static const char *poset_fatal = "fatal";
+static const char *poset_fatal   = "fatal";
 
 static int *deleted_tasks = NULL;
 
@@ -676,6 +676,15 @@ static void print_line (int num, const char *line)
 	printf ("%s\n", line);
 }
 
+static void print_EOT (int num)
+{
+	if (print_eot){
+		print_line (num, "");
+		if (flush_eot)
+			fflush (stdout);
+	}
+}
+
 static void send_to_node (void)
 {
 	int n = find_free_node ();
@@ -778,8 +787,8 @@ static void loop (void)
 					if (resistant){
 						FD_CLR (fd_out [i], &rset);
 						mark_node_as_dead (i);
-						print_header (i);
-						printf ("%s\n", poset_fatal);
+						print_line (i, poset_fatal);
+						print_EOT (i);
 
 						if (alive_nodes_count == 0){
 							exit_with_error ("loop", "all nodes failed");
@@ -841,13 +850,7 @@ static void loop (void)
 								}
 							}
 
-							if (print_eot){
-								print_line (i, curr_line);
-								if (flush_eot){
-									fflush (stdout);
-								}
-							}
-
+							print_EOT (i);
 							break;
 						}
 

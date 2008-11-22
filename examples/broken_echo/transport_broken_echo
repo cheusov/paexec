@@ -14,7 +14,7 @@ BEGIN {
 
 {
 	print "I'll output " $1
-	if ($1 == id && id == 1){
+	if ($1 == id && id >= 1){
 		# fatal error emulation
 		exit 1
 	}
