@@ -53,6 +53,11 @@
 #define PAEXEC_VERSION "x.y.z"
 #endif
 
+#ifndef SA_RESTART
+#define SA_RESTART 0 /* ...and hope for the best
+                        (stdin should be immune from EINTR i/o errors) */
+#endif
+
 #include <maa.h>
 
 #include "wrappers.h"
@@ -713,7 +718,7 @@ static void send_to_node (void)
 	{
 		if (resistant){
 			mark_node_as_dead (n);
-			print_line (n, poset_fatal);
+			print_line (n, /*poset_fatal*/ "fatal2");
 			print_EOT (n);
 
 			if (alive_nodes_count == 0){
