@@ -556,6 +556,16 @@ static void set_sigchld_handler (void)
 	sigaction (SIGCHLD, &sa, NULL);
 }
 
+static void ignore_sigpipe (void)
+{
+	struct sigaction sa;
+
+	sa.sa_handler = SIG_IGN;
+	sigemptyset (&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	sigaction (SIGPIPE, &sa, NULL);
+}
+
 static void init (void)
 {
 	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
@@ -609,6 +619,9 @@ static void init (void)
 
 	/* SIGCHLD signal handler */
 	set_sigchld_handler ();
+
+	/* ignore SIGPIPE signal */
+	ignore_sigpipe ();
 }
 
 static void kill_childs (void)
@@ -718,7 +731,7 @@ static void send_to_node (void)
 	{
 		if (resistant){
 			mark_node_as_dead (n);
-			print_line (n, /*poset_fatal*/ "fatal2");
+			print_line (n, poset_fatal);
 			print_EOT (n);
 
 			if (alive_nodes_count == 0){

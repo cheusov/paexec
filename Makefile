@@ -52,9 +52,13 @@ paexec.html : paexec.pod
 
 ##################################################
 
+${.OBJDIR}/transport_closed_stdin: ${.PARSEDIR}/examples/broken_echo/transport_closed_stdin.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $(.TARGET) $(.ALLSRC) $(LDFLAGS)
+
 .PHONY : test
 test : paexec
-	@echo 'running tests...'; \
+	@$(MAKE) ${.OBJDIR}/transport_closed_stdin; \
+	echo 'running tests...'; \
 	if cd tests && ./test.sh; \
 	then echo '   succeeded'; \
 	else echo '   failed'; false; \

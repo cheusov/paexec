@@ -31,7 +31,8 @@ Version 0.10.1, by Aleksey Cheusov, Sat, 25 Oct 2008 02:00:55 +0300
    By default(!) getopt_long(3) is enabled on the following platforms
    (macro): __NetBSD__, __FreeBSD__, __OpenBSD__, __DragonFly__,
    __linux__ and __APPLE__.  On others only short options provided by
-   getopt(3) are used. This means that long option may to not work.
+   getopt(3) are used. This means that long option may to not work
+   on your platform.
 
    fix in manual page: accept(2) -> select(2)
 

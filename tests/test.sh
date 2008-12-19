@@ -527,6 +527,17 @@ EOF
 5 6
 EOF
 
+    # resistance to transport failure2 (write(2) errors)
+    runtest -s -z -lre -t ../transport_closed_stdin -c : \
+	-n '0 1 2 3 4 5 6 7 8' <<EOF
+0 1
+1 2
+2 3
+3 4
+4 5
+5 6
+EOF
+
     # resistance to transport failure
     awk '
     BEGIN {
