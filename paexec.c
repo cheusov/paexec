@@ -55,7 +55,7 @@
 
 #ifndef SA_RESTART
 #define SA_RESTART 0 /* ...and hope for the best
-                        (stdin should be immune from EINTR i/o errors) */
+                        (stdio should be immune from EINTR i/o errors) */
 #endif
 
 #include <maa.h>
