@@ -59,6 +59,7 @@ ${.OBJDIR}/transport_closed_stdin: ${.PARSEDIR}/examples/broken_echo/transport_c
 test : paexec
 	@$(MAKE) ${.OBJDIR}/transport_closed_stdin; \
 	echo 'running tests...'; \
+	export OBJDIR=${.OBJDIR}; \
 	if cd tests && ./test.sh; \
 	then echo '   succeeded'; \
 	else echo '   failed'; false; \

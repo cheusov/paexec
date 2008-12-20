@@ -2,8 +2,8 @@
 
 runtest (){
     printf '=================================================================\n'
-    printf '======= args: %s\n' "$*"
-    ../paexec "$@" 2>&1
+    printf '======= args: %s\n' "$*" | cut_full_path_closed_stdin
+    $OBJDIR/paexec "$@" 2>&1
 }
 
 cut_version (){
@@ -12,6 +12,10 @@ cut_version (){
 
 cut_help (){
     awk 'NR <= 3'
+}
+
+cut_full_path_closed_stdin (){
+    sed 's|^\(.*\) [^ ]*\(transport_closed_stdin.*\)$|\1 \2|'
 }
 
 resort (){
@@ -140,7 +144,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c ../examples/make_package/make_package_cmd -n +2 \
+    $OBJDIR/paexec -l -s -c ../examples/make_package/make_package_cmd -n +2 \
 	> _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -165,7 +169,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' \
 	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -190,7 +194,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' \
 	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -215,7 +219,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' \
 	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -240,7 +244,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -264,7 +268,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' \
 	-n +2 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -288,7 +292,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' \
 	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -312,7 +316,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' \
 	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -336,7 +340,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5 \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5 \
 	> _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -361,7 +365,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -386,7 +390,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -409,7 +413,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' \
+    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -440,7 +444,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s \
+    $OBJDIR/paexec -l -s \
 	-c '../examples/make_package/make_package_cmd__xxx_failed "gmake|autoconf"' \
 	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
 
@@ -473,7 +477,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    ../paexec -l -s \
+    $OBJDIR/paexec -l -s \
 	-c '../examples/make_package/make_package_cmd__xxx_failed flex' \
 	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks2
 
@@ -528,7 +532,7 @@ EOF
 EOF
 
     # resistance to transport failure2 (write(2) errors)
-    runtest -s -z -lre -t ../transport_closed_stdin -c : \
+    runtest -s -z -lre -t $OBJDIR/transport_closed_stdin -c : \
 	-n '0 1 2 3 4 5 6 7 8' <<EOF
 0 1
 1 2
