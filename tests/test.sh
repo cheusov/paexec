@@ -36,7 +36,7 @@ gln (){
     END {
         if (task in fail) {print "rf"}
     }
-    ' _test.tmp
+    ' $OBJDIR/_test.tmp
 }
 
 do_test (){
@@ -145,7 +145,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c ../examples/make_package/make_package_cmd -n +2 \
-	> _test.tmp < ../examples/make_package/make_package_tasks
+	> $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -160,7 +160,7 @@ EOF
     test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
     test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 22 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 22 && echo ok100
 
     # -s: byacc fails
     cat <<EOF
@@ -170,7 +170,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' \
-	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -185,7 +185,7 @@ EOF
     test "`gln wip/dict-server`" = "rf" && echo ok10
     test "`gln wip/dict-client`" = "rf" && echo ok11
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 19 && echo ok100
 
     # -s: flex fails
     cat <<EOF
@@ -195,7 +195,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' \
-	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -210,7 +210,7 @@ EOF
     test "`gln wip/dict-server`" = "rf" && echo ok10
     test "`gln wip/dict-client`" = "rf" && echo ok11
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 19 && echo ok100
 
     # -s: libmaa fails
     cat <<EOF
@@ -220,7 +220,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' \
-	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -235,7 +235,7 @@ EOF
     test "`gln wip/dict-server`" = "rf" && echo ok10
     test "`gln wip/dict-client`" = "rf" && echo ok11
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 19 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 19 && echo ok100
 
     # -s: m4 fails
     cat <<EOF
@@ -245,7 +245,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -259,7 +259,7 @@ EOF
 
     test "`gln wip/dict-server`" = "rf" && echo ok10
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 21 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 21 && echo ok100
 
     # -s: libjudy fails
     cat <<EOF
@@ -269,7 +269,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' \
-	-n +2 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +2 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -283,7 +283,7 @@ EOF
     test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
     test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 23 && echo ok100
 
     # -s: dictem fails
     cat <<EOF
@@ -293,7 +293,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' \
-	-n +3 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln devel/libjudy`" -gt 0 && echo ok3
@@ -307,7 +307,7 @@ EOF
     test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
     test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 23 && echo ok100
 
     # -s: glib2 fails
     cat <<EOF
@@ -317,7 +317,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' \
-	-n +6 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln textproc/dictem`" -gt 0 && echo ok2
     test "`gln devel/libjudy`" -gt 0 && echo ok3
@@ -331,7 +331,7 @@ EOF
     test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
     test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 23 && echo ok100
 
     # -s: gmake fails
     cat <<EOF
@@ -341,7 +341,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5 \
-	> _test.tmp < ../examples/make_package/make_package_tasks
+	> $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -356,7 +356,7 @@ EOF
     test "`gln wip/dict-server`" = "rf" && echo ok12
     test "`gln wip/dict-client`" = "rf" && echo ok13
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 17 && echo ok100
 
     # -s: autoconf fails
     cat <<EOF
@@ -366,7 +366,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -381,7 +381,7 @@ EOF
     test "`gln wip/dict-server`" = "rf" && echo ok12
     test "`gln wip/dict-client`" = "rf" && echo ok13
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 17 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 17 && echo ok100
 
     # -s: dict-server fails
     cat <<EOF
@@ -391,7 +391,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -404,7 +404,7 @@ EOF
     test "`gln devel/byacc`" -lt "`gln wip/dict-client`" && echo ok9
     test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 23 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 23 && echo ok100
 
     # -s: flex and byacc fail
     cat <<EOF
@@ -414,7 +414,7 @@ EOF
 EOF
 
     $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -430,12 +430,12 @@ EOF
 
     awk 'NF > 2 && $2 == "devel/flex" &&
          /wip\/dict-server/ &&
-         /wip\/dict-client/ {print "ok20"}' _test.tmp
+         /wip\/dict-client/ {print "ok20"}' $OBJDIR/_test.tmp
     awk 'NF > 2 && $2 == "devel/byacc" &&
          /wip\/dict-server/ &&
-         /wip\/dict-client/ {print "ok21"}' _test.tmp
+         /wip\/dict-client/ {print "ok21"}' $OBJDIR/_test.tmp
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 20 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 20 && echo ok100
 
     # -s: gmake and autoconf fail
     cat <<EOF
@@ -446,7 +446,7 @@ EOF
 
     $OBJDIR/paexec -l -s \
 	-c '../examples/make_package/make_package_cmd__xxx_failed "gmake|autoconf"' \
-	-n +4 > _test.tmp < ../examples/make_package/make_package_tasks
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -463,12 +463,12 @@ EOF
 
     awk 'NF > 2 && $2 == "devel/autoconf" &&
          /wip\/libmaa/ && /wip\/dict-server/ &&
-         /wip\/dict-client/ {print "ok20"}' _test.tmp
+         /wip\/dict-client/ {print "ok20"}' $OBJDIR/_test.tmp
     awk 'NF > 2 && $2 == "devel/gmake" &&
          /wip\/libmaa/ && /wip\/dict-server/ &&
-         /wip\/dict-client/ {print "ok21"}' _test.tmp
+         /wip\/dict-client/ {print "ok21"}' $OBJDIR/_test.tmp
 
-    test "`awk 'END {print NR}' _test.tmp`" -eq 18 && echo ok100
+    test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 18 && echo ok100
 
     # diamond-like dependancy and failure
     cat <<EOF
@@ -479,15 +479,15 @@ EOF
 
     $OBJDIR/paexec -l -s \
 	-c '../examples/make_package/make_package_cmd__xxx_failed flex' \
-	-n +5 > _test.tmp < ../examples/make_package/make_package_tasks2
+	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks2
 
     test "`gln devel/flex`" = f && echo ok1
 
     awk 'NF > 2 && $2 == "devel/flex" &&
          /wip\/dict-client/ && /wip\/dict-server/ &&
-         /wip\/pkg_online/ {print "ok2"}' _test.tmp
+         /wip\/pkg_online/ {print "ok2"}' $OBJDIR/_test.tmp
 
-    if grep 'wip/pkg_online.*wip/pkg_online' _test.tmp > /dev/null; then
+    if grep 'wip/pkg_online.*wip/pkg_online' $OBJDIR/_test.tmp > /dev/null; then
 	echo 'needs to be fixed!!!'
     else
 	echo ok
@@ -561,7 +561,9 @@ for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
     printf "PAEXEC_BUFSIZE=%d:\n" $PAEXEC_BUFSIZE
     export PAEXEC_BUFSIZE
 
-    if do_test > _test.res 2>&1 && diff -C10 test.out _test.res; then
+    if do_test > $OBJDIR/_test.res 2>&1 &&
+	diff -C10 test.out $OBJDIR/_test.res
+    then
 	true
     else
 	echo "paexec fails (PAEXEC_BUFSIZE=$PAEXEC_BUFSIZE)" 1>&2
