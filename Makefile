@@ -62,8 +62,8 @@ ${.OBJDIR}/transport_closed_stdin: ${.PARSEDIR}/examples/broken_echo/transport_c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $(.TARGET) $(.ALLSRC) $(LDFLAGS)
 
 .PHONY : test
-test : paexec
-	@$(MAKE) ${.OBJDIR}/transport_closed_stdin; \
+test : paexec ${.OBJDIR}/transport_closed_stdin; \
+	cd ${.CURDIR}; \
 	echo 'running tests...'; \
 	export OBJDIR=${.OBJDIR}; \
 	if cd tests && ./test.sh; \
