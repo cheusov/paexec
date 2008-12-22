@@ -167,13 +167,15 @@ Imply B<-e> and flushes stdout.
 
 =item B<-s>|B<--pos>
 
-Partially ordered set of tasks are read from stdin.
+Partially ordered set of tasks (orgraph) is read from stdin.
 
 Instead of autonomous tasks, graph of the tasks is read from stdin.
 In this mode every task can either FAIL or SUCCEED.
 As always an empty line output by I<command> means I<end of task>.
 The line before it shows an EXIT STATUS of the task.
-The word "failure" means failure, "success" - success.
+The word "failure" means failure, "success" - success and
+"fatal" means that the current task is reassigned to another node
+(and restarted, of course) (see option -z).
 See examples/1_div_x/1_div_X_cmd for the sample.
 An input line (paexec's stdin) should contain
 either single task without spaces inside
@@ -297,8 +299,8 @@ during the current run of paexec.
 
 Depending on the system, long options may be not available.
 
-select(2) system call and non-blocking read(2) are used to read
-I<tasks> from stdin and result lines from I<nodes>.
+select(2) system call and non-blocking read(2) are used to read result
+lines from I<nodes>.
 
 At the moment blocking write(2) is used to send I<task> to the
 I<node>. This may slow down an entire processing if I<tasks> are
