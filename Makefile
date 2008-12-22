@@ -15,9 +15,6 @@ MAALIB?=		-lmaa
 # maximum length of result line (line read from command's stdout)
 BUFSIZE?=		4096
 
-# directory with paexec sources
-SRCROOT?=		${.PARSEDIR}
-
 ############################################################
 .include "Makefile.version"
 
@@ -71,6 +68,5 @@ test : paexec ${.OBJDIR}/transport_closed_stdin; \
 	fi
 
 ############################################################
-.PATH: ${SRCROOT}
 
 .include <bsd.prog.mk>
