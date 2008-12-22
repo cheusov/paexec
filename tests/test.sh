@@ -554,6 +554,14 @@ EOF
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '4'
 
+    # resistance to transport failure
+    runtest -s -z -lre -t ../tests/transport_broken -c : \
+	-n 'paexec ok dict-client 1-fail' <<EOF
+libmaa paexec
+libmaa dict-client
+libmaa dict-server
+EOF
+
     return 0
 }
 

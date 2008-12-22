@@ -510,9 +510,10 @@ static void init__child_processes (void)
 
 static void mark_node_as_dead (int node)
 {
-	int status;
-	if (pids [node] > 0)
-		waitpid(pids [node], &status, WNOHANG);
+	if (debug){
+		fprintf (stderr, "mark_node_as_dead (%d)\n", node);
+	}
+
 	pids [node] = (pid_t) -1;
 
 	if (busy [node]){
@@ -536,14 +537,8 @@ static void handler_sigchld (int dummy)
 {
 	int status;
 	pid_t pid;
-	int i = 0;
 
 	while (pid = waitpid(-1, &status, WNOHANG), pid > 0){
-		for (i=0; i < nodes_count; ++i){
-			if (pids [i] == pid){
-				pids [i] = (pid_t) -1;
-			}
-		}
 	}
 }
 
@@ -629,7 +624,7 @@ static void kill_childs (void)
 {
 	int i;
 	for (i=0; i < nodes_count; ++i){
-		if (pids [i] > 0){
+		if (pids [i] != (pid_t) -1){
 			kill (pids [i], SIGTERM);
 		}
 	}
@@ -644,7 +639,7 @@ static void wait_for_childs (void)
 	}
 
 	for (i=0; i < nodes_count; ++i){
-		if (pids [i] > 0){
+		if (pids [i] != (pid_t) -1){
 			mark_node_as_dead (i);
 		}
 	}
@@ -665,7 +660,7 @@ static int find_free_node (void)
 {
 	int i;
 	for (i=0; i < nodes_count; ++i){
-		if (pids [i] > 0 && !busy [i])
+		if (pids [i] != (pid_t) -1 && !busy [i])
 			return i;
 	}
 
@@ -685,7 +680,7 @@ static void print_header (int num)
 		printf ("%d ", line_nums [num]);
 	}
 	if (show_pid){
-		printf ("%d ", (int) pids [num]);
+		printf ("%ld ", (long) pids [num]);
 	}
 }
 
@@ -712,7 +707,7 @@ static void send_to_node (void)
 	assert (n >= 0);
 
 	if (debug){
-		printf ("send to %d (pid: %d)\n", n, (int) pids [n]);
+		printf ("send to %d (pid: %ld)\n", n, (long) pids [n]);
 	}
 
 	busy [n]      = 1;
@@ -927,10 +922,12 @@ static void loop (void)
 		}
 
 		if (debug){
+			printf ("alive_nodes_count = %d\n", alive_nodes_count);
 			printf ("busy_count = %d\n", busy_count);
 			printf ("end_of_stdin = %d\n", end_of_stdin);
 			for (i=0; i < nodes_count; ++i){
 				printf ("busy [%d]=%d\n", i, busy [i]);
+				printf ("pid [%d]=%d\n", i, (int) pids [i]);
 			}
 		}
 

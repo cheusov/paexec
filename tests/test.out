@@ -543,3 +543,21 @@ all nodes failed
 4 fatal
 4 
 all nodes failed
+=================================================================
+======= args: -s -z -lre -t ../tests/transport_broken -c : -n paexec ok dict-client 1-fail
+paexec 2  libmaa
+paexec 2 success
+paexec 2 
+paexec 1 fatal
+paexec 1 
+1-fail 4 fatal
+1-fail 4 
+ok 3  dict-client
+ok 3 success
+ok 3 
+dict-client 4  dict-server
+dict-client 4 success
+dict-client 4 
+ok 4  paexec
+ok 4 success
+ok 4 
