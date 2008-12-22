@@ -1,5 +1,5 @@
 ======================================================================
-Version 0.12.0, by Aleksey Cheusov, Mon, 22 Dec 2008 17:23:32 +0200
+Version 0.12.0, by Aleksey Cheusov, Mon, 22 Dec 2008 18:38:00 +0200
 
   ADDED: -z option. If applied, read/write(2) operations from/to nodes
   becomes not critical. In case paexec has lost connection to the
