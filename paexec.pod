@@ -240,6 +240,17 @@ word is output followed by a list of tasks failed because of it.
      2 wip/libmaa
      2 success
 
+=item B<-z>|B<--resistant>
+
+If applied, read/write(2) operations from/to nodes becomes not
+critical. In case paexec has lost connection to the node, it will
+reassign failed task to another node and, if -s applied, will output
+"fatal" string to stdout ("success" + "failure" + "fatal").  This
+makes paexec resistant to the I/O errors, as a result you can create
+paexec clusters even over network consisting of unreliable hosts
+(Internet?). Failed hosts are marked as such and will not be used
+during the current run of paexec.
+
 =back
 
 =head1 EXAMPLES

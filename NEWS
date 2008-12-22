@@ -1,4 +1,18 @@
 ======================================================================
+Version 0.12.0, by Aleksey Cheusov, Mon, 22 Dec 2008 17:23:32 +0200
+
+  ADDED: -z option. If applied, read/write(2) operations from/to nodes
+  are not critical. In case paexec has lost connection to the node, it
+  will reassign failed task to another node and (if -s applied) output
+  "fatal" string to stdout ("success" + "failure" + "fatal").  This
+  makes paexec resistant to the I/O errors, as a result you can create
+  paexec clusters even over network consisting of unreliable hosts
+  (Internet?). Failed hosts are marked as such and will not be used
+  during the current run of paexec.
+
+  select(2) do not listen stdin (fd=0) anymore.
+
+======================================================================
 Version 0.11.0, by Aleksey Cheusov, Sat, 25 Oct 2008 17:49:47 +0300
 
    paexec -s: before beginning actual work an input tasks graph is
