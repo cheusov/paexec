@@ -411,7 +411,9 @@ static void init__check_cycles (void)
 
 static void init__read_poset_tasks (void)
 {
-	char buf [BUFSIZE];
+	char *buf = NULL;
+	size_t len = 0;
+
 	int i;
 
 	if (!poset_of_tasks){
@@ -423,8 +425,7 @@ static void init__read_poset_tasks (void)
 	tasks = hsh_create (NULL, NULL);
 
 	/* reading all tasks with their dependancies */
-	while (fgets (buf, sizeof (buf), stdin)){
-		size_t len = strlen (buf);
+	while (buf = xfgetln (stdin, &len), buf != NULL){
 		char *sep = strchr (buf, ' ');
 		int id1, id2;
 		char *s1, *s2;
