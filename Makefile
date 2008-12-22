@@ -63,10 +63,9 @@ ${.OBJDIR}/transport_closed_stdin: ${.PARSEDIR}/examples/broken_echo/transport_c
 
 .PHONY : test
 test : paexec ${.OBJDIR}/transport_closed_stdin; \
-	cd ${.CURDIR}; \
-	echo 'running tests...'; \
+	@echo 'running tests...'; \
 	export OBJDIR=${.OBJDIR}; \
-	if cd tests && ./test.sh; \
+	if cd ${.CURDIR}/tests && ./test.sh; \
 	then echo '   succeeded'; \
 	else echo '   failed'; false; \
 	fi
