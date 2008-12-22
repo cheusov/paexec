@@ -30,8 +30,8 @@ SRCS=		paexec.c wrappers.c nonblock_helpers.c
 
 LDADD+=		$(MAALIB)
 
-CPPFLAGS+=	-DPAEXEC_VERSION='"${VERSION}"'
-CPPFLAGS+=	-DBUFSIZE=${BUFSIZE}
+CFLAGS+=	-DPAEXEC_VERSION='"${VERSION}"'
+CFLAGS+=	-DBUFSIZE=${BUFSIZE}
 
 ############################################################
 .PHONY: install-dirs

@@ -14,6 +14,9 @@ Version 0.12.0, by Aleksey Cheusov, Mon, 22 Dec 2008 17:23:32 +0200
   select(2) do not listen stdin (fd=0) anymore. Blocking read(2) is
   used to read tasks from stdin.
 
+  Makefile: CPPFLAGS -> CFLAGS, FreeBSD make Mk scripts
+  don't use CPPFLAGS.
+
 ======================================================================
 Version 0.11.0, by Aleksey Cheusov, Sat, 25 Oct 2008 17:49:47 +0300
 
