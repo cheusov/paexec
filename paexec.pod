@@ -144,6 +144,10 @@ When end-of-task marker is obtained from node, an empty line is
 printed to stdout. This option may be useful together with I<-l>
 and/or I<-r>.
 
+=item B<-E>|B<--eot-flush>
+
+Imply B<-e> and flushes stdout.
+
 =item B<-d>|B<--debug>
 
 Turn on a debugging mode (for debugging purposes only)
@@ -155,15 +159,6 @@ Copy input lines (i.e. tasks) to stdout.
 =item B<-I>|B<--i2o-flush>
 
 Imply B<-i> and flushes stdout.
-
-=item B<-e>|B<--eot>
-
-Print an empty line to stdout when end-of-task marker is read from
-processor.
-
-=item B<-E>|B<--eot-flush>
-
-Imply B<-e> and flushes stdout.
 
 =item B<-s>|B<--pos>
 
@@ -297,7 +292,8 @@ during the current run of paexec.
 
 =head1 NOTES
 
-Depending on the system, long options may be not available.
+On some systems long options may be not available.
+Use short options to make programs more portable.
 
 select(2) system call and non-blocking read(2) are used to read result
 lines from I<nodes>.
