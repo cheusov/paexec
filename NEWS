@@ -1,4 +1,11 @@
 ======================================================================
+Version 0.12.1, by Aleksey Cheusov, Tue, 23 Dec 2008 20:33:20 +0200
+
+  FIXED: broken support for -z :-/ Now everything is fixed.
+
+  Makefile: adapted for FreeBSD make which doesn't support .PARSEDIR
+
+======================================================================
 Version 0.12.0, by Aleksey Cheusov, Mon, 22 Dec 2008 21:48:01 +0200
 
   ADDED: -z option. If applied, read/write(2) operations from/to nodes
