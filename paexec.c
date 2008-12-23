@@ -295,12 +295,10 @@ static const char *get_new_task (void)
 {
 	const char *task = NULL;
 	size_t task_len = 0;
-	int node;
 
 	if (failed_nodes_count > 0){
-		node = failed_nodes [--failed_nodes_count];
-		assert (node >= 0 && node < nodes_count);
-		task = node2task [node];
+		line_num = failed_nodes [--failed_nodes_count];
+		task = id2task [line_num];
 		assert (task);
 	}else if (poset_of_tasks){
 		task = get_new_task_from_graph ();
@@ -529,7 +527,7 @@ static void mark_node_as_dead (int node)
 	fd_in  [node] = -1;
 	fd_out [node] = -1;
 
-	failed_nodes [failed_nodes_count++] = node;
+	failed_nodes [failed_nodes_count++] = line_nums [node];
 	--alive_nodes_count;
 }
 
