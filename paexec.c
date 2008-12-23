@@ -164,8 +164,8 @@ static int *tasks_graph_deg = NULL;
 static char *current_task     = NULL;
 static size_t current_task_sz = 0;
 
-static int *failed_nodes     = NULL;
-static int failed_nodes_count = 0;
+static int *failed_taskids     = NULL;
+static int failed_taskids_count = 0;
 
 static char **node2task         = NULL;
 static size_t *node2task_buf_sz = NULL;
@@ -296,8 +296,8 @@ static const char *get_new_task (void)
 	const char *task = NULL;
 	size_t task_len = 0;
 
-	if (failed_nodes_count > 0){
-		taskid = failed_nodes [--failed_nodes_count];
+	if (failed_taskids_count > 0){
+		taskid = failed_taskids [--failed_taskids_count];
 		task = id2task [taskid];
 		assert (task);
 	}else if (poset_of_tasks){
@@ -527,7 +527,7 @@ static void mark_node_as_dead (int node)
 	fd_in  [node] = -1;
 	fd_out [node] = -1;
 
-	failed_nodes [failed_nodes_count++] = node2taskid [node];
+	failed_taskids [failed_taskids_count++] = node2taskid [node];
 	--alive_nodes_count;
 }
 
@@ -592,8 +592,8 @@ static void init (void)
 
 	ret_codes = xmalloc (nodes_count * sizeof (*ret_codes));
 
-	failed_nodes = xmalloc (nodes_count * sizeof (*failed_nodes));
-	memset (failed_nodes, -1, nodes_count * sizeof (*failed_nodes));
+	failed_taskids = xmalloc (nodes_count * sizeof (*failed_taskids));
+	memset (failed_taskids, -1, nodes_count * sizeof (*failed_taskids));
 
 	/* stdin */
 	buf_stdin = xmalloc (initial_bufsize);
