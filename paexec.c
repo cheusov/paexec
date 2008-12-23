@@ -115,7 +115,7 @@ static int busy_count   = 0;
 
 static pid_t *pids      = NULL;
 
-static int *line_nums   = NULL;
+static int *node2taskid = NULL;
 
 typedef enum {
 	rt_undef   = -1,
@@ -126,7 +126,7 @@ static ret_code_t *ret_codes   = NULL;
 
 static int max_fd   = 0;
 
-static int line_num = 0;
+static int taskid = 0;
 
 static char *buf_stdin      = NULL;
 static size_t bufsize_stdin = 0;
@@ -136,7 +136,7 @@ static int nodes_count = 0;
 static int alive_nodes_count = 0;
 
 static int show_pid      = 0;
-static int show_line_num = 0;
+static int show_taskid = 0;
 static int show_node     = 0;
 
 static int print_eot      = 0;
@@ -286,7 +286,7 @@ static const char * get_new_task_from_graph (void)
 	if (num == -1)
 		return NULL;
 
-	line_num = num;
+	taskid = num;
 	tasks_graph_deg [num] = -1;
 	return id2task [num];
 }
@@ -297,8 +297,8 @@ static const char *get_new_task (void)
 	size_t task_len = 0;
 
 	if (failed_nodes_count > 0){
-		line_num = failed_nodes [--failed_nodes_count];
-		task = id2task [line_num];
+		taskid = failed_nodes [--failed_nodes_count];
+		task = id2task [taskid];
 		assert (task);
 	}else if (poset_of_tasks){
 		task = get_new_task_from_graph ();
@@ -319,7 +319,7 @@ static const char *get_new_task (void)
 	memcpy (current_task, task, task_len+1);
 
 	if (!poset_of_tasks){
-		++line_num;
+		++taskid;
 	}
 
 	return current_task;
@@ -527,7 +527,7 @@ static void mark_node_as_dead (int node)
 	fd_in  [node] = -1;
 	fd_out [node] = -1;
 
-	failed_nodes [failed_nodes_count++] = line_nums [node];
+	failed_nodes [failed_nodes_count++] = node2taskid [node];
 	--alive_nodes_count;
 }
 
@@ -588,7 +588,7 @@ static void init (void)
 
 	busy     = xmalloc (nodes_count * sizeof (*busy));
 
-	line_nums = xmalloc (nodes_count * sizeof (*line_nums));
+	node2taskid = xmalloc (nodes_count * sizeof (*node2taskid));
 
 	ret_codes = xmalloc (nodes_count * sizeof (*ret_codes));
 
@@ -674,8 +674,8 @@ static void print_header (int num)
 		else
 			printf ("%d ", num);
 	}
-	if (show_line_num){
-		printf ("%d ", line_nums [num]);
+	if (show_taskid){
+		printf ("%d ", node2taskid [num]);
 	}
 	if (show_pid){
 		printf ("%ld ", (long) pids [num]);
@@ -710,7 +710,7 @@ static void send_to_node (void)
 
 	busy [n]      = 1;
 	size_out [n]  = 0;
-	line_nums [n] = line_num;
+	node2taskid [n] = taskid;
 
 	++busy_count;
 
@@ -856,11 +856,11 @@ static void loop (void)
 								switch (ret_codes [i]){
 									case rt_failure:
 										print_header (i);
-										delete_task_rec (line_nums [i]);
+										delete_task_rec (node2taskid [i]);
 										printf ("\n");
 										break;
 									case rt_success:
-										delete_task (line_nums [i], 0);
+										delete_task (node2taskid [i], 0);
 										break;
 									case rt_undef:
 										print_line (i, "?");
@@ -1079,7 +1079,7 @@ static void process_args (int *argc, char ***argv)
 				show_pid = 1;
 				break;
 			case 'l':
-				show_line_num = 1;
+				show_taskid = 1;
 				break;
 			case 'r':
 				show_node = 1;
@@ -1177,8 +1177,8 @@ static void free_memory (void)
 	if (pids)
 		xfree (pids);
 
-	if (line_nums)
-		xfree (line_nums);
+	if (node2taskid)
+		xfree (node2taskid);
 
 	if (ret_codes)
 		xfree (ret_codes);
