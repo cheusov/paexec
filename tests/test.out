@@ -544,6 +544,12 @@ all nodes failed
 4 
 all nodes failed
 =================================================================
+======= args: -z -r -s -i -E -t ../examples/broken_echo/transport_broken_echo -c : -n 4
+4 mama
+4 fatal
+4 
+all nodes failed
+=================================================================
 ======= paexec -s -z -lr -t ../tests/transport_broken_rnd -c : -n '0.1 0.15 0.2 0.25 0.3 0' | filter_succeded_tasks
 ======= -z test!!!
 1 paexec

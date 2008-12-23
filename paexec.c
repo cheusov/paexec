@@ -720,6 +720,13 @@ static void send_to_node (void)
 	}
 	memcpy (node2task [n], current_task, task_len + 1);
 
+	if (print_i2o){
+		print_line (n, current_task);
+		if (flush_i2o){
+			fflush (stdout);
+		}
+	}
+
 	if (-1 == iwrite (fd_in [n], current_task, task_len) ||
 		-1 == iwrite (fd_in [n], "\n", 1))
 	{
@@ -734,13 +741,6 @@ static void send_to_node (void)
 			return;
 		}else{
 			err_fatal_errno ("send_to_node", "write() failed:");
-		}
-	}
-
-	if (print_i2o){
-		print_line (n, current_task);
-		if (flush_i2o){
-			fflush (stdout);
 		}
 	}
 }

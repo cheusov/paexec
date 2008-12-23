@@ -566,6 +566,13 @@ EOF
 	-n '4'
 
     # resistance to transport failure
+    runtest -z -r -s -i -E \
+	-t ../examples/broken_echo/transport_broken_echo -c ':' \
+	-n '4' <<EOF
+mama
+EOF
+
+    # resistance to transport failure
     cat <<EOF
 =================================================================
 ======= paexec -s -z -lr -t ../tests/transport_broken_rnd -c : -n '0.1 0.15 0.2 0.25 0.3 0' | filter_succeded_tasks
