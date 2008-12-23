@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 
 function sleep (secs){
-	if (system("sleep " secs)){
+	if (!nosleep && 0 != system("sleep " secs)){
 		exit 10
 	}
 }
@@ -16,6 +16,8 @@ function my_rnd (){
 BEGIN {
 	threshold = ARGV [1] + 0.0
 	fake_cmd  = ARGV [2]
+
+	nosleep   = ARGV [1] ~ /ns/
 
 	ARGV [1] = "-"
 	ARGV [2] = ""

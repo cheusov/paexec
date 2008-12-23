@@ -588,6 +588,20 @@ EOF
 	-n '0.1 0.15 0.2 0.25 0.3 0' < $OBJDIR/_test.in |
     filter_succeded_tasks | sort -n
 
+    # resistance to transport failure
+    cat <<EOF
+=================================================================
+======= <echo 1-1000 number> |
+======= paexec -s -z -lr -t ../tests/transport_broken_rnd -c :
+=======     -n '0.01 0.01 0.01 0.01 0.01 0' | filter_succeded_tasks
+======= -z test!!!
+EOF
+
+    awk 'BEGIN {for (i=1; i <= 1000; ++i) {print "dat" i}}' |
+    ${OBJDIR}/paexec -s -z -lr -t ../tests/transport_broken_rnd -c : \
+	-n '0.01-ns 0.01-ns 0.01-ns 0.01-ns 0.01-ns 0-ns' |
+    filter_succeded_tasks | sort -n | cksum
+
     return 0
 }
 
