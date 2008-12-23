@@ -544,20 +544,15 @@ all nodes failed
 4 
 all nodes failed
 =================================================================
-======= args: -s -z -lre -t ../tests/transport_broken -c : -n paexec ok dict-client 1-fail
-paexec 2  libmaa
-paexec 2 success
-paexec 2 
-paexec 1 fatal
-paexec 1 
-1-fail 4 fatal
-1-fail 4 
-ok 3  dict-client
-ok 3 success
-ok 3 
-dict-client 4  dict-server
-dict-client 4 success
-dict-client 4 
-ok 4  paexec
-ok 4 success
-ok 4 
+======= paexec -s -z -lr -t ../tests/transport_broken_rnd -c : -n '0.1 0.15 0.2 0.25 0.3 0' | filter_succeded_tasks
+======= -z test!!!
+1 paexec
+2 libmaa
+3 dict-client
+4 dict-server
+5 dat1
+6 dat2
+7 dat3
+8 dat4
+9 dat5
+10 dat6

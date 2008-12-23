@@ -39,6 +39,17 @@ gln (){
     ' $OBJDIR/_test.tmp
 }
 
+filter_succeded_tasks (){
+    awk '
+    $3 == "success" {
+        print $2, hash [$1, $2]
+        next
+    }
+    $3 != "fatal" {
+        hash [$1, $2] = $3
+    }'
+}
+
 do_test (){
     runtest -V        | cut_version
 #    runtest --version | cut_version
@@ -555,12 +566,27 @@ EOF
 	-n '4'
 
     # resistance to transport failure
-    runtest -s -z -lre -t ../tests/transport_broken -c : \
-	-n 'paexec ok dict-client 1-fail' <<EOF
+    cat <<EOF
+=================================================================
+======= paexec -s -z -lr -t ../tests/transport_broken_rnd -c : -n '0.1 0.15 0.2 0.25 0.3 0' | filter_succeded_tasks
+======= -z test!!!
+EOF
+
+    cat > $OBJDIR/_test.in <<EOF
 libmaa paexec
 libmaa dict-client
 libmaa dict-server
+dat1
+dat2
+dat3
+dat4
+dat5
+dat6
 EOF
+
+    ${OBJDIR}/paexec -s -z -lr -t ../tests/transport_broken_rnd -c : \
+	-n '0.1 0.15 0.2 0.25 0.3 0' < $OBJDIR/_test.in |
+    filter_succeded_tasks | sort -n
 
     return 0
 }
