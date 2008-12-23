@@ -599,7 +599,7 @@ EOF
 
     awk 'BEGIN {for (i=1; i <= 1000; ++i) {print "dat" i}}' |
     ${OBJDIR}/paexec -s -z -lr -t ../tests/transport_broken_rnd -c : \
-	-n '0.01-ns 0.01-ns 0.01-ns 0.01-ns 0.01-ns 0-ns' |
+	-n '0.01-ns 0.03-ns 0.09-ns 0.09-ns 0.03-ns 0-ns' |
     filter_succeded_tasks | sort -n | cksum
 
     return 0
