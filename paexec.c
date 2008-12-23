@@ -136,7 +136,7 @@ static int nodes_count = 0;
 static int alive_nodes_count = 0;
 
 static int show_pid      = 0;
-static int show_taskid = 0;
+static int show_taskid   = 0;
 static int show_node     = 0;
 
 static int print_eot      = 0;
