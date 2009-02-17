@@ -556,10 +556,9 @@ EOF
     # resistance to transport failure
     awk '
     BEGIN {
-        for (i=1; i < 10000; ++i){
+        for (i=1; i < 300; ++i){
             print i
         }
-        printf "\n"
     }' |
     runtest -z -r -s -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
