@@ -53,10 +53,10 @@
 #define PAEXEC_VERSION "x.y.z"
 #endif
 
-#ifndef SA_RESTART
-#define SA_RESTART 0 /* ...and hope for the best
-                        (stdio should be immune to EINTR i/o errors) */
-#endif
+//#ifndef SA_RESTART
+//#define SA_RESTART 0 /* ...and hope for the best
+//                        (stdio should be immune to EINTR i/o errors) */
+//#endif
 
 #include <maa.h>
 
@@ -185,7 +185,7 @@ static void close_all_ins (void)
 	int i;
 	for (i=0; i < nodes_count; ++i){
 		if (!busy [i] && fd_in [i] != -1){
-			iclose (fd_in [i]);
+			close (fd_in [i]);
 			fd_in [i] = -1;
 		}
 	}
@@ -520,9 +520,9 @@ static void mark_node_as_dead (int node)
 	}
 
 	if (fd_in [node] >= 0)
-		iclose (fd_in  [node]);
+		close (fd_in  [node]);
 	if (fd_out [node] >= 0)
-		iclose (fd_out [node]);
+		close (fd_out [node]);
 
 	fd_in  [node] = -1;
 	fd_out [node] = -1;
@@ -546,7 +546,7 @@ static void set_sigchld_handler (void)
 
 	sa.sa_handler = handler_sigchld;
 	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
+	sa.sa_flags = 0; //SA_RESTART;
 	sigaction (SIGCHLD, &sa, NULL);
 }
 
@@ -556,8 +556,30 @@ static void ignore_sigpipe (void)
 
 	sa.sa_handler = SIG_IGN;
 	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
+	sa.sa_flags = 0; //SA_RESTART;
 	sigaction (SIGPIPE, &sa, NULL);
+}
+
+static void block_signals (void)
+{
+	sigset_t set;
+
+	sigemptyset (&set);
+	xsigaddset (&set, SIGALRM);
+	xsigaddset (&set, SIGCHLD);
+
+	xsigprocmask (SIG_BLOCK, &set, NULL);
+}
+
+static void unblock_signals (void)
+{
+	sigset_t set;
+
+	sigemptyset (&set);
+	xsigaddset (&set, SIGALRM);
+	xsigaddset (&set, SIGCHLD);
+
+	xsigprocmask (SIG_UNBLOCK, &set, NULL);
 }
 
 static void init (void)
@@ -727,8 +749,8 @@ static void send_to_node (void)
 		}
 	}
 
-	if (-1 == iwrite (fd_in [n], current_task, task_len) ||
-		-1 == iwrite (fd_in [n], "\n", 1))
+	if (-1 == write (fd_in [n], current_task, task_len) ||
+		-1 == write (fd_in [n], "\n", 1))
 	{
 		if (resistant){
 			mark_node_as_dead (n);
@@ -743,6 +765,17 @@ static void send_to_node (void)
 			err_fatal_errno ("send_to_node", "write() failed:");
 		}
 	}
+}
+
+static int unblock_select_block (
+	int nfds, fd_set * readfds, fd_set * writefds,
+	fd_set * exceptfds, struct timeval * timeout)
+{
+	int ret;
+	unblock_signals ();
+	ret = select (nfds, readfds, writefds, exceptfds, timeout);
+	block_signals ();
+	return ret;
 }
 
 static void loop (void)
@@ -775,9 +808,14 @@ static void loop (void)
 			&& (task = get_new_task ()) != NULL)
 		   ||
 		   (busy_count > 0
-			&& (ret = xselect (max_fd+1, &rset, NULL, NULL, NULL)) >= 0))
+			&& (ret = unblock_select_block (
+					max_fd+1, &rset, NULL, NULL, NULL)) != 0))
 	{
 		/* ret == -777 means select(2) was not called */
+
+		if (ret == -1 && errno == EINTR){
+			continue;
+		}
 
 		if (debug){
 			printf ("select ret=%d\n", ret);
@@ -791,9 +829,9 @@ static void loop (void)
 			if (fd_out [i] >= 0 && FD_ISSET (fd_out [i], &rset)){
 				buf_out_i = buf_out [i];
 
-				cnt = iread (fd_out [i],
-							 buf_out_i + size_out [i],
-							 bufsize_out [i] - size_out [i]);
+				cnt = read (fd_out [i],
+							buf_out_i + size_out [i],
+							bufsize_out [i] - size_out [i]);
 
 				if (debug && cnt >= 0){
 					buf_out_i [size_out [i] + cnt] = 0;
@@ -847,7 +885,7 @@ static void loop (void)
 							--busy_count;
 
 							if (end_of_stdin){
-								iclose (fd_in [i]);
+								close (fd_in [i]);
 								fd_in [i] = -1;
 							}
 
@@ -1195,6 +1233,8 @@ int main (int argc, char **argv)
 {
 	int i;
 
+	block_signals ();
+
 	maa_init ("paexec");
 	log_stream ("paexec", stderr);
 
@@ -1216,5 +1256,8 @@ int main (int argc, char **argv)
 
 	log_close ();
 	maa_shutdown ();
+
+	unblock_signals ();
+
 	return 0;
 }

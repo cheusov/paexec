@@ -31,6 +31,7 @@
 
 #include <maa.h>
 
+/*
 static size_t linebuf_size = 0;
 static char *linebuf       = NULL;
 
@@ -79,10 +80,10 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 		FD_ZERO (&rset);
 		FD_SET (fd, &rset);
 
-		xselect (fd+1, &rset, NULL, NULL, NULL);
+		select (fd+1, &rset, NULL, NULL, NULL);
 
 		if (FD_ISSET (fd, &rset)){
-			cnt = xread (fd, buf, sizeof (buf));
+			cnt = read (fd, buf, sizeof (buf));
 
 			if (cnt < 0){
 				perror ("Reading from child process failed\n");
@@ -116,3 +117,4 @@ int put_until_emptyline (int fd, line_putter_t putter, void *data)
 	}
 #endif
 }
+*/

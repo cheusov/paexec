@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 void nonblock (int fd);
+/*
 int xselect (
 	int nfds,
 	fd_set * readfds, fd_set * writefds,
@@ -38,6 +39,9 @@ ssize_t iwrite (int fd, const void *buf, size_t count);
 ssize_t xwrite (int fd, const void *buf, size_t count);
 int iclose (int fd);
 void xclose (int fd);
+*/
 char * xfgetln(FILE *fp, size_t *len);
+void xsigprocmask (int how, const sigset_t *set, sigset_t *oset);
+void xsigaddset (sigset_t *set, int signo);
 
 #endif /* _WRAPPERS_H_ */

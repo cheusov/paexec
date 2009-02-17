@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 
 #include <maa.h>
 
@@ -47,6 +48,7 @@ void nonblock (int fd)
 	}
 }
 
+/*
 int xselect (
 	int nfds,
 	fd_set * readfds, fd_set * writefds,
@@ -137,6 +139,21 @@ void xclose (int fd)
 	if (ret == -1){
 		log_error ("", "close failed: %s\n", strerror (errno));
 		exit (1);
+	}
+}
+*/
+
+void xsigaddset (sigset_t *set, int signo)
+{
+	if (sigaddset (set, signo)){
+		log_error ("", "sigaddset(2) failed: %s\n", strerror (errno));
+	}
+}
+
+void xsigprocmask (int how, const sigset_t *set, sigset_t *oset)
+{
+	if (sigprocmask (how, set, oset)){
+		log_error ("", "sigaddset(2) failed: %s\n", strerror (errno));
 	}
 }
 
