@@ -92,6 +92,7 @@ OPTIONS:\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
   -z --resistant           failed nodes are marked as dead\n\
+  -Z <timeout>             timeout to restart faild command, imply -z\n\
 -n and -c are mandatory options\n\
 \n\
 ");
@@ -179,6 +180,7 @@ static const char *poset_fatal   = "fatal";
 static int *deleted_tasks = NULL;
 
 static int resistant = 0;
+static int resistance_timeout = 0;
 
 static void close_all_ins (void)
 {
@@ -471,12 +473,13 @@ static void init__child_processes (void)
 	int i;
 
 	for (i=0; i < nodes_count; ++i){
-		pids [i] = (pid_t) -1;
-	}
+		if (pids [i] != (pid_t) -1)
+			continue;
 
-	for (i=0; i < nodes_count; ++i){
-		buf_out [i] = xmalloc (initial_bufsize);
-		bufsize_out [i] = initial_bufsize;
+		if (!buf_out [i])
+			buf_out [i] = xmalloc (initial_bufsize);
+		if (!bufsize_out [i])
+			bufsize_out [i] = initial_bufsize;
 
 		size_out [i] = 0;
 
@@ -494,6 +497,8 @@ static void init__child_processes (void)
 			full_cmd,
 			PR_CREATE_STDIN | PR_CREATE_STDOUT,
 			&fd_in [i], &fd_out [i], NULL);
+
+		++alive_nodes_count;
 
 		nonblock (fd_out [i]);
 
@@ -531,6 +536,12 @@ static void mark_node_as_dead (int node)
 	--alive_nodes_count;
 }
 
+static sig_atomic_t sigalrm_tic = 0;
+static void handler_sigalrm (int dummy)
+{
+	sigalrm_tic = 1;
+}
+
 static void handler_sigchld (int dummy)
 {
 	int status;
@@ -538,6 +549,16 @@ static void handler_sigchld (int dummy)
 
 	while (pid = waitpid(-1, &status, WNOHANG), pid > 0){
 	}
+}
+
+static void set_sigalrm_handler (void)
+{
+	struct sigaction sa;
+
+	sa.sa_handler = handler_sigalrm;
+	sigemptyset (&sa.sa_mask);
+	sa.sa_flags = 0; //SA_RESTART;
+	sigaction (SIGALRM, &sa, NULL);
 }
 
 static void set_sigchld_handler (void)
@@ -595,20 +616,30 @@ static void init (void)
 
 	/* arrays */
 	pids  = xmalloc (nodes_count * sizeof (*pids));
+	memset (pids,-1, nodes_count * sizeof (*pids));
 
 	fd_in  = xmalloc (nodes_count * sizeof (*fd_in));
+	memset (fd_in, -1, nodes_count * sizeof (*fd_in));
+
 	fd_out = xmalloc (nodes_count * sizeof (*fd_out));
+	memset (fd_out, -1, nodes_count * sizeof (*fd_out));
 
 	node2task        = xmalloc (nodes_count * sizeof (*node2task));
 	node2task_buf_sz = xmalloc (nodes_count * sizeof (*node2task_buf_sz));
 	memset (node2task, 0, nodes_count * sizeof (*node2task));
 	memset (node2task_buf_sz, 0, nodes_count * sizeof (*node2task_buf_sz));
 
-	buf_out     = xmalloc (nodes_count * sizeof (*buf_out));
-	bufsize_out = xmalloc (nodes_count * sizeof (*bufsize_out));
-	size_out    = xmalloc (nodes_count * sizeof (*size_out));
+	buf_out = xmalloc (nodes_count * sizeof (*buf_out));
+	memset (buf_out, 0, nodes_count * sizeof (*buf_out));
 
-	busy     = xmalloc (nodes_count * sizeof (*busy));
+	bufsize_out = xmalloc (nodes_count * sizeof (*bufsize_out));
+	memset (bufsize_out, 0, nodes_count * sizeof (*bufsize_out));
+
+	size_out = xmalloc (nodes_count * sizeof (*size_out));
+	memset (size_out, 0, nodes_count * sizeof (*size_out));
+
+	busy = xmalloc (nodes_count * sizeof (*busy));
+	memset (busy, 0, nodes_count * sizeof (*busy));
 
 	node2taskid = xmalloc (nodes_count * sizeof (*node2taskid));
 
@@ -633,8 +664,13 @@ static void init (void)
 	/* in/out */
 	init__child_processes ();
 
-	/* SIGCHLD signal handler */
+	/* signal handlers */
 	set_sigchld_handler ();
+	set_sigalrm_handler ();
+
+	/* alarm(2) */
+	if (resistance_timeout)
+		alarm (resistance_timeout);
 
 	/* ignore SIGPIPE signal */
 	ignore_sigpipe ();
@@ -778,6 +814,26 @@ static int unblock_select_block (
 	return ret;
 }
 
+static int condition (
+	fd_set *rset, int max_descr,
+	int *ret, const char **task)
+{
+	*ret = -777;
+
+	if (busy_count < alive_nodes_count && (*task = get_new_task ()) != NULL){
+		return 1;
+	}
+
+	if (busy_count > 0
+			&& (*ret = unblock_select_block (
+					max_descr+1, rset, NULL, NULL, NULL)) != 0)
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
 static void loop (void)
 {
 	char msg [2000];
@@ -803,15 +859,14 @@ static void loop (void)
 
 	FD_CLR (0, &rset);
 
-	while (ret = -777,
-		   (busy_count < alive_nodes_count
-			&& (task = get_new_task ()) != NULL)
-		   ||
-		   (busy_count > 0
-			&& (ret = unblock_select_block (
-					max_fd+1, &rset, NULL, NULL, NULL)) != 0))
-	{
+	while (condition (&rset, max_fd, &ret, &task)){
 		/* ret == -777 means select(2) was not called */
+
+		if (sigalrm_tic == 1){
+			init__child_processes ();
+			sigalrm_tic = 0;
+			continue;
+		}
 
 		if (ret == -1 && errno == EINTR){
 			continue;
@@ -1050,8 +1105,6 @@ static void split_nodes (void)
 		split_nodes__list ();
 	}
 
-	alive_nodes_count = nodes_count;
-
 	/* final check */
 	if (nodes_count == 0)
 		err_fatal ("split_nodes", "invalid option -n:\n");
@@ -1088,7 +1141,7 @@ static void process_args (int *argc, char ***argv)
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIzn:c:t:s",
+	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIzZ:n:c:t:s",
 							longopts, NULL),
 		   c != EOF)
 	{
@@ -1141,6 +1194,10 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 'z':
 				resistant = 1;
+				break;
+			case 'Z':
+				resistant = 1;
+				resistance_timeout = atoi (optarg);
 				break;
 			default:
 				usage ();

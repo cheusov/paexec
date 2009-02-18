@@ -608,6 +608,26 @@ EOF
 	-n '0.01-ns 0.03-ns 0.09-ns 0.09-ns 0.03-ns 0-ns' |
     filter_succeded_tasks | sort -n | cksum
 
+    # resistance with timeout to rerun failed command
+    cat <<EOF
+=================================================================
+======= paexec -Z1 -s -r -n '1 2' -c:
+=======   -t "../examples/broken_echo/transport_broken_echo2 \$test_file"
+EOF
+
+    test_file=/tmp/paexec_test.$$
+    rm -f "$test_file"
+    ${OBJDIR}/paexec -Z1 -s -r -n '1 2' -c: \
+	-t "../examples/broken_echo/transport_broken_echo2 $test_file" <<EOF
+1 2
+2 3
+3 4
+4 5
+5 6
+10
+EOF
+    rm -f "$test_file"
+
     return 0
 }
 

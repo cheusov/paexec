@@ -1,0 +1,24 @@
+#!/bin/sh
+
+fn=$1
+shift
+
+id=$1
+shift
+
+if test "$id" -eq 1 && ! test -f "$fn"; then
+    touch "$fn"
+    exit 12
+fi
+
+if test "$id" -eq 2; then
+    read task
+    sleep 3
+    exit 11
+fi
+
+while read task; do
+    echo "output $task"
+    echo success
+    echo ''
+done

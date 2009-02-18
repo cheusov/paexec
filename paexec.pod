@@ -248,6 +248,13 @@ paexec clusters even over network consisting of unreliable hosts
 (Internet?). Failed hosts are marked as such and will not be used
 during the current run of paexec.
 
+=item B<-Z> I<timeout>
+
+When I<-z> applied, if a I<command> fails, appropriate node is marked
+as broken and is excluded from the following task distribution. If
+B<-Z> applied, every I<timeout> seconds it is made an attempt to rerun
+a failed comand on failed node. I<-Z> implies I<-z>.
+
 =back
 
 =head1 EXAMPLES

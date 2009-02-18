@@ -568,3 +568,22 @@ all nodes failed
 =======     -n '0.01 0.01 0.01 0.01 0.01 0' | filter_succeded_tasks
 ======= -z test!!!
 3878868009 10786
+=================================================================
+======= paexec -Z1 -s -r -n '1 2' -c:
+=======   -t "../examples/broken_echo/transport_broken_echo2 $test_file"
+1 fatal
+1 output 1
+1 success
+1 output 2
+1 success
+1 output 3
+1 success
+1 output 4
+1 success
+1 output 5
+1 success
+1 output 6
+1 success
+2 fatal
+1 output 10
+1 success
