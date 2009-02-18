@@ -53,15 +53,9 @@
 #define PAEXEC_VERSION "x.y.z"
 #endif
 
-//#ifndef SA_RESTART
-//#define SA_RESTART 0 /* ...and hope for the best
-//                        (stdio should be immune to EINTR i/o errors) */
-//#endif
-
 #include <maa.h>
 
 #include "wrappers.h"
-#include "nonblock_helpers.h"
 
 static void usage (void)
 {
@@ -557,7 +551,7 @@ static void set_sigalrm_handler (void)
 
 	sa.sa_handler = handler_sigalrm;
 	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = 0; //SA_RESTART;
+	sa.sa_flags = 0;
 	sigaction (SIGALRM, &sa, NULL);
 }
 
@@ -567,7 +561,7 @@ static void set_sigchld_handler (void)
 
 	sa.sa_handler = handler_sigchld;
 	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = 0; //SA_RESTART;
+	sa.sa_flags = 0;
 	sigaction (SIGCHLD, &sa, NULL);
 }
 
@@ -577,7 +571,7 @@ static void ignore_sigpipe (void)
 
 	sa.sa_handler = SIG_IGN;
 	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = 0; //SA_RESTART;
+	sa.sa_flags = 0;
 	sigaction (SIGPIPE, &sa, NULL);
 }
 
