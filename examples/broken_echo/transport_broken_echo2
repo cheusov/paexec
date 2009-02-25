@@ -1,5 +1,9 @@
 #!/bin/sh
 
+#
+# usage: transport <check_filename> <node_id>
+#
+
 fn=$1
 shift
 
@@ -7,16 +11,20 @@ id=$1
 shift
 
 if test "$id" -eq 1 && ! test -f "$fn"; then
+    # fails if there is not file <check_filename> and <node_id> = 1
     touch "$fn"
     exit 12
 fi
 
 if test "$id" -eq 2; then
+    # fails <node_id> = 2 with 3 secs timeout
     read task
     sleep 3
+    echo task
     exit 11
 fi
 
+# succeeds in all other cases
 while read task; do
     echo "output $task"
     echo success
