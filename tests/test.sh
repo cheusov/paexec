@@ -613,12 +613,10 @@ EOF
 =================================================================
 ======= paexec -Z1 -s -r -n '1 2' -c:
 =======   -t "../examples/broken_echo/transport_broken_echo2 \$test_file"
+======= < _tasks.tmp | grep output | sort
 EOF
 
-    test_file=/tmp/paexec_test.$$
-    rm -f "$test_file"
-    ${OBJDIR}/paexec -Z1 -s -r -n '1 2' -c: \
-	-t "../examples/broken_echo/transport_broken_echo2 $test_file" <<EOF
+    cat > $OBJDIR/_tasks.tmp <<EOF
 1 2
 2 3
 3 4
@@ -626,6 +624,15 @@ EOF
 5 6
 10
 EOF
+
+    test_file=/tmp/paexec_test.$$
+
+    rm -f "$test_file"
+
+    ${OBJDIR}/paexec -Z1 -s -n '1 2' -c: \
+	-t "../examples/broken_echo/transport_broken_echo2 $test_file" \
+	< $OBJDIR/_tasks.tmp | grep output | sort
+
     rm -f "$test_file"
 
     return 0
