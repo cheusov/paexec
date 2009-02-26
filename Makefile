@@ -11,8 +11,10 @@ INST_DIR?=		${INSTALL} -d
 
 MAALIB?=		-lmaa
 
-# maximum length of task (line read from paexec's stdin)
-# maximum length of result line (line read from command's stdout)
+# initial buffer size for the tasks
+#    (line read from paexec's stdin)
+# initial buffer size for the result line
+#    (line read from command's stdout)
 BUFSIZE?=		4096
 
 ############################################################
