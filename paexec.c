@@ -175,6 +175,7 @@ static int *deleted_tasks = NULL;
 
 static int resistant = 0;
 static int resistance_timeout = 0;
+static int resistance_last_restart = 0;
 
 static void close_all_ins (void)
 {
@@ -565,10 +566,10 @@ static void mark_node_as_dead (int node)
 	--alive_nodes_count;
 }
 
-static sig_atomic_t sigalrm_tic = 0;
+static int sigalrm_tics = 0;
 static void handler_sigalrm (int dummy)
 {
-	sigalrm_tic = 1;
+	++sigalrm_tics;
 }
 
 static void handler_sigchld (int dummy)
@@ -699,7 +700,7 @@ static void init (void)
 
 	/* alarm(2) */
 	if (resistance_timeout)
-		alarm (resistance_timeout);
+		alarm (1);
 
 	/* ignore SIGPIPE signal */
 	ignore_sigpipe ();
@@ -891,9 +892,11 @@ static void loop (void)
 	while (condition (&rset, max_fd, &ret, &task)){
 		/* ret == -777 means select(2) was not called */
 
-		if (sigalrm_tic == 1){
+		if (resistance_timeout &&
+			sigalrm_tics - resistance_last_restart >= resistance_timeout)
+		{
+			resistance_last_restart = resistance_timeout;
 			init__child_processes ();
-			sigalrm_tic = 0;
 			continue;
 		}
 
