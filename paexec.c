@@ -367,6 +367,12 @@ static void init__check_cycles (void)
 	int from, to;
 	int *lnk = NULL;
 
+	/* */
+	if (debug){
+		fprintf (stderr, "begin: init__check_cycles\n");
+	}
+
+	/* */
 	lnk = xmalloc (tasks_count * tasks_count * sizeof (*lnk));
 	memset (lnk, -1, tasks_count * tasks_count * sizeof (*lnk));
 
@@ -380,9 +386,11 @@ static void init__check_cycles (void)
 	/* transitive closure (algorithm by Floyd) */
 	for (k=0; k < tasks_count; ++k){
 		for (i=0; i < tasks_count; ++i){
+			if (lnk [i * tasks_count + k] == -1)
+				continue;
+
 			for (j=0; j < tasks_count; ++j){
 				if (lnk [i * tasks_count + j] == -1 &&
-					lnk [i * tasks_count + k] >= 0 &&
 					lnk [k * tasks_count + j] >= 0)
 				{
 					lnk [i * tasks_count + j] = k;
@@ -401,6 +409,11 @@ static void init__check_cycles (void)
 			exit (1);
 		}
 	}
+
+	/* */
+	if (debug){
+		fprintf (stderr, "end: init__check_cycles\n");
+	}
 }
 
 static void init__read_poset_tasks (void)
@@ -410,6 +423,12 @@ static void init__read_poset_tasks (void)
 
 	int i;
 
+	/* */
+	if (debug){
+		fprintf (stderr, "start: init__read_poset_tasks\n");
+	}
+
+	/* */
 	if (!poset_of_tasks){
 		/* completely independent tasks */
 		return;
@@ -459,6 +478,11 @@ static void init__read_poset_tasks (void)
 	for (i=0; i < arcs_count; ++i){
 		++tasks_graph_deg [arcs_to [i]];
 	}
+
+	/* */
+	if (debug){
+		fprintf (stderr, "end: init__read_poset_tasks\n");
+	}
 }
 
 static void init__child_processes (void)
@@ -466,6 +490,12 @@ static void init__child_processes (void)
 	char full_cmd [2000];
 	int i;
 
+	/* */
+	if (debug){
+		fprintf (stderr, "start: init__child_processes\n");
+	}
+
+	/* */
 	for (i=0; i < nodes_count; ++i){
 		if (pids [i] != (pid_t) -1)
 			continue;
@@ -502,6 +532,11 @@ static void init__child_processes (void)
 		if (fd_out [i] > max_fd){
 			max_fd = fd_out [i];
 		}
+	}
+
+	/* */
+	if (debug){
+		fprintf (stderr, "end: init__child_processes\n");
 	}
 }
 
