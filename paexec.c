@@ -42,6 +42,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <stdint.h>
 
 /***********************************************************/
 
@@ -351,14 +352,38 @@ static int add_task (const char *s)
 	}
 }
 
-static void print_cycle (const int *lnk, int s, int t)
+static hsh_HashTable hsh_cycles_lnk;
+
+static int hsh_cycles_lnk__get (int from, int to)
 {
-	int k = lnk [s * tasks_count + t];
+	char str [200];
+	snprintf (str, sizeof (str), "%d %d", from, to);
+
+	const void *value = hsh_retrieve (hsh_cycles_lnk, str);
+	if (value)
+		return (int) (intptr_t) value;
+	else
+		return -1;
+}
+
+static void hsh_cycles_lnk__set (int from, int to, int value)
+{
+	char str [200];
+	snprintf (str, sizeof (str), "%d %d", from, to);
+
+	hsh_insert (hsh_cycles_lnk, xstrdup (str), (void *) (intptr_t) value);
+}
+
+static void print_cycle (int s, int t)
+{
+	int k = hsh_cycles_lnk__get (s, t);
+	assert (k >= 0);
+
 	if (k == s){
 		fprintf (stderr, "  %s -> %s\n", id2task [s], id2task [t]);
 	}else{
-		print_cycle (lnk, s, k);
-		print_cycle (lnk, k, t);
+		print_cycle (s, k);
+		print_cycle (k, t);
 	}
 }
 
@@ -366,35 +391,35 @@ static void init__check_cycles (void)
 {
 	int i, j, k;
 	int from, to;
-	int *lnk = NULL;
+	hsh_Position hsh_pos;
+	void * hsh_key;
+	void * hsh_data;
+
+	hsh_cycles_lnk = hsh_create (NULL, NULL);
 
 	/* */
 	if (debug){
 		fprintf (stderr, "begin: init__check_cycles\n");
 	}
 
-	/* */
-	lnk = xmalloc (tasks_count * tasks_count * sizeof (*lnk));
-	memset (lnk, -1, tasks_count * tasks_count * sizeof (*lnk));
-
 	/* initial arcs */
 	for (i=0; i < arcs_count; ++i){
 		from = arcs_from [i];
 		to   = arcs_to [i];
-		lnk [from * tasks_count + to] = from;
+		hsh_cycles_lnk__set (from, to, from);
 	}
 
 	/* transitive closure (algorithm by Floyd) */
 	for (k=0; k < tasks_count; ++k){
 		for (i=0; i < tasks_count; ++i){
-			if (lnk [i * tasks_count + k] == -1)
+			if (hsh_cycles_lnk__get (i, k) == -1)
 				continue;
 
 			for (j=0; j < tasks_count; ++j){
-				if (lnk [i * tasks_count + j] == -1 &&
-					lnk [k * tasks_count + j] >= 0)
+				if (hsh_cycles_lnk__get (i, j) == -1 &&
+					hsh_cycles_lnk__get (k, j) >= 0)
 				{
-					lnk [i * tasks_count + j] = k;
+					hsh_cycles_lnk__set (i, j, k);
 				}
 			}
 		}
@@ -402,14 +427,21 @@ static void init__check_cycles (void)
 
 	/* looking for cycles */
 	for (i=0; i < tasks_count; ++i){
-		if (lnk [i * tasks_count + i] >= 0){
+		if (hsh_cycles_lnk__get (i, i) >= 0){
 			fprintf (stderr, "Cyclic dependancy detected:\n");
 
-			print_cycle (lnk, i, i);
+			print_cycle (i, i);
 
 			exit (1);
 		}
 	}
+
+	/* freeing the hash table */
+	HSH_ITERATE (hsh_cycles_lnk, hsh_pos, hsh_key, hsh_data){
+		if (hsh_key)
+			xfree (hsh_key);
+	}
+	hsh_destroy (hsh_cycles_lnk);
 
 	/* */
 	if (debug){
