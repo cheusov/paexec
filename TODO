@@ -1,5 +1,3 @@
-try to rerun failed COMMAND on failed NODE periodically.
-
 non-blocking write(2) for sending task to the slave hosts/CPUs.
 
 command for resorting output of "paexec -le"
