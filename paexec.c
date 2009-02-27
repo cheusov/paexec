@@ -352,96 +352,89 @@ static int add_task (const char *s)
 	}
 }
 
-static hsh_HashTable hsh_cycles_lnk;
+static int *check_cycles__stack;
+static int *check_cycles__mark;
 
-static int hsh_cycles_lnk__get (int from, int to)
+static void check_cycles__outgoing (int stack_sz)
 {
-	char str [200];
-	snprintf (str, sizeof (str), "%d %d", from, to);
+	assert (stack_sz > 0);
 
-	const void *value = hsh_retrieve (hsh_cycles_lnk, str);
-	if (value)
-		return (int) (intptr_t) value;
-	else
-		return -1;
-}
+	int from = check_cycles__stack [stack_sz-1];
+	int i, j;
+	int s, t;
 
-static void hsh_cycles_lnk__set (int from, int to, int value)
-{
-	char str [200];
-	snprintf (str, sizeof (str), "%d %d", from, to);
+	assert (check_cycles__mark [from] == 0);
+	check_cycles__mark [from] = 2; /* currently in the path */
 
-	hsh_insert (hsh_cycles_lnk, xstrdup (str), (void *) (intptr_t) value);
-}
+	for (i=0; i < arcs_count; ++i){
+		if (arcs_from [i] != from)
+			continue;
 
-static void print_cycle (int s, int t)
-{
-	int k = hsh_cycles_lnk__get (s, t);
-	assert (k >= 0);
+		assert (stack_sz < tasks_count);
 
-	if (k == s){
-		fprintf (stderr, "  %s -> %s\n", id2task [s], id2task [t]);
-	}else{
-		print_cycle (s, k);
-		print_cycle (k, t);
+		int to = arcs_to [i];
+		check_cycles__stack [stack_sz] = to;
+
+		switch (check_cycles__mark [to]){
+			case 2:
+				fprintf (stderr, "Cyclic dependancy detected:\n");
+				int loop = 0;
+				for (j=1; j <= stack_sz; ++j){
+					s = check_cycles__stack [j-1];
+					t = check_cycles__stack [j];
+
+					if (!loop && s != to)
+						continue;
+
+					loop = 1;
+					fprintf (stderr, "  %s -> %s\n", id2task [s], id2task [t]);
+				}
+
+				exit (1);
+			case 0:
+				check_cycles__outgoing (stack_sz + 1);
+				break;
+			case 1:
+				break;
+			default:
+				abort (); /* this should not happen */
+		}
 	}
+
+	check_cycles__mark [from] = 1; /* already seen */
 }
 
 static void init__check_cycles (void)
 {
-	int i, j, k;
-	int from, to;
-	hsh_Position hsh_pos;
-	void * hsh_key;
-	void * hsh_data;
+	int i;
 
-	hsh_cycles_lnk = hsh_create (NULL, NULL);
+	check_cycles__stack = xmalloc (
+		tasks_count * sizeof (check_cycles__stack [0]));
+
+	check_cycles__mark = xmalloc (
+		tasks_count * sizeof (check_cycles__mark [0]));
+	memset (check_cycles__mark, 0, sizeof (check_cycles__mark [0]));
 
 	/* */
 	if (debug){
 		fprintf (stderr, "begin: init__check_cycles\n");
 	}
 
-	/* initial arcs */
-	for (i=0; i < arcs_count; ++i){
-		from = arcs_from [i];
-		to   = arcs_to [i];
-		hsh_cycles_lnk__set (from, to, from);
-	}
-
-	/* transitive closure (algorithm by Floyd) */
-	for (k=0; k < tasks_count; ++k){
-		for (i=0; i < tasks_count; ++i){
-			if (hsh_cycles_lnk__get (i, k) == -1)
-				continue;
-
-			for (j=0; j < tasks_count; ++j){
-				if (hsh_cycles_lnk__get (i, j) == -1 &&
-					hsh_cycles_lnk__get (k, j) >= 0)
-				{
-					hsh_cycles_lnk__set (i, j, k);
-				}
-			}
-		}
-	}
-
-	/* looking for cycles */
 	for (i=0; i < tasks_count; ++i){
-		if (hsh_cycles_lnk__get (i, i) >= 0){
-			fprintf (stderr, "Cyclic dependancy detected:\n");
-
-			print_cycle (i, i);
-
-			exit (1);
+		switch (check_cycles__mark [i]){
+			case 0:
+				check_cycles__stack [0] = i;
+				check_cycles__outgoing (1);
+				break;
+			case 1:
+				break;
+			case 2:
+				abort (); /* this should not happen */
 		}
 	}
 
-	/* freeing the hash table */
-	HSH_ITERATE (hsh_cycles_lnk, hsh_pos, hsh_key, hsh_data){
-		if (hsh_key)
-			xfree (hsh_key);
-	}
-	hsh_destroy (hsh_cycles_lnk);
+	xfree (check_cycles__mark);
+	xfree (check_cycles__stack);
 
 	/* */
 	if (debug){

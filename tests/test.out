@@ -420,6 +420,22 @@ Cyclic dependancy detected:
   lang/gcc -> devel/gettext-lib
   devel/gettext-lib -> devel/gmake
 =================================================================
+======= args: -l -s -c ../examples/make_package/make_package_cmd -n +5
+Cyclic dependancy detected:
+  task10 -> task20
+  task20 -> task30
+  task30 -> task10
+=================================================================
+======= args: -l -s -c ../examples/make_package/make_package_cmd -n +5
+Cyclic dependancy detected:
+  task50 -> task50
+=================================================================
+======= args: -l -s -c ../examples/make_package/make_package_cmd -n +5
+Cyclic dependancy detected:
+  task0 -> task200
+  task200 -> task300
+  task300 -> task0
+=================================================================
 ======= args: -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1 2 3 4 5 6
 I'll output -1
 -1

@@ -504,10 +504,49 @@ EOF
 	echo ok
     fi
 
-    # cycle detection
+    # cycle detection1
     runtest -l -s \
 	-c ../examples/make_package/make_package_cmd \
 	-n +5 < ../examples/make_package/make_package_tasks_cycle
+
+    # cycle detection2
+    runtest -l -s \
+	-c ../examples/make_package/make_package_cmd \
+	-n +5 <<EOF
+task-2 task-1
+task-1 task0
+task0 task10
+task10 task20
+task20 task30
+task30 task10
+EOF
+
+    # cycle detection2
+    runtest -l -s \
+	-c ../examples/make_package/make_package_cmd \
+	-n +5 <<EOF
+task0 task10
+task10 task20
+task20 task30
+task50 task50
+task30 task40
+EOF
+
+    # cycle detection2
+    runtest -l -s \
+	-c ../examples/make_package/make_package_cmd \
+	-n +5 <<EOF
+task0
+task100
+task0 task200
+task0 task100
+task10 task100
+task20 task100
+task50 task100
+task100 task110
+task200 task300
+task300 task0
+EOF
 
     # transport failure
     runtest -s -E \
