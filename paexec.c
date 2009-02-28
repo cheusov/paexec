@@ -362,6 +362,7 @@ static void check_cycles__outgoing (int stack_sz)
 	int from = check_cycles__stack [stack_sz-1];
 	int i, j;
 	int s, t;
+	int loop;
 
 	assert (check_cycles__mark [from] == 0);
 	check_cycles__mark [from] = 2; /* currently in the path */
@@ -377,8 +378,8 @@ static void check_cycles__outgoing (int stack_sz)
 
 		switch (check_cycles__mark [to]){
 			case 2:
+				loop = 0;
 				fprintf (stderr, "Cyclic dependancy detected:\n");
-				int loop = 0;
 				for (j=1; j <= stack_sz; ++j){
 					s = check_cycles__stack [j-1];
 					t = check_cycles__stack [j];
