@@ -413,7 +413,8 @@ static void init__check_cycles (void)
 
 	check_cycles__mark = xmalloc (
 		tasks_count * sizeof (check_cycles__mark [0]));
-	memset (check_cycles__mark, 0, sizeof (check_cycles__mark [0]));
+	memset (check_cycles__mark, 0,
+		tasks_count * sizeof (check_cycles__mark [0]));
 
 	/* */
 	if (debug){
