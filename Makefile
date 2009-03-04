@@ -51,11 +51,8 @@ paexec.html : paexec.pod
 
 ##################################################
 
-.PHONY: clean-my
-clean: clean-my
-clean-my:
-	rm -f *~ core* paexec.1 *.cat1 ktrace* ChangeLog *.tmp
-	rm -f paexec.html transport_closed_stdin
+CLEANFILES=  *~ core* paexec.1 *.cat1 ktrace* ChangeLog *.tmp
+CLEANFILES+= paexec.html transport_closed_stdin
 
 ${.OBJDIR}/transport_closed_stdin: examples/broken_echo/transport_closed_stdin.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $(.TARGET) $(.ALLSRC) $(LDFLAGS)
