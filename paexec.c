@@ -597,6 +597,7 @@ static int sigalrm_tics = 0;
 static void handler_sigalrm (int dummy)
 {
 	++sigalrm_tics;
+	alarm (1);
 }
 
 static void handler_sigchld (int dummy)
@@ -922,7 +923,7 @@ static void loop (void)
 		if (resistance_timeout &&
 			sigalrm_tics - resistance_last_restart >= resistance_timeout)
 		{
-			resistance_last_restart = resistance_timeout;
+			resistance_last_restart = sigalrm_tics;
 			init__child_processes ();
 			continue;
 		}
