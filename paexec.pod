@@ -251,9 +251,10 @@ during the current run of paexec.
 =item B<-Z> I<timeout>
 
 When I<-z> applied, if a I<command> fails, appropriate node is marked
-as broken and is excluded from the following task distribution. If
-B<-Z> applied, every I<timeout> seconds it is made an attempt to rerun
-a failed comand on failed node. I<-Z> implies I<-z>.
+as broken and is excluded from the following task distribution. But if
+B<-Z> applied, every I<timeout> seconds an attempt to rerun a comand
+on a failed node is made. I<-Z> implies I<-z>. This option makes
+possible to organize clusters over unreliable networks/hardware.
 
 =back
 
