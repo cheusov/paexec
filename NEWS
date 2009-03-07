@@ -1,9 +1,9 @@
 ======================================================================
 Version 0.13.0, by Aleksey Cheusov, Sat,  7 Mar 2009 12:41:34 +0200
 
-  FIXED: When 'paexec -s' retreives 1000 tasks, it allocates
+  FIXED: When 'paexec -s' retreives 10000 tasks, it allocates
   10000*10000*sizeof(int) bytes for detecting cycles, i.e. ~400Mb on
-  32-bit system or 800Gb on 64-bit system. This is absolutely
+  32-bit system or 800Mb on 64-bit system. This is absolutely
   inacceptable. This bad algorithm is replaced with new one which
   doesn't need quadratic matrix and works much faster.
 
