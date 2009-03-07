@@ -1,4 +1,27 @@
 ======================================================================
+Version 0.13.0, by Aleksey Cheusov, Sat,  7 Mar 2009 12:41:34 +0200
+
+  FIXED: When 'paexec -s' retreives 1000 tasks, it allocates
+  10000*10000*sizeof(int) bytes for detecting cycles, i.e. ~400Mb on
+  32-bit system or 800Gb on 64-bit system. This is absolutely
+  inacceptable. This bad algorithm is replaced with new one which
+  doesn't need quadratic matrix and works much faster.
+
+  ADDED: -Z<timeout> option
+     When I<-z> applied, if a I<command> fails, appropriate node is
+     marked as broken and is excluded from the following task
+     distribution. But if B<-Z> applied, every I<timeout> seconds an
+     attempt to rerun a comand on a failed node is made. I<-Z> implies
+     I<-z>. This option makes possible to organize clusters over
+     unreliable networks/hardware.
+
+  No EINTR wrappers anymore (iread, xread etc.). SIGCHLD and SIGALRM
+  are blocked most of the time. They are unblocked before select(2)
+  and blocked just after it. SA_RESTART is not used anymore.
+
+  Minor clean-ups in Makefile.
+
+======================================================================
 Version 0.12.1, by Aleksey Cheusov, Tue, 23 Dec 2008 20:33:20 +0200
 
   FIX: support for -z appeared in paexec-0.12.0 was actually
