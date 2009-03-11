@@ -1,8 +1,10 @@
 ############################################################
 
-PREFIX?=/usr/local
-BINDIR?=${PREFIX}/bin
-MANDIR?=${PREFIX}/man
+PREFIX?=		/usr/local
+BINDIR?=		${PREFIX}/bin
+MANDIR?=		${PREFIX}/man
+
+MKHTML?=		no
 
 POD2MAN?=		pod2man
 POD2HTML?=		pod2html
