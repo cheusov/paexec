@@ -1,3 +1,7 @@
 non-blocking write(2) for sending task to the slave hosts/CPUs.
 
+SIGINFO for displaying current status of tasks
+
+SIGUSR1 for trying restore dead client hosts
+
 command for resorting output of "paexec -le"
