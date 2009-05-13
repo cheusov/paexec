@@ -1,7 +1,11 @@
+-w option for resorting tasks according to their weights (weights of
+ their subtrees). This is for reducing idle time at the end of
+ processing.
+
 non-blocking write(2) for sending task to the slave hosts/CPUs.
 
 SIGINFO for displaying current status of tasks
 
-SIGUSR1 for trying restore dead client hosts
+SIGUSR1 for trying restore connection to dead client hosts
 
 command for resorting output of "paexec -le"
