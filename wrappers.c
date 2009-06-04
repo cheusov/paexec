@@ -32,6 +32,7 @@
 #include <maa.h>
 
 #include "wrappers.h"
+#include "common.h"
 
 void nonblock (int fd)
 {
@@ -69,7 +70,7 @@ char * xfgetln(FILE *fp, size_t *len)
 	char c;
 	size_t sz = 0;
 
-	while (c = getc (stdin), c != EOF && c != '\n'){
+	while (c = getc (fp), c != EOF && c != '\n'){
 		if (sz+1 >= buffer_size){
 			// +2 is enough for `c' and terminating zero
 			buffer_size = buffer_size * 3 / 2 + 2;
