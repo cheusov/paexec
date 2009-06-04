@@ -126,7 +126,6 @@ static int max_fd   = 0;
 static int taskid = 0;
 
 static char *buf_stdin      = NULL;
-static size_t bufsize_stdin = 0;
 
 static char **nodes    = NULL;
 static int nodes_count = 0;
@@ -670,8 +669,6 @@ static void init (void)
 	if (env_bufsize){
 		initial_bufsize = atoi (env_bufsize);
 	}
-
-	bufsize_stdin = initial_bufsize;
 
 	/* arrays */
 	pids  = xmalloc (nodes_count * sizeof (*pids));
