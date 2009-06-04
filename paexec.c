@@ -57,6 +57,7 @@
 #include <maa.h>
 
 #include "wrappers.h"
+#include "common.h"
 
 static void usage (void)
 {
@@ -594,13 +595,13 @@ static void mark_node_as_dead (int node)
 }
 
 static int sigalrm_tics = 0;
-static void handler_sigalrm (int dummy)
+static void handler_sigalrm (int dummy attr_unused)
 {
 	++sigalrm_tics;
 	alarm (1);
 }
 
-static void handler_sigchld (int dummy)
+static void handler_sigchld (int dummy attr_unused)
 {
 	int status;
 	pid_t pid;
@@ -759,7 +760,7 @@ static void wait_for_childs (void)
 	}
 }
 
-static void exit_with_error (const char * routine, const char *msg)
+static void exit_with_error (const char * routine attr_unused, const char *msg)
 {
 	kill_childs ();
 	wait_for_childs ();
