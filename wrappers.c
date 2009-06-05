@@ -67,7 +67,7 @@ char * xfgetln(FILE *fp, size_t *len)
 {
 	static char *buffer       = NULL;
 	static size_t buffer_size = 0;
-	char c;
+	int c;
 	size_t sz = 0;
 
 	while (c = getc (fp), c != EOF && c != '\n'){
@@ -77,7 +77,7 @@ char * xfgetln(FILE *fp, size_t *len)
 			buffer = xrealloc (buffer, buffer_size);
 		}
 
-		buffer [sz++] = c;
+		buffer [sz++] = (char) c;
 	}
 
 	if (ferror (stdin)){
