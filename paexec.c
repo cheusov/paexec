@@ -42,7 +42,6 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <errno.h>
-#include <stdint.h>
 
 /***********************************************************/
 
