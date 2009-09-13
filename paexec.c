@@ -36,7 +36,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <ctype.h>
 #include <unistd.h>
 #include <limits.h>
 #include <signal.h>
