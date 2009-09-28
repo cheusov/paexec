@@ -35,8 +35,8 @@ CFLAGS+=	-DPAEXEC_VERSION='"${VERSION}"'
 CFLAGS+=	-DBUFSIZE=${BUFSIZE}
 
 ############################################################
-.PHONY: install-dirs
-install-dirs:
+.PHONY: installdirs
+installdirs:
 	$(INST_DIR) ${DESTDIR}${BINDIR}
 .if !defined(MKMAN) || empty(MKMAN:M[Nn][Oo])
 	$(INST_DIR) ${DESTDIR}${MANDIR}/man1
