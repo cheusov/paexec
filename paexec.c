@@ -83,7 +83,8 @@ OPTIONS:\n\
   -i --i2o                 copy input lines (i.e. tasks) to stdout\n\
   -I --i2o-flush           implies -i and flushes stdout\n\
 \n\
-  -s --pos                 partially ordered set of tasks is given on stdin\n\
+  -s --pos\n\
+  -g --graph               graph of tasks is given on stdin\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
   -z --resistant           failed nodes are marked as dead\n\
@@ -177,7 +178,7 @@ static void init__read_poset_tasks (void)
 	}
 
 	/* */
-	if (!poset_of_tasks){
+	if (!graph_mode){
 		/* completely independent tasks */
 		return;
 	}
@@ -407,7 +408,7 @@ static void init (void)
 	buf_stdin [0] = 0;
 
 	/* tasks */
-	init_tasks (poset_of_tasks ? 0 : nodes_count);
+	init_tasks (graph_mode ? 0 : nodes_count);
 
 	/**/
 	init__read_poset_tasks ();
@@ -581,7 +582,7 @@ static int condition (
 		return 1;
 	}
 
-	if (!task && !poset_of_tasks && feof (stdin)){
+	if (!task && !graph_mode && feof (stdin)){
 		end_of_stdin = 1;
 		close_all_ins ();
 	}
@@ -610,7 +611,7 @@ static void loop (void)
 	const char *task = NULL;
 	const char *curr_line = NULL;
 
-	if (poset_of_tasks && tasks_count == 1){
+	if (graph_mode && tasks_count == 1){
 		/* no tasks */
 		close_all_ins ();
 		wait_for_childs ();
@@ -709,7 +710,7 @@ static void loop (void)
 							}
 
 							/* an empty line means end-of-task */
-							if (poset_of_tasks){
+							if (graph_mode){
 								switch (ret_codes [i]){
 									case rt_failure:
 										print_header (i);
@@ -737,7 +738,7 @@ static void loop (void)
 							break;
 						}
 
-						if (poset_of_tasks){
+						if (graph_mode){
 							if (!strcmp (curr_line, poset_success)){
 								ret_codes [i] = rt_success;
 							}else if (!strcmp (curr_line, poset_failure)){
@@ -793,7 +794,7 @@ static void loop (void)
 		}
 
 		/* exit ? */
-		if (poset_of_tasks)
+		if (graph_mode)
 			end_of_stdin = (remained_tasks_count == 0);
 
 		if (!busy_count && end_of_stdin)
@@ -903,6 +904,7 @@ static void process_args (int *argc, char ***argv)
 		{ "i2o-flush", 0, 0, 'I' },
 
 		{ "pos",       0, 0, 's' },
+		{ "graph",     0, 0, 'g' },
 
 		{ "debug",     0, 0, 'd' },
 
@@ -911,7 +913,7 @@ static void process_args (int *argc, char ***argv)
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIzZ:n:c:t:s",
+	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIzZ:n:c:t:sg",
 							longopts, NULL),
 		   c != EOF)
 	{
@@ -960,7 +962,8 @@ static void process_args (int *argc, char ***argv)
 				flush_i2o = 1;
 				break;
 			case 's':
-				poset_of_tasks = 1;
+			case 'g':
+				graph_mode = 1;
 				break;
 			case 'z':
 				resistant = 1;

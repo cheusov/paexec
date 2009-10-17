@@ -464,7 +464,7 @@ Node 1 exited unexpectedly
 6 CHERRY
 6
 =================================================================
-======= args: -z -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1
+======= args: -z -g -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1
 I'll output -1
 -1
 success
@@ -478,7 +478,7 @@ fatal
 
 all nodes failed
 =================================================================
-======= args: -z -r -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1 2 3 4 5 6 7
+======= args: -z -r -g -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1 2 3 4 5 6 7
 1 I'll output -1
 1 -1
 1 success
@@ -529,7 +529,7 @@ all nodes failed
 7 success
 7 
 =================================================================
-======= args: -s -z -lre -t transport_closed_stdin -c : -n 0 1 2 3 4 5 6 7 8
+======= args: -g -z -lre -t transport_closed_stdin -c : -n 0 1 2 3 4 5 6 7 8
 0 2 I'll output 0
 0 2 0
 0 2 success
@@ -571,12 +571,12 @@ all nodes failed
 6 7 success
 6 7 
 =================================================================
-======= args: -z -r -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 4
+======= args: -z -r -g -E -t ../examples/broken_echo/transport_broken_echo -c : -n 4
 4 fatal
 4 
 all nodes failed
 =================================================================
-======= args: -z -r -s -i -E -t ../examples/broken_echo/transport_broken_echo -c : -n 4
+======= args: -z -r -g -i -E -t ../examples/broken_echo/transport_broken_echo -c : -n 4
 4 mama
 4 fatal
 4 

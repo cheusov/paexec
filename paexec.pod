@@ -160,9 +160,9 @@ Copy input lines (i.e. tasks) to stdout.
 
 Imply B<-i> and flushes stdout.
 
-=item B<-s>|B<--pos>
+=item B<-s>|B<--pos>|B<-g>|B<--graph>
 
-Partially ordered set of tasks (orgraph) is read from stdin.
+Orgraph of tasks (partially ordered set) is read from stdin.
 
 Instead of autonomous tasks, graph of the tasks is read from stdin.
 In this mode every task can either FAIL or SUCCEED.

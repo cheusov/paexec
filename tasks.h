@@ -8,7 +8,7 @@ extern int tasks_count;
 /* numeric task id to textual representation*/
 extern char ** id2task;
 /* true "paexec -s" */
-extern int poset_of_tasks;
+extern int graph_mode;
 /* last read task and its id */
 extern char *current_task;
 extern int current_taskid;

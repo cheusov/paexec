@@ -582,7 +582,7 @@ cherry
 EOF
 
     # resistance to transport failure
-    runtest -z -s -E \
+    runtest -z -g -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '1' <<EOF
 -1 0
@@ -590,7 +590,7 @@ EOF
 EOF
 
     # resistance to transport failure
-    runtest -z -r -s -E \
+    runtest -z -r -g -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '1 2 3 4 5 6 7' <<EOF
 -1 0
@@ -603,7 +603,7 @@ EOF
 EOF
 
     # resistance to transport failure2 (write(2) errors)
-    runtest -s -z -lre -t $OBJDIR/transport_closed_stdin -c : \
+    runtest -g -z -lre -t $OBJDIR/transport_closed_stdin -c : \
 	-n '0 1 2 3 4 5 6 7 8' <<EOF
 0 1
 1 2
@@ -620,12 +620,12 @@ EOF
             print i
         }
     }' |
-    runtest -z -r -s -E \
+    runtest -z -r -g -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '4'
 
     # resistance to transport failure
-    runtest -z -r -s -i -E \
+    runtest -z -r -g -i -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '4' <<EOF
 mama

@@ -49,7 +49,7 @@ int remained_tasks_count = 0;
 
 static hsh_HashTable tasks;
 
-int poset_of_tasks  = 0;
+int graph_mode  = 0;
 char ** id2task = NULL;
 
 char *current_task     = NULL;
@@ -81,14 +81,14 @@ void delete_task (int task, int print_task)
 
 	assert (task >= 0);
 
-	if (!poset_of_tasks){
+	if (!graph_mode){
 		if (id2task [task]){
 			xfree (id2task [task]);
 			id2task [task] = NULL;
 		}
 	}
 
-	if (poset_of_tasks){
+	if (graph_mode){
 		for (i=0; i < arcs_count; ++i){
 			to = arcs_to [i];
 			if (arcs_from [i] == task){
@@ -187,7 +187,7 @@ const char *get_new_task (void)
 		current_taskid = failed_taskids [--failed_taskids_count];
 		task = id2task [current_taskid];
 		assert (task);
-	}else if (poset_of_tasks){
+	}else if (graph_mode){
 		task = get_new_task_from_graph ();
 	}else{
 		task = get_new_task_from_stdin ();
