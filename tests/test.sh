@@ -1,9 +1,18 @@
 #!/bin/sh
 
-runtest (){
+print_header (){
     printf '=================================================================\n'
     printf '======= args: %s\n' "$*" | cut_full_path_closed_stdin
+}
+
+runtest (){
+    print_header "$@"
     $OBJDIR/paexec "$@" 2>&1
+}
+
+runtest_resort (){
+    print_header "$@"
+    $OBJDIR/paexec "$@" 2>&1 | resort
 }
 
 cut_version (){
@@ -558,6 +567,18 @@ EOF
 2 3
 3 4
 4 5
+EOF
+
+    # resistance/-z without -s
+    runtest_resort -el -z \
+	-t ../examples/broken_echo/transport_broken_toupper \
+	-c : -n '4 5 6 7' <<'EOF'
+bilberry
+gooseberry
+apple
+pear
+plum
+cherry
 EOF
 
     # resistance to transport failure

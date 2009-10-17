@@ -448,6 +448,22 @@ success
 I'll output 1
 Node 1 exited unexpectedly
 =================================================================
+======= args: -el -z -t env quiet=1 ../examples/broken_echo/transport_broken_echo -c : -n 4 5 6 7
+1 fatal
+1
+1 BILBERRY
+1
+2 GOOSEBERRY
+2
+3 APPLE
+3
+4 PEAR
+4
+5 PLUM
+5
+6 CHERRY
+6
+=================================================================
 ======= args: -z -s -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1
 I'll output -1
 -1
