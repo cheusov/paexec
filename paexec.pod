@@ -256,6 +256,12 @@ B<-Z> applied, every I<timeout> seconds an attempt to rerun a comand
 on a failed node is made. I<-Z> implies I<-z>. This option makes
 possible to organize clusters over unreliable networks/hardware.
 
+=item B<-w>
+
+If I<-Z> option were applied, B<paexec> exits with error
+if B<ALL> nodes failed. With B<-w> it will not exit
+and will wait for restoring nodes.
+
 =back
 
 =head1 EXAMPLES

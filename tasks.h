@@ -14,6 +14,8 @@ extern char *current_task;
 extern int current_taskid;
 /* a number of tasks to be done */
 extern int remained_tasks_count;
+/* a number of tasks with FATAL failure (e.g. connection lost) */
+extern int failed_taskids_count;
 
 void init_tasks (int nodes_count);
 int add_task (char *s);

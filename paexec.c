@@ -156,6 +156,8 @@ static int resistant = 0;
 static int resistance_timeout = 0;
 static int resistance_last_restart = 0;
 
+static int wait_mode = 0;
+
 static void close_all_ins (void)
 {
 	int i;
@@ -363,6 +365,15 @@ static void unblock_signals (void)
 	xsigprocmask (SIG_UNBLOCK, &set, NULL);
 }
 
+static void wait_for_sigalrm (void)
+{
+	sigset_t set;
+
+	sigemptyset (&set);
+
+	sigsuspend (&set);
+}
+
 static void init (void)
 {
 	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
@@ -548,7 +559,7 @@ static void send_to_node (void)
 			print_line (n, poset_fatal);
 			print_EOT (n);
 
-			if (alive_nodes_count == 0){
+			if (alive_nodes_count == 0 && !wait_mode){
 				exit_with_error ("loop", "all nodes failed");
 			}
 			return;
@@ -563,10 +574,34 @@ static int unblock_select_block (
 	fd_set * exceptfds, struct timeval * timeout)
 {
 	int ret;
+	char msg [200];
 	unblock_signals ();
-	ret = select (nfds, readfds, writefds, exceptfds, timeout);
+
+	do {
+		errno = 0;
+		ret = select (nfds, readfds, writefds, exceptfds, timeout);
+	}while (ret == -1 && errno == EINTR);
+
+	if (ret == -1){
+		snprintf (msg, sizeof (msg), "select(2) failed: %s", strerror (errno));
+		exit_with_error (NULL, msg);
+	}
+
 	block_signals ();
 	return ret;
+}
+
+static int try_to_reinit_failed_nodes (void)
+{
+	if (resistance_timeout &&
+		sigalrm_tics - resistance_last_restart >= resistance_timeout)
+	{
+		resistance_last_restart = sigalrm_tics;
+		init__child_processes ();
+		return 1;
+	}
+
+	return 0;
 }
 
 static int condition (
@@ -591,6 +626,12 @@ static int condition (
 			&& (*ret = unblock_select_block (
 					max_descr+1, rset, NULL, NULL, NULL)) != 0)
 	{
+		return 1;
+	}
+
+	if (failed_taskids_count > 0 && wait_mode){
+		wait_for_sigalrm ();
+		try_to_reinit_failed_nodes ();
 		return 1;
 	}
 
@@ -625,13 +666,8 @@ static void loop (void)
 	while (condition (&rset, max_fd, &ret, &task)){
 		/* ret == -777 means select(2) was not called */
 
-		if (resistance_timeout &&
-			sigalrm_tics - resistance_last_restart >= resistance_timeout)
-		{
-			resistance_last_restart = sigalrm_tics;
-			init__child_processes ();
+		if (try_to_reinit_failed_nodes ())
 			continue;
-		}
 
 		if (ret == -1 && errno == EINTR){
 			continue;
@@ -668,7 +704,7 @@ static void loop (void)
 						print_line (i, poset_fatal);
 						print_EOT (i);
 
-						if (alive_nodes_count == 0){
+						if (alive_nodes_count == 0 && !wait_mode){
 							exit_with_error ("loop", "all nodes failed");
 						}
 						continue;
@@ -913,7 +949,7 @@ static void process_args (int *argc, char ***argv)
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIzZ:n:c:t:sg",
+	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sg",
 							longopts, NULL),
 		   c != EOF)
 	{
@@ -965,6 +1001,9 @@ static void process_args (int *argc, char ***argv)
 			case 'g':
 				graph_mode = 1;
 				break;
+			case 'w':
+				wait_mode = 1;
+				break;
 			case 'z':
 				resistant = 1;
 				break;
@@ -976,6 +1015,10 @@ static void process_args (int *argc, char ***argv)
 				usage ();
 				exit (1);
 		}
+	}
+
+	if (!resistance_timeout && wait_mode){
+		err_fatal (NULL, "-w is useless without -Z\n");
 	}
 
 	if (arg_nodes){

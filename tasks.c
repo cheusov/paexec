@@ -58,7 +58,7 @@ size_t current_task_sz = 0;
 int current_taskid = 0;
 
 static int *failed_taskids     = NULL;
-static int failed_taskids_count = 0;
+int failed_taskids_count = 0;
 
 void init_tasks (int node_count)
 {
