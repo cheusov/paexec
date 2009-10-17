@@ -27,7 +27,7 @@ BIRTHDATE=	2008-01-25
 WARNS?=		4
 
 PROG=		paexec
-SRCS=		paexec.c wrappers.c
+SRCS=		paexec.c wrappers.c tasks.c
 
 LDADD+=		$(MAALIB)
 

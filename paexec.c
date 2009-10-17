@@ -56,6 +56,7 @@
 
 #include "wrappers.h"
 #include "common.h"
+#include "tasks.h"
 
 static void usage (void)
 {
@@ -121,8 +122,6 @@ static ret_code_t *ret_codes   = NULL;
 
 static int max_fd   = 0;
 
-static int taskid = 0;
-
 static char *buf_stdin      = NULL;
 
 static char **nodes    = NULL;
@@ -143,24 +142,6 @@ static int initial_bufsize = BUFSIZE;
 
 static int debug           = 0;
 
-static int poset_of_tasks  = 0;
-static hsh_HashTable tasks;
-static int tasks_count = 1; /* 0 - special meaning, not task ID */
-static const char ** id2task = NULL;
-static int remained_tasks_count = 0;
-
-static int *arcs_from = NULL;
-static int *arcs_to   = NULL;
-static int arcs_count = 0;
-
-static int *tasks_graph_deg = NULL;
-
-static char *current_task     = NULL;
-static size_t current_task_sz = 0;
-
-static int *failed_taskids     = NULL;
-static int failed_taskids_count = 0;
-
 static char **node2task         = NULL;
 static size_t *node2task_buf_sz = NULL;
 
@@ -169,8 +150,6 @@ static int end_of_stdin = 0;
 static const char *poset_success = "success";
 static const char *poset_failure = "failure";
 static const char *poset_fatal   = "fatal";
-
-static int *deleted_tasks = NULL;
 
 static int resistant = 0;
 static int resistance_timeout = 0;
@@ -187,267 +166,10 @@ static void close_all_ins (void)
 	}
 }
 
-static void delete_task (int task, int print_task)
-{
-	int i, to;
-
-	assert (task >= 0);
-
-	for (i=0; i < arcs_count; ++i){
-		to = arcs_to [i];
-		if (arcs_from [i] == task){
-			if (tasks_graph_deg [to] > 0)
-				--tasks_graph_deg [to];
-		}
-	}
-
-	if (tasks_graph_deg [task] >= -1){
-		tasks_graph_deg [task] = -2;
-
-		--remained_tasks_count;
-	}
-
-	end_of_stdin = (remained_tasks_count == 0);
-	if (end_of_stdin)
-		close_all_ins ();
-
-	if (print_task){
-		if (!deleted_tasks [task]){
-			printf ("%s ", id2task [task]);
-			deleted_tasks [task] = 1;
-		}
-	}
-}
-
-static void delete_task_rec2 (int task)
-{
-	int i, to;
-
-	assert (task >= 0);
-
-	delete_task (task, 1);
-
-	for (i=0; i < arcs_count; ++i){
-		if (arcs_from [i] == task){
-			to = arcs_to [i];
-			delete_task_rec2 (to);
-		}
-	}
-}
-
-static void delete_task_rec (int task)
-{
-	memset (deleted_tasks, 0, tasks_count * sizeof (*deleted_tasks));
-
-	delete_task_rec2 (task);
-}
-
-static const char * get_new_task_from_stdin (void)
-{
-	const char *task = NULL;
-	size_t sz = 0;
-
-	if (end_of_stdin)
-		return NULL;
-
-	task = xfgetln (stdin, &sz);
-
-	if (!task && feof (stdin)){
-		end_of_stdin = 1;
-		close_all_ins ();
-		return NULL;
-	}
-
-	return task;
-}
-
-static int get_new_task_num_from_graph (void)
-{
-	int i;
-
-	for (i=1; i < tasks_count; ++i){
-		assert (tasks_graph_deg [i] >= -2);
-
-		if (tasks_graph_deg [i] == 0)
-			return i;
-	}
-
-	return -1;
-}
-
-static const char * get_new_task_from_graph (void)
-{
-	/* topological sort of task graph */
-	int num = get_new_task_num_from_graph ();
-	if (num == -1)
-		return NULL;
-
-	taskid = num;
-	tasks_graph_deg [num] = -1;
-	return id2task [num];
-}
-
-static const char *get_new_task (void)
-{
-	const char *task = NULL;
-	size_t task_len = 0;
-
-	if (failed_taskids_count > 0){
-		taskid = failed_taskids [--failed_taskids_count];
-		task = id2task [taskid];
-		assert (task);
-	}else if (poset_of_tasks){
-		task = get_new_task_from_graph ();
-	}else{
-		task = get_new_task_from_stdin ();
-	}
-
-	if (!task)
-		return NULL;
-
-	task_len = strlen (task);
-
-	if (task_len >= current_task_sz){
-		current_task_sz = task_len+1;
-		current_task = (char *) xrealloc (current_task, current_task_sz);
-	}
-
-	memcpy (current_task, task, task_len+1);
-
-	if (!poset_of_tasks){
-		++taskid;
-	}
-
-	return current_task;
-}
-
-typedef union {
-	int integer;
-	const void *ptr;
-} int_ptr_union_t;
-
-static int add_task (const char *s)
-{
-	int_ptr_union_t r;
-
-	r.integer = 0;
-	r.ptr = hsh_retrieve (tasks, s);
-	if (r.ptr){
-		return r.integer;
-	}else{
-		r.ptr = NULL;
-		r.integer = tasks_count;
-		hsh_insert (tasks, s, r.ptr);
-
-		++tasks_count;
-		++remained_tasks_count;
-
-		id2task = (const char **) xrealloc (
-			id2task, tasks_count * sizeof (*id2task));
-		id2task [tasks_count-1] = s;
-
-		return tasks_count-1;
-	}
-}
-
-static int *check_cycles__stack;
-static int *check_cycles__mark;
-
-static void check_cycles__outgoing (int stack_sz)
-{
-	assert (stack_sz > 0);
-
-	int from = check_cycles__stack [stack_sz-1];
-	int i, j;
-	int s, t;
-	int loop;
-
-	assert (check_cycles__mark [from] == 0);
-	check_cycles__mark [from] = 2; /* currently in the path */
-
-	for (i=0; i < arcs_count; ++i){
-		if (arcs_from [i] != from)
-			continue;
-
-		assert (stack_sz < tasks_count);
-
-		int to = arcs_to [i];
-		check_cycles__stack [stack_sz] = to;
-
-		switch (check_cycles__mark [to]){
-			case 2:
-				loop = 0;
-				fprintf (stderr, "Cyclic dependancy detected:\n");
-				for (j=1; j <= stack_sz; ++j){
-					s = check_cycles__stack [j-1];
-					t = check_cycles__stack [j];
-
-					if (!loop && s != to)
-						continue;
-
-					loop = 1;
-					fprintf (stderr, "  %s -> %s\n", id2task [s], id2task [t]);
-				}
-
-				exit (1);
-			case 0:
-				check_cycles__outgoing (stack_sz + 1);
-				break;
-			case 1:
-				break;
-			default:
-				abort (); /* this should not happen */
-		}
-	}
-
-	check_cycles__mark [from] = 1; /* already seen */
-}
-
-static void init__check_cycles (void)
-{
-	int i;
-
-	check_cycles__stack = xmalloc (
-		tasks_count * sizeof (check_cycles__stack [0]));
-
-	check_cycles__mark = xmalloc (
-		tasks_count * sizeof (check_cycles__mark [0]));
-	memset (check_cycles__mark, 0,
-		tasks_count * sizeof (check_cycles__mark [0]));
-
-	/* */
-	if (debug){
-		fprintf (stderr, "begin: init__check_cycles\n");
-	}
-
-	for (i=0; i < tasks_count; ++i){
-		switch (check_cycles__mark [i]){
-			case 0:
-				check_cycles__stack [0] = i;
-				check_cycles__outgoing (1);
-				break;
-			case 1:
-				break;
-			case 2:
-				abort (); /* this should not happen */
-		}
-	}
-
-	xfree (check_cycles__mark);
-	xfree (check_cycles__stack);
-
-	/* */
-	if (debug){
-		fprintf (stderr, "end: init__check_cycles\n");
-	}
-}
-
 static void init__read_poset_tasks (void)
 {
 	char *buf = NULL;
 	size_t len = 0;
-
-	int i;
 
 	/* */
 	if (debug){
@@ -461,7 +183,7 @@ static void init__read_poset_tasks (void)
 	}
 
 	/* partially ordered set of tasks */
-	tasks = hsh_create (NULL, NULL);
+	init_tasks ();
 
 	/* reading all tasks with their dependancies */
 	while (buf = xfgetln (stdin, &len), buf != NULL){
@@ -485,24 +207,8 @@ static void init__read_poset_tasks (void)
 
 		if (sep){
 			/* (from,to) pair */
-			++arcs_count;
-			arcs_from = (int *) xrealloc (arcs_from,
-										  arcs_count * sizeof (*arcs_from));
-			arcs_to = (int *) xrealloc (arcs_to,
-										arcs_count * sizeof (*arcs_to));
-
-			arcs_from [arcs_count-1] = id1;
-			arcs_to [arcs_count-1]   = id2;
+			add_task_arc (id1, id2);
 		}
-	}
-
-	/* degree for each task */
-	tasks_graph_deg = (int *) xmalloc (
-		tasks_count * sizeof (*tasks_graph_deg));
-	memset (tasks_graph_deg, 0, tasks_count * sizeof (*tasks_graph_deg));
-
-	for (i=0; i < arcs_count; ++i){
-		++tasks_graph_deg [arcs_to [i]];
 	}
 
 	/* */
@@ -587,7 +293,7 @@ static void mark_node_as_dead (int node)
 	fd_in  [node] = -1;
 	fd_out [node] = -1;
 
-	failed_taskids [failed_taskids_count++] = node2taskid [node];
+	mark_task_as_failed (node2taskid [node]);
 	--alive_nodes_count;
 }
 
@@ -699,18 +405,12 @@ static void init (void)
 
 	ret_codes = xmalloc (nodes_count * sizeof (*ret_codes));
 
-	failed_taskids = xmalloc (nodes_count * sizeof (*failed_taskids));
-	memset (failed_taskids, -1, nodes_count * sizeof (*failed_taskids));
-
 	/* stdin */
 	buf_stdin = xmalloc (initial_bufsize);
 	buf_stdin [0] = 0;
 
 	/**/
 	init__read_poset_tasks ();
-
-	/* recursive task deleting and rhomb-like dependencies */
-	deleted_tasks = xmalloc (tasks_count * sizeof (*deleted_tasks));
 
 	/**/
 	init__check_cycles ();
@@ -873,9 +573,17 @@ static int condition (
 	int *ret, const char **task)
 {
 	*ret = -777;
+	*task = NULL;
 
-	if (busy_count < alive_nodes_count && (*task = get_new_task ()) != NULL){
+	if (busy_count < alive_nodes_count && !end_of_stdin &&
+		(*task = get_new_task ()) != NULL)
+	{
 		return 1;
+	}
+
+	if (!task && !poset_of_tasks && feof (stdin)){
+		end_of_stdin = 1;
+		close_all_ins ();
 	}
 
 	if (busy_count > 0
@@ -1017,6 +725,10 @@ static void loop (void)
 									default:
 										abort ();
 								}
+
+								end_of_stdin = (remained_tasks_count == 0);
+								if (end_of_stdin)
+									close_all_ins ();
 							}
 
 							print_EOT (i);
@@ -1334,12 +1046,7 @@ static void free_memory (void)
 	if (ret_codes)
 		xfree (ret_codes);
 
-	if (poset_of_tasks){
-		hsh_destroy (tasks);
-	}
-
-	if (deleted_tasks)
-		xfree (deleted_tasks);
+	destroy_tasks ();
 }
 
 int main (int argc, char **argv)
