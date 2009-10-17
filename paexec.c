@@ -522,7 +522,7 @@ static void send_to_node (void)
 
 	busy [n]      = 1;
 	size_out [n]  = 0;
-	node2taskid [n] = taskid;
+	node2taskid [n] = current_taskid;
 
 	++busy_count;
 

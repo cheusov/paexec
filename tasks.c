@@ -55,7 +55,7 @@ const char ** id2task = NULL;
 char *current_task     = NULL;
 size_t current_task_sz = 0;
 
-int taskid = 0;
+int current_taskid = 0;
 
 static int *failed_taskids     = NULL;
 static int failed_taskids_count = 0;
@@ -147,7 +147,7 @@ static const char * get_new_task_from_graph (void)
 	if (num == -1)
 		return NULL;
 
-	taskid = num;
+	current_taskid = num;
 	tasks_graph_deg [num] = -1;
 	return id2task [num];
 }
@@ -167,9 +167,10 @@ const char *get_new_task (void)
 	const char *task = NULL;
 	size_t task_len = 0;
 
+//	taskid = -1;
 	if (failed_taskids_count > 0){
-		taskid = failed_taskids [--failed_taskids_count];
-		task = id2task [taskid];
+		current_taskid = failed_taskids [--failed_taskids_count];
+		task = id2task [current_taskid];
 		assert (task);
 	}else if (poset_of_tasks){
 		task = get_new_task_from_graph ();
@@ -190,7 +191,7 @@ const char *get_new_task (void)
 	memcpy (current_task, task, task_len+1);
 
 	if (!poset_of_tasks){
-		++taskid;
+		++current_taskid;
 	}
 
 	return current_task;
@@ -223,6 +224,7 @@ int add_task (const char *s)
 
 		deleted_tasks = (int *) xrealloc (
 			deleted_tasks, tasks_count * sizeof (*deleted_tasks));
+		deleted_tasks [tasks_count-1] = -1;
 
 		tasks_graph_deg = (int *) xrealloc (
 			tasks_graph_deg, tasks_count * sizeof (*tasks_graph_deg));

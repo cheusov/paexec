@@ -1,11 +1,18 @@
 #ifndef _TASKS_H_
 #define _TASKS_H_
 
+/* The following variables are read-only, do set them directly! */
+
+/* a number of tasks */
 extern int tasks_count;
+/* numeric task id to textual representation*/
 extern const char ** id2task;
+/* true "paexec -s" */
 extern int poset_of_tasks;
+/* last read task and its id */
 extern char *current_task;
-extern int taskid;
+extern int current_taskid;
+/* a number of tasks to be done */
 extern int remained_tasks_count;
 
 void init_tasks (void);
