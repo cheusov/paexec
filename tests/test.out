@@ -448,7 +448,7 @@ success
 I'll output 1
 Node 1 exited unexpectedly
 =================================================================
-======= args: -el -z -t env quiet=1 ../examples/broken_echo/transport_broken_echo -c : -n 4 5 6 7
+======= args: -el -z -t ../examples/broken_echo/transport_broken_toupper -c : -n 4 5 6 7
 1 fatal
 1
 1 BILBERRY

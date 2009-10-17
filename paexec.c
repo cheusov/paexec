@@ -62,7 +62,7 @@ static void usage (void)
 {
 	fprintf (stderr, "\
 paexec - parallel executor\n\
-         processes the list of autonomous tasks in parallel\n\
+         processes a list/graph of tasks in parallel\n\
 usage: paexec [OPTIONS] [files...]\n\
 OPTIONS:\n\
   -h --help                give this help\n\
