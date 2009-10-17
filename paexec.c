@@ -182,9 +182,6 @@ static void init__read_poset_tasks (void)
 		return;
 	}
 
-	/* partially ordered set of tasks */
-	init_tasks ();
-
 	/* reading all tasks with their dependancies */
 	while (buf = xfgetln (stdin, &len), buf != NULL){
 		char *sep = strchr (buf, ' ');
@@ -408,6 +405,9 @@ static void init (void)
 	/* stdin */
 	buf_stdin = xmalloc (initial_bufsize);
 	buf_stdin [0] = 0;
+
+	/* tasks */
+	init_tasks (poset_of_tasks ? 0 : nodes_count);
 
 	/**/
 	init__read_poset_tasks ();
@@ -729,6 +729,8 @@ static void loop (void)
 								end_of_stdin = (remained_tasks_count == 0);
 								if (end_of_stdin)
 									close_all_ins ();
+							}else{
+								delete_task (node2taskid [i], 0);
 							}
 
 							print_EOT (i);

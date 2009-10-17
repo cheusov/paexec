@@ -36,21 +36,21 @@
 #include "tasks.h"
 #include "wrappers.h"
 
-int *deleted_tasks = NULL;
+static int *deleted_tasks = NULL;
 
-int *arcs_from = NULL;
-int *arcs_to   = NULL;
-int arcs_count = 0;
+static int *arcs_from = NULL;
+static int *arcs_to   = NULL;
+static int arcs_count = 0;
 
-int *tasks_graph_deg = NULL;
+static int *tasks_graph_deg = NULL;
 
 int tasks_count = 1; /* 0 - special meaning, not task ID */
 int remained_tasks_count = 0;
 
-hsh_HashTable tasks;
+static hsh_HashTable tasks;
 
 int poset_of_tasks  = 0;
-const char ** id2task = NULL;
+char ** id2task = NULL;
 
 char *current_task     = NULL;
 size_t current_task_sz = 0;
@@ -60,14 +60,14 @@ int current_taskid = 0;
 static int *failed_taskids     = NULL;
 static int failed_taskids_count = 0;
 
-void init_tasks (void)
+void init_tasks (int node_count)
 {
 	tasks = hsh_create (NULL, NULL);
 }
 
 void destroy_tasks (void)
 {
-	if (poset_of_tasks){
+	if (tasks){
 		hsh_destroy (tasks);
 	}
 
@@ -81,18 +81,27 @@ void delete_task (int task, int print_task)
 
 	assert (task >= 0);
 
-	for (i=0; i < arcs_count; ++i){
-		to = arcs_to [i];
-		if (arcs_from [i] == task){
-			if (tasks_graph_deg [to] > 0)
-				--tasks_graph_deg [to];
+	if (!poset_of_tasks){
+		if (id2task [task]){
+			xfree (id2task [task]);
+			id2task [task] = NULL;
 		}
 	}
 
-	if (tasks_graph_deg [task] >= -1){
-		tasks_graph_deg [task] = -2;
+	if (poset_of_tasks){
+		for (i=0; i < arcs_count; ++i){
+			to = arcs_to [i];
+			if (arcs_from [i] == task){
+				if (tasks_graph_deg [to] > 0)
+					--tasks_graph_deg [to];
+			}
+		}
 
-		--remained_tasks_count;
+		if (tasks_graph_deg [task] >= -1){
+			tasks_graph_deg [task] = -2;
+
+			--remained_tasks_count;
+		}
 	}
 
 	if (print_task){
@@ -158,6 +167,13 @@ static const char * get_new_task_from_stdin (void)
 	size_t sz = 0;
 
 	task = xfgetln (stdin, &sz);
+	if (!task)
+		return NULL;
+
+	++current_taskid;
+	id2task = (char **) xrealloc (
+		id2task, (current_taskid + 1) * sizeof (*id2task));
+	id2task [current_taskid] = xstrdup(task);
 
 	return task;
 }
@@ -167,7 +183,6 @@ const char *get_new_task (void)
 	const char *task = NULL;
 	size_t task_len = 0;
 
-//	taskid = -1;
 	if (failed_taskids_count > 0){
 		current_taskid = failed_taskids [--failed_taskids_count];
 		task = id2task [current_taskid];
@@ -190,10 +205,6 @@ const char *get_new_task (void)
 
 	memcpy (current_task, task, task_len+1);
 
-	if (!poset_of_tasks){
-		++current_taskid;
-	}
-
 	return current_task;
 }
 
@@ -202,7 +213,7 @@ typedef union {
 	const void *ptr;
 } int_ptr_union_t;
 
-int add_task (const char *s)
+int add_task (char *s)
 {
 	int_ptr_union_t r;
 
@@ -218,7 +229,7 @@ int add_task (const char *s)
 		++tasks_count;
 		++remained_tasks_count;
 
-		id2task = (const char **) xrealloc (
+		id2task = (char **) xrealloc (
 			id2task, tasks_count * sizeof (*id2task));
 		id2task [tasks_count-1] = s;
 
