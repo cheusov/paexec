@@ -581,6 +581,12 @@ plum
 cherry
 EOF
 
+    # -Z + -w without -s
+    printf '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n' |
+    runtest_resort -Z1 -w \
+	-t ../tests/transport_broken_rnd \
+	-m F= -c: -n '0.5ns-nopostfail 0.5ns-nopostfail 0.5ns-nopostfail'
+
     # resistance to transport failure
     runtest -z -g -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \

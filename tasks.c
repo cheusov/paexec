@@ -79,6 +79,7 @@ void delete_task (int task, int print_task)
 {
 	int i, to;
 
+	assert (task < tasks_count);
 	assert (task >= 0);
 
 	if (!graph_mode){
@@ -170,9 +171,10 @@ static const char * get_new_task_from_stdin (void)
 	if (!task)
 		return NULL;
 
-	++current_taskid;
+	current_taskid = tasks_count++;
+
 	id2task = (char **) xrealloc (
-		id2task, (current_taskid + 1) * sizeof (*id2task));
+		id2task, tasks_count * sizeof (*id2task));
 	id2task [current_taskid] = xstrdup(task);
 
 	return task;
@@ -185,6 +187,7 @@ const char *get_new_task (void)
 
 	if (failed_taskids_count > 0){
 		current_taskid = failed_taskids [--failed_taskids_count];
+		assert (current_taskid < tasks_count);
 		task = id2task [current_taskid];
 		assert (task);
 	}else if (graph_mode){

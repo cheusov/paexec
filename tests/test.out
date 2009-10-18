@@ -464,6 +464,40 @@ Node 1 exited unexpectedly
 6 CHERRY
 6
 =================================================================
+======= args: -Z1 -w -t ../tests/transport_broken_rnd -m F= -c: -n 0.5ns-nopostfail 0.5ns-nopostfail 0.5ns-nopostfail
+success
+success
+success
+success
+success
+success
+success
+success
+success
+success
+success
+success
+success
+success
+success
+success
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+=================================================================
 ======= args: -z -g -E -t ../examples/broken_echo/transport_broken_echo -c : -n 1
 I'll output -1
 -1

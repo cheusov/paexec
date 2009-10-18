@@ -262,6 +262,16 @@ If I<-Z> option were applied, B<paexec> exits with error
 if B<ALL> nodes failed. With B<-w> it will not exit
 and will wait for restoring nodes.
 
+=item B<-m> s=I<success>
+
+=item B<-m> f=I<failure>
+
+=item B<-m> F=I<fatal>
+
+Set alternative messages instead of default 'success', 'failure' and
+'fatal'. An empty 'fatal' message means it will not be output to
+stdout in case of fatal error.
+
 =back
 
 =head1 EXAMPLES

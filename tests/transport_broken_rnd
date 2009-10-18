@@ -18,6 +18,7 @@ BEGIN {
 	fake_cmd  = ARGV [2]
 
 	nosleep   = ARGV [1] ~ /ns/
+	nopostfail = ARGV [1] ~ /nopostfail/
 
 	ARGV [1] = "-"
 	ARGV [2] = ""
@@ -37,7 +38,7 @@ BEGIN {
 
 	print " " $0
 
-	if (my_rnd() == 0.0) {
+	if (!nopostfail && my_rnd() == 0.0) {
 		sleep(0.1)
 		exit 1
 	}

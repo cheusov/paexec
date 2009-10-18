@@ -89,6 +89,11 @@ OPTIONS:\n\
   -d --debug               debug mode, for debugging only\n\
   -z --resistant           failed nodes are marked as dead\n\
   -Z <timeout>             timeout to restart faild command, imply -z\n\
+  -w                       wait for restoring nodes (needs -Z)\n\
+  -m s=<success>\n\
+  -m f=<failure>\n\
+  -m F=<fatal>             set alternative messages instead of default\n\
+                           'success', 'failure' and 'fatal'.\n\
 -n and -c are mandatory options\n\
 \n\
 ");
@@ -556,7 +561,8 @@ static void send_to_node (void)
 	{
 		if (resistant){
 			mark_node_as_dead (n);
-			print_line (n, poset_fatal);
+			if (poset_fatal [0])
+				print_line (n, poset_fatal);
 			print_EOT (n);
 
 			if (alive_nodes_count == 0 && !wait_mode){
@@ -701,7 +707,8 @@ static void loop (void)
 					if (resistant){
 						FD_CLR (fd_out [i], &rset);
 						mark_node_as_dead (i);
-						print_line (i, poset_fatal);
+						if (poset_fatal [0])
+							print_line (i, poset_fatal);
 						print_EOT (i);
 
 						if (alive_nodes_count == 0 && !wait_mode){
@@ -949,7 +956,7 @@ static void process_args (int *argc, char ***argv)
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sg",
+	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:",
 							longopts, NULL),
 		   c != EOF)
 	{
@@ -1010,6 +1017,18 @@ static void process_args (int *argc, char ***argv)
 			case 'Z':
 				resistant = 1;
 				resistance_timeout = atoi (optarg);
+				break;
+			case 'm':
+				if (optarg [0] == 's' && optarg [1] == '=')
+					poset_success = xstrdup (optarg+2);
+				else if (optarg [0] == 'f' && optarg [1] == '=')
+					poset_failure = xstrdup (optarg+2);
+				else if (optarg [0] == 'F' && optarg [1] == '=')
+					poset_fatal = xstrdup (optarg+2);
+				else{
+					err_fatal (NULL, "bad argument for -m\n");
+				}
+
 				break;
 			default:
 				usage ();
