@@ -26,6 +26,7 @@
 
 #include <sys/select.h>
 #include <unistd.h>
+#include <signal.h>
 
 void nonblock (int fd);
 char * xfgetln(FILE *fp, size_t *len);
