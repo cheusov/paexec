@@ -60,7 +60,7 @@ int current_taskid = 0;
 static int *failed_taskids     = NULL;
 int failed_taskids_count = 0;
 
-void init_tasks (int node_count)
+void init_tasks (void)
 {
 	tasks = hsh_create (NULL, NULL);
 }

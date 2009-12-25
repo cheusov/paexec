@@ -17,7 +17,7 @@ extern int remained_tasks_count;
 /* a number of tasks with FATAL failure (e.g. connection lost) */
 extern int failed_taskids_count;
 
-void init_tasks (int nodes_count);
+void init_tasks (void);
 int add_task (char *s);
 void add_task_arc (int task_from, int task_to);
 void init__check_cycles (void);
