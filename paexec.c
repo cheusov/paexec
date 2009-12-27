@@ -424,7 +424,7 @@ static void init (void)
 	buf_stdin [0] = 0;
 
 	/* tasks */
-	init_tasks (graph_mode ? 0 : nodes_count);
+	init_tasks ();
 
 	/**/
 	init__read_poset_tasks ();
