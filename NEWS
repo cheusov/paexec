@@ -1,4 +1,22 @@
 ======================================================================
+Version 0.14.0, by Aleksey Cheusov, Sun,  3 Jan 2010 12:38:54 +0200
+
+  fixed: "paexec -z" without -s never worked.  Now it is fine.
+
+  New options -g|--graph are synonyms for -s|--pos.
+
+  New option -w for waiting for failed nodes if they ALL failed.
+  By default (with -Z) if ALL nodes fail paexec exits with error.
+
+  New option -m for setting alternative strings for
+  success/failure/fatal.
+
+  Target for installing directories has been renamed from
+  install-dirs to installdirs.
+
+  Other minor fixes and code clean-ups.
+
+s======================================================================
 Version 0.13.0, by Aleksey Cheusov, Sat,  7 Mar 2009 19:17:03 +0200
 
   FIXED: When 'paexec -s' retreives 10000 tasks, it allocates
