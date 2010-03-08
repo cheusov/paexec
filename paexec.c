@@ -163,6 +163,8 @@ static int resistance_last_restart = 0;
 
 static int wait_mode = 0;
 
+static void exit_with_error (const char * routine attr_unused, const char *msg);
+
 static void close_all_ins (void)
 {
 	int i;
@@ -179,6 +181,13 @@ static void init__read_poset_tasks (void)
 	char *buf = NULL;
 	size_t len = 0;
 
+	int id1, id2;
+	char *s1, *s2;
+
+	char *tok1, *tok2, *tok3;
+	int tok_cnt;
+	char *p;
+
 	/* */
 	if (debug){
 		fprintf (stderr, "start: init__read_poset_tasks\n");
@@ -192,25 +201,46 @@ static void init__read_poset_tasks (void)
 
 	/* reading all tasks with their dependancies */
 	while (buf = xfgetln (stdin, &len), buf != NULL){
-		char *sep = strchr (buf, ' ');
-		int id1, id2;
-		char *s1, *s2;
-
 		if (len > 0 && buf [len-1] == '\n'){
 			buf [len-1] = 0;
+			--len;
 		}
 
-		if (sep){
+		tok1 = tok2 = tok3 = NULL;
+		tok_cnt = 0;
+
+		for (p=buf; *p; ++p){
+			if (*p == ' '){
+				*p = 0;
+			}else if (p == buf || p [-1] == 0){
+				if (!tok1){
+					tok1 = p;
+					tok_cnt = 1;
+				}else if (!tok2){
+					tok2 = p;
+					tok_cnt = 2;
+				}else if (!tok3){
+					tok3 = p;
+					tok_cnt = 3;
+				}else{
+					exit_with_error (NULL, "Invalid input line");
+				}
+			}
+		}
+
+		if (!tok_cnt)
+			continue;
+
+		if (tok_cnt == 2){
 			/* task2(to) */
-			*sep = 0;
-			s2 = xstrdup (sep+1);
+			s2 = xstrdup (tok2);
 			id2 = tasks__add_task (s2);
 		}
 		/* task1(from) */
-		s1 = xstrdup (buf);
+		s1 = xstrdup (tok1);
 		id1 = tasks__add_task (s1);
 
-		if (sep){
+		if (tok_cnt == 2){
 			/* (from,to) pair */
 			tasks__add_task_arc (id1, id2);
 		}
