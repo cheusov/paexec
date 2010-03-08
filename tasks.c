@@ -60,12 +60,12 @@ int current_taskid = 0;
 static int *failed_taskids     = NULL;
 int failed_taskids_count = 0;
 
-void init_tasks (void)
+void tasks__init (void)
 {
 	tasks = hsh_create (NULL, NULL);
 }
 
-void destroy_tasks (void)
+void tasks__destroy (void)
 {
 	if (tasks){
 		hsh_destroy (tasks);
@@ -75,7 +75,7 @@ void destroy_tasks (void)
 		xfree (deleted_tasks);
 }
 
-void delete_task (int task, int print_task)
+void tasks__delete_task (int task, int print_task)
 {
 	int i, to;
 
@@ -119,7 +119,7 @@ static void delete_task_rec2 (int task)
 
 	assert (task >= 0);
 
-	delete_task (task, 1);
+	tasks__delete_task (task, 1);
 
 	for (i=0; i < arcs_count; ++i){
 		if (arcs_from [i] == task){
@@ -129,7 +129,7 @@ static void delete_task_rec2 (int task)
 	}
 }
 
-void delete_task_rec (int task)
+void tasks__delete_task_rec (int task)
 {
 	memset (deleted_tasks, 0, tasks_count * sizeof (*deleted_tasks));
 
@@ -180,7 +180,7 @@ static const char * get_new_task_from_stdin (void)
 	return task;
 }
 
-const char *get_new_task (void)
+const char *tasks__get_new_task (void)
 {
 	const char *task = NULL;
 	size_t task_len = 0;
@@ -216,7 +216,7 @@ typedef union {
 	const void *ptr;
 } int_ptr_union_t;
 
-int add_task (char *s)
+int tasks__add_task (char *s)
 {
 	int_ptr_union_t r;
 
@@ -248,7 +248,7 @@ int add_task (char *s)
 	}
 }
 
-void add_task_arc (int task_from, int task_to)
+void tasks__add_task_arc (int task_from, int task_to)
 {
 	++arcs_count;
 	arcs_from = (int *) xrealloc (arcs_from,
@@ -262,7 +262,7 @@ void add_task_arc (int task_from, int task_to)
 	++tasks_graph_deg [task_to];
 }
 
-void mark_task_as_failed (int id)
+void tasks__mark_task_as_failed (int id)
 {
 	failed_taskids = (int *) xrealloc (
 		failed_taskids,
@@ -324,7 +324,7 @@ static void check_cycles__outgoing (int stack_sz)
 	check_cycles__mark [from] = 1; /* already seen */
 }
 
-void init__check_cycles (void)
+void tasks__check_for_cycles (void)
 {
 	int i;
 

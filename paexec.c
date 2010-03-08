@@ -204,15 +204,15 @@ static void init__read_poset_tasks (void)
 			/* task2(to) */
 			*sep = 0;
 			s2 = xstrdup (sep+1);
-			id2 = add_task (s2);
+			id2 = tasks__add_task (s2);
 		}
 		/* task1(from) */
 		s1 = xstrdup (buf);
-		id1 = add_task (s1);
+		id1 = tasks__add_task (s1);
 
 		if (sep){
 			/* (from,to) pair */
-			add_task_arc (id1, id2);
+			tasks__add_task_arc (id1, id2);
 		}
 	}
 
@@ -298,7 +298,7 @@ static void mark_node_as_dead (int node)
 	fd_in  [node] = -1;
 	fd_out [node] = -1;
 
-	mark_task_as_failed (node2taskid [node]);
+	tasks__mark_task_as_failed (node2taskid [node]);
 	--alive_nodes_count;
 }
 
@@ -424,13 +424,13 @@ static void init (void)
 	buf_stdin [0] = 0;
 
 	/* tasks */
-	init_tasks ();
+	tasks__init ();
 
 	/**/
 	init__read_poset_tasks ();
 
 	/**/
-	init__check_cycles ();
+	tasks__check_for_cycles ();
 
 	/* in/out */
 	init__child_processes ();
@@ -618,7 +618,7 @@ static int condition (
 	*task = NULL;
 
 	if (busy_count < alive_nodes_count && !end_of_stdin &&
-		(*task = get_new_task ()) != NULL)
+		(*task = tasks__get_new_task ()) != NULL)
 	{
 		return 1;
 	}
@@ -757,11 +757,11 @@ static void loop (void)
 								switch (ret_codes [i]){
 									case rt_failure:
 										print_header (i);
-										delete_task_rec (node2taskid [i]);
+										tasks__delete_task_rec (node2taskid [i]);
 										printf ("\n");
 										break;
 									case rt_success:
-										delete_task (node2taskid [i], 0);
+										tasks__delete_task (node2taskid [i], 0);
 										break;
 									case rt_undef:
 										print_line (i, "?");
@@ -774,7 +774,7 @@ static void loop (void)
 								if (end_of_stdin)
 									close_all_ins ();
 							}else{
-								delete_task (node2taskid [i], 0);
+								tasks__delete_task (node2taskid [i], 0);
 							}
 
 							print_EOT (i);
@@ -1113,7 +1113,7 @@ static void free_memory (void)
 	if (ret_codes)
 		xfree (ret_codes);
 
-	destroy_tasks ();
+	tasks__destroy ();
 }
 
 int main (int argc, char **argv)

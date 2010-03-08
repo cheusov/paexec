@@ -17,14 +17,14 @@ extern int remained_tasks_count;
 /* a number of tasks with FATAL failure (e.g. connection lost) */
 extern int failed_taskids_count;
 
-void init_tasks (void);
-int add_task (char *s);
-void add_task_arc (int task_from, int task_to);
-void init__check_cycles (void);
-void delete_task (int task, int print_task);
-void delete_task_rec (int task);
-void destroy_tasks (void);
-const char *get_new_task (void);
-void mark_task_as_failed (int taskid);
+void tasks__init (void);
+int  tasks__add_task (char *s);
+void tasks__add_task_arc (int task_from, int task_to);
+void tasks__check_for_cycles (void);
+void tasks__delete_task (int task, int print_task);
+void tasks__delete_task_rec (int task);
+void tasks__destroy (void);
+const char *tasks__get_new_task (void);
+void tasks__mark_task_as_failed (int taskid);
 
 #endif // _TASKS_H_
