@@ -61,21 +61,20 @@
 static void usage (void)
 {
 	fprintf (stderr, "\
-paexec - distributes a list or a graph of tasks into CPUs or\n\
-         machines in a network.\n\
+paexec - parallel executor\n\
+         that distributes tasks over CPUs or machines in a network.\n\
 usage: paexec [OPTIONS] [files...]\n\
 OPTIONS:\n\
   -h --help                give this help\n\
   -V --version             show version\n\
 \n\
   -n --nodes <nodes|+num>  list of nodes|number of subprocesses\n\
-  -c --cmd <command>       path to command\n\
-  -t --transport <trans>   path to transport program\n\
+  -c --cmd <command>       path to a command\n\
+  -t --transport <trans>   path to a transport program\n\
 \n\
-  -r --show-node           include node (or number) to the output\n\
-  -l --show-line           include 0-based task number (input line number)\n\
-                           to the output\n\
-  -p --show-pid            include pid of subprocess to the output\n\
+  -r --show-node           include a node (or a number) to the output\n\
+  -l --show-line           include 0-based task number to the output\n\
+  -p --show-pid            include a pid of subprocess to the output\n\
 \n\
   -e --eot                 print an empty line when end-of-task is reached\n\
   -E --eot-flush           implies -e and flushes stdout\n\
@@ -94,8 +93,9 @@ OPTIONS:\n\
   -w                       wait for restoring nodes (needs -Z)\n\
 \n\
   -W                       heavier tasks are processed first, a weight\n\
-                           of task is a sum of its own weight and weight\n\
-                           of all tasks that depend on it, directly or indirectly\n\
+                           of task is a sum of its own weight and weights\n\
+                           of all tasks that depend on it,\n\
+                           directly or indirectly\n\
 \n\
   -m s=<success>\n\
   -m f=<failure>\n\
@@ -170,6 +170,8 @@ static int resistance_last_restart = 0;
 
 static int wait_mode = 0;
 
+static int use_weights = 0;
+
 static void exit_with_error (const char * routine attr_unused, const char *msg);
 
 static void close_all_ins (void)
@@ -241,11 +243,11 @@ static void init__read_poset_tasks (void)
 		if (tok_cnt == 2){
 			/* task2(to) */
 			s2 = xstrdup (tok2);
-			id2 = tasks__add_task (s2);
+			id2 = tasks__add_task (s2, 1);
 		}
 		/* task1(from) */
 		s1 = xstrdup (tok1);
-		id1 = tasks__add_task (s1);
+		id1 = tasks__add_task (s1, 1);
 
 		if (tok_cnt == 2){
 			/* (from,to) pair */
@@ -1066,6 +1068,10 @@ static void process_args (int *argc, char ***argv)
 					err_fatal (NULL, "bad argument for -m\n");
 				}
 
+				break;
+			case 'W':
+				use_weights = 1;
+				graph_mode  = 1;
 				break;
 			default:
 				usage ();

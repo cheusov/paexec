@@ -5,8 +5,6 @@
 
 /* a number of tasks */
 extern int tasks_count;
-/* numeric task id to textual representation*/
-extern char ** id2task;
 /* true "paexec -s" */
 extern int graph_mode;
 /* last read task and its id */
@@ -18,7 +16,7 @@ extern int remained_tasks_count;
 extern int failed_taskids_count;
 
 void tasks__init (void);
-int  tasks__add_task (char *s);
+int  tasks__add_task (char *s, int weight);
 void tasks__add_task_arc (int task_from, int task_to);
 void tasks__check_for_cycles (void);
 void tasks__delete_task (int task, int print_task);

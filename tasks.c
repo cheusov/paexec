@@ -50,7 +50,10 @@ int remained_tasks_count = 0;
 static hsh_HashTable tasks;
 
 int graph_mode  = 0;
-char ** id2task = NULL;
+/* numeric task id to textual representation*/
+static char ** id2task = NULL;
+/* numeric task id to weight */
+static int *id2weight = NULL;
 
 char *current_task     = NULL;
 size_t current_task_sz = 0;
@@ -139,15 +142,21 @@ void tasks__delete_task_rec (int task)
 static int get_new_task_num_from_graph (void)
 {
 	int i;
+	int best_weight = 0;
+	int best_task = -1;
 
 	for (i=1; i < tasks_count; ++i){
 		assert (tasks_graph_deg [i] >= -2);
 
-		if (tasks_graph_deg [i] == 0)
-			return i;
+		if (tasks_graph_deg [i] == 0){
+			if (id2weight [i] > best_weight){
+				best_weight = id2weight [i];
+				best_task = i;
+			}
+		}
 	}
 
-	return -1;
+	return best_task;
 }
 
 static const char * get_new_task_from_graph (void)
@@ -216,7 +225,7 @@ typedef union {
 	const void *ptr;
 } int_ptr_union_t;
 
-int tasks__add_task (char *s)
+int tasks__add_task (char *s, int weight)
 {
 	int_ptr_union_t r;
 
@@ -235,6 +244,10 @@ int tasks__add_task (char *s)
 		id2task = (char **) xrealloc (
 			id2task, tasks_count * sizeof (*id2task));
 		id2task [tasks_count-1] = s;
+
+		id2weight = (int *) xrealloc (
+			id2weight, tasks_count * sizeof (*id2weight));
+		id2weight [tasks_count-1] = weight;
 
 		deleted_tasks = (int *) xrealloc (
 			deleted_tasks, tasks_count * sizeof (*deleted_tasks));
