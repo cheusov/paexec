@@ -61,8 +61,8 @@
 static void usage (void)
 {
 	fprintf (stderr, "\
-paexec - parallel executor\n\
-         processes a list/graph of tasks in parallel\n\
+paexec - distributes a list or a graph of tasks into CPUs or\n\
+         machines in a network.\n\
 usage: paexec [OPTIONS] [files...]\n\
 OPTIONS:\n\
   -h --help                give this help\n\
@@ -84,12 +84,19 @@ OPTIONS:\n\
   -I --i2o-flush           implies -i and flushes stdout\n\
 \n\
   -s --pos\n\
-  -g --graph               graph of tasks is given on stdin\n\
+  -g --graph               graph of tasks is given on stdin, by default a list of\n\
+                           independent tasks is read from stdin\n\
 \n\
   -d --debug               debug mode, for debugging only\n\
+\n\
   -z --resistant           failed nodes are marked as dead\n\
   -Z <timeout>             timeout to restart faild command, imply -z\n\
   -w                       wait for restoring nodes (needs -Z)\n\
+\n\
+  -W                       heavier tasks are processed first, a weight\n\
+                           of task is a sum of its own weight and weight\n\
+                           of all tasks that depend on it, directly or indirectly\n\
+\n\
   -m s=<success>\n\
   -m f=<failure>\n\
   -m F=<fatal>             set alternative messages instead of default\n\
