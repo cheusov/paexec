@@ -645,3 +645,47 @@ output 3
 output 4
 output 5
 output 6
+=================================================================
+======= args: -We -c ../examples/make_package/make_package_cmd -n +1
+qt4
+success
+
+kde
+success
+
+gnome
+success
+
+mplayer
+success
+
+gcc
+success
+
+glibc
+success
+
+tcl
+success
+
+python
+success
+
+pike
+success
+
+ruby
+success
+
+pcc
+success
+
+dictd
+success
+
+runawk
+success
+
+mk-configure
+success
+

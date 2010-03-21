@@ -701,6 +701,24 @@ EOF
 
     rm -f "$test_file"
 
+    # tests for weighted nodes of graph (-W option)
+    runtest -We -c ../examples/make_package/make_package_cmd -n +1 <<EOF
+weight: gcc 10
+weight: tcl 8
+weight: glibc 9
+weight: python 7
+weight: pcc 4
+weight: dictd 3
+weight: mplayer 11
+weight: pike 6
+weight: ruby 5
+weight: gnome 12
+weight: kde 13
+weight: runawk 2
+weight: mk-configure 1
+weight: qt4 14
+EOF
+
     return 0
 }
 

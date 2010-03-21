@@ -240,6 +240,11 @@ static void init__read_poset_tasks (void)
 		if (!tok_cnt)
 			continue;
 
+		if (tok_cnt == 3 && !strcmp (tok1, "weight:")){
+			id2 = tasks__add_task (xstrdup (tok2), atoi (tok3));
+			continue;
+		}
+
 		if (tok_cnt == 2){
 			/* task2(to) */
 			s2 = xstrdup (tok2);
@@ -995,7 +1000,7 @@ static void process_args (int *argc, char ***argv)
 		{ NULL,        0, 0, 0 },
 	};
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:",
+	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W",
 							longopts, NULL),
 		   c != EOF)
 	{
