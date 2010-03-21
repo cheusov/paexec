@@ -689,3 +689,33 @@ success
 mk-configure
 success
 
+=================================================================
+======= paexec -W -d # 1
+sum_weight [pcc]=4
+sum_weight [gcc]=10
+sum_weight [tcl]=8
+sum_weight [glibc]=9
+sum_weight [python]=7
+sum_weight [dictd]=3
+sum_weight [mplayer]=11
+sum_weight [pike]=6
+sum_weight [ruby]=5
+sum_weight [gnome]=12
+sum_weight [kde]=13
+sum_weight [runawk]=2
+sum_weight [mk-configure]=1
+sum_weight [qt4]=14
+=================================================================
+======= paexec -W -d # 2
+sum_weight [pipestatus]=6
+sum_weight [pkg_status]=1
+sum_weight [pkg_summary-utils]=5
+sum_weight [dict]=16
+sum_weight [pkg_online-client]=1
+sum_weight [netcat]=2
+sum_weight [dictd]=21
+sum_weight [pkg_online-server]=1
+sum_weight [judyhash]=12
+sum_weight [runawk]=7
+sum_weight [libmaa]=49
+sum_weight [paexec]=9

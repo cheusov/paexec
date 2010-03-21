@@ -59,6 +59,61 @@ filter_succeded_tasks (){
     }'
 }
 
+test_tasks1 (){
+    cat<<EOF
+pcc
+weight: gcc 10
+weight: tcl 8
+glibc
+weight: glibc 9
+weight: python 7
+python
+weight: pcc 4
+weight: dictd 3
+weight: mplayer 11
+weight: pike 6
+weight: ruby 5
+weight: gnome 12
+gnome
+weight: kde 13
+weight: runawk 2
+weight: mk-configure 1
+weight: qt4 14
+EOF
+}
+
+test_tasks2 (){
+    cat <<EOF
+pipestatus pkg_status
+pkg_summary-utils pkg_status
+dict pkg_online-client
+pkg_summary-utils pkg_online-client
+pipestatus pkg_online-client
+netcat pkg_online-client
+dictd pkg_online-server
+pkg_summary-utils pkg_online-server
+pipestatus pkg_online-server
+judyhash
+runawk
+libmaa paexec
+libmaa dictd
+libmaa dict
+pipestatus pkg_summary-utils
+paexec pkg_summary-utils
+runawk pkg_summary-utils
+
+weight: judyhash 12
+weight: dictd 20
+weight: dict 15
+weight: pkg_summary-utils 2
+weight: runawk 2
+weight: paexec 4
+weight: libmaa 5
+weight: pkg_online-server 1
+weight: pkg_online-client 1
+EOF
+}
+
 do_test (){
     runtest -V        | cut_version
 #    runtest --version | cut_version
@@ -702,25 +757,30 @@ EOF
     rm -f "$test_file"
 
     # tests for weighted nodes of graph (-W option)
-    runtest -We -c ../examples/make_package/make_package_cmd -n +1 <<EOF
-weight: gcc 10
-weight: tcl 8
-glibc
-weight: glibc 9
-weight: python 7
-python
-weight: pcc 4
-weight: dictd 3
-weight: mplayer 11
-weight: pike 6
-weight: ruby 5
-weight: gnome 12
-gnome
-weight: kde 13
-weight: runawk 2
-weight: mk-configure 1
-weight: qt4 14
+    test_tasks1 | runtest -We -c ../examples/make_package/make_package_cmd -n +1
+    # tests for sum_weight calculation (-W option)
+#    test_tasks2 | runtest -We -c ../examples/make_package/make_package_cmd -n +1
+
+    # tests for sum_weight calculation (-W option)
+    cat <<EOF
+=================================================================
+======= paexec -W -d # 1
 EOF
+
+    test_tasks1 |
+    ${OBJDIR}/paexec -We -d -c ../examples/make_package/make_package_cmd \
+	-n +1 2>&1 | grep '^sum_weight'
+
+    # tests for sum_weight calculation (-W option)
+    cat <<EOF
+=================================================================
+======= paexec -W -d # 2
+EOF
+
+    test_tasks2 |
+    ${OBJDIR}/paexec -We -d -c ../examples/make_package/make_package_cmd \
+	-n +1 2>&1 | grep '^sum_weight'
+
 
     return 0
 }

@@ -185,6 +185,12 @@ static void close_all_ins (void)
 	}
 }
 
+static void bad_input_line (const char *line)
+{
+	fprintf (stderr, "Bad input line: %s\n", line);
+	exit_with_error (NULL, NULL);
+}
+
 static void init__read_poset_tasks (void)
 {
 	char *buf = NULL;
@@ -195,6 +201,8 @@ static void init__read_poset_tasks (void)
 	char *tok1, *tok2, *tok3;
 	int tok_cnt;
 	char *p;
+
+	char buf_copy [2000];
 
 	/* */
 	if (debug){
@@ -214,6 +222,8 @@ static void init__read_poset_tasks (void)
 			--len;
 		}
 
+		strncpy (buf_copy, buf, sizeof (buf_copy));
+
 		tok1 = tok2 = tok3 = NULL;
 		tok_cnt = 0;
 
@@ -231,7 +241,7 @@ static void init__read_poset_tasks (void)
 					tok3 = p;
 					tok_cnt = 3;
 				}else{
-					exit_with_error (NULL, "Invalid input line");
+					bad_input_line (buf_copy);
 				}
 			}
 		}
@@ -259,6 +269,8 @@ static void init__read_poset_tasks (void)
 			id1 = tasks__add_task (xstrdup (tok1), 1);
 			continue;
 		}
+
+		bad_input_line (buf_copy);
 	}
 
 	/* */
@@ -477,6 +489,11 @@ static void init (void)
 	/**/
 	tasks__check_for_cycles ();
 
+	/**/
+	tasks__make_sum_weights ();
+	if (debug)
+		tasks__print_sum_weights ();
+
 	/* in/out */
 	init__child_processes ();
 
@@ -524,7 +541,9 @@ static void exit_with_error (const char * routine attr_unused, const char *msg)
 
 	fflush (stdout);
 	/*	err_fatal (routine, msg);*/
-	fprintf (stderr, "%s\n", msg);
+	if (msg)
+		fprintf (stderr, "%s\n", msg);
+
 	exit (1);
 }
 

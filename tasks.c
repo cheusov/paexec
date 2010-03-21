@@ -54,6 +54,7 @@ int graph_mode  = 0;
 static char ** id2task = NULL;
 /* numeric task id to weight */
 static int *id2weight = NULL;
+static int *id2sum_weight = NULL;
 
 char *current_task     = NULL;
 size_t current_task_sz = 0;
@@ -76,6 +77,11 @@ void tasks__destroy (void)
 
 	if (deleted_tasks)
 		xfree (deleted_tasks);
+
+	if (id2weight)
+		xfree (id2weight);
+	if (id2sum_weight)
+		xfree (id2sum_weight);
 }
 
 void tasks__delete_task (int task, int print_task)
@@ -149,8 +155,8 @@ static int get_new_task_num_from_graph (void)
 		assert (tasks_graph_deg [i] >= -2);
 
 		if (tasks_graph_deg [i] == 0){
-			if (id2weight [i] > best_weight){
-				best_weight = id2weight [i];
+			if (id2sum_weight [i] > best_weight){
+				best_weight = id2sum_weight [i];
 				best_task = i;
 			}
 		}
@@ -232,8 +238,10 @@ int tasks__add_task (char *s, int weight)
 	r.integer = 0;
 	r.ptr = hsh_retrieve (tasks, s);
 	if (r.ptr){
-		if (id2weight [r.integer] < weight)
-			id2weight [r.integer] = weight;
+		if (id2weight [r.integer] < weight){
+			id2weight     [r.integer] = weight;
+			id2sum_weight [r.integer] = weight;
+		}
 		return r.integer;
 	}else{
 		r.ptr = NULL;
@@ -250,6 +258,10 @@ int tasks__add_task (char *s, int weight)
 		id2weight = (int *) xrealloc (
 			id2weight, tasks_count * sizeof (*id2weight));
 		id2weight [tasks_count-1] = weight;
+
+		id2sum_weight = (int *) xrealloc (
+			id2sum_weight, tasks_count * sizeof (*id2sum_weight));
+		id2sum_weight [tasks_count-1] = weight;
 
 		deleted_tasks = (int *) xrealloc (
 			deleted_tasks, tasks_count * sizeof (*deleted_tasks));
@@ -352,7 +364,7 @@ void tasks__check_for_cycles (void)
 		tasks_count * sizeof (check_cycles__mark [0]));
 
 	/* */
-	for (i=0; i < tasks_count; ++i){
+	for (i=1; i < tasks_count; ++i){
 		switch (check_cycles__mark [i]){
 			case 0:
 				check_cycles__stack [0] = i;
@@ -367,4 +379,88 @@ void tasks__check_for_cycles (void)
 
 	xfree (check_cycles__mark);
 	xfree (check_cycles__stack);
+}
+
+static int *tasks_seen;
+static int curr_leaf_node;
+
+static void add_weight_rec (int task_id, int accu)
+{
+	/* add accu to all parents' m_id2sum_weight but only once */
+
+	int i;
+	int id;
+	int temp_accu;
+
+	if (!tasks_seen [task_id])
+		tasks_seen [task_id] = curr_leaf_node;
+
+	for (i=0; i < arcs_count; ++i){
+		if (arcs_to [i] == task_id){
+			id = arcs_from [i];
+
+			if (tasks_seen [id] == curr_leaf_node)
+				continue;
+
+//			fprintf (stderr, " sum_weight [%s] += %d\n", id2task [id], accu);
+			id2sum_weight [id] += accu;
+
+			if (tasks_seen [id])
+				temp_accu = accu;
+			else
+				temp_accu = accu + id2weight [id];
+
+			add_weight_rec (id, temp_accu);
+		}
+	}
+
+	tasks_seen [task_id] = curr_leaf_node;
+}
+
+void tasks__make_sum_weights (void)
+{
+	int j;
+	int leaf = 0;
+	size_t seen_arr_sz;
+
+	if (!graph_mode)
+		return;
+
+	seen_arr_sz = tasks_count * sizeof (*tasks_seen);
+	tasks_seen = (int *) xmalloc (seen_arr_sz);
+	memset (tasks_seen, 0, seen_arr_sz);
+
+	for (curr_leaf_node=1; curr_leaf_node < tasks_count; ++curr_leaf_node){
+		/* leaf node? */
+		leaf = 1;
+
+		for (j=0; j < arcs_count; ++j){
+			if (arcs_from [j] == curr_leaf_node){
+				leaf = 0;
+				break;
+			}
+		}
+
+		if (!leaf)
+			continue;
+
+		/* yes */
+//		fprintf (stderr, "-%s:\n", id2task [curr_leaf_node]);
+		add_weight_rec (curr_leaf_node, id2sum_weight [curr_leaf_node]);
+	}
+
+	xfree (tasks_seen);
+}
+
+void tasks__print_sum_weights (void)
+{
+	int i;
+
+	if (!graph_mode)
+		return;
+
+	for (i=1; i < tasks_count; ++i){
+		fprintf (stderr, "weight [%s]=%d\n", id2task [i], id2weight [i]);
+		fprintf (stderr, "sum_weight [%s]=%d\n", id2task [i], id2sum_weight [i]);
+	}
 }
