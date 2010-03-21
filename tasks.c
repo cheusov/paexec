@@ -232,6 +232,8 @@ int tasks__add_task (char *s, int weight)
 	r.integer = 0;
 	r.ptr = hsh_retrieve (tasks, s);
 	if (r.ptr){
+		if (id2weight [r.integer] < weight)
+			id2weight [r.integer] = weight;
 		return r.integer;
 	}else{
 		r.ptr = NULL;

@@ -191,7 +191,6 @@ static void init__read_poset_tasks (void)
 	size_t len = 0;
 
 	int id1, id2;
-	char *s1, *s2;
 
 	char *tok1, *tok2, *tok3;
 	int tok_cnt;
@@ -241,22 +240,24 @@ static void init__read_poset_tasks (void)
 			continue;
 
 		if (tok_cnt == 3 && !strcmp (tok1, "weight:")){
+			/* weight: <task> <weight> */
 			id2 = tasks__add_task (xstrdup (tok2), atoi (tok3));
 			continue;
 		}
 
 		if (tok_cnt == 2){
-			/* task2(to) */
-			s2 = xstrdup (tok2);
-			id2 = tasks__add_task (s2, 1);
-		}
-		/* task1(from) */
-		s1 = xstrdup (tok1);
-		id1 = tasks__add_task (s1, 1);
+			/* <task-from> <task-to> */
+			id2 = tasks__add_task (xstrdup (tok2), 1);
+			id1 = tasks__add_task (xstrdup (tok1), 1);
 
-		if (tok_cnt == 2){
-			/* (from,to) pair */
 			tasks__add_task_arc (id1, id2);
+			continue;
+		}
+
+		if (tok_cnt == 1){
+			/* <task> */
+			id1 = tasks__add_task (xstrdup (tok1), 1);
+			continue;
 		}
 	}
 

@@ -705,14 +705,17 @@ EOF
     runtest -We -c ../examples/make_package/make_package_cmd -n +1 <<EOF
 weight: gcc 10
 weight: tcl 8
+glibc
 weight: glibc 9
 weight: python 7
+python
 weight: pcc 4
 weight: dictd 3
 weight: mplayer 11
 weight: pike 6
 weight: ruby 5
 weight: gnome 12
+gnome
 weight: kde 13
 weight: runawk 2
 weight: mk-configure 1
