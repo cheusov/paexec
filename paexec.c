@@ -247,8 +247,8 @@ static void init__read_poset_tasks (void)
 
 		if (tok_cnt == 2){
 			/* <task-from> <task-to> */
-			id2 = tasks__add_task (xstrdup (tok2), 1);
 			id1 = tasks__add_task (xstrdup (tok1), 1);
+			id2 = tasks__add_task (xstrdup (tok2), 1);
 
 			tasks__add_task_arc (id1, id2);
 			continue;
