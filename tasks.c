@@ -303,12 +303,13 @@ static int *check_cycles__mark;
 
 static void check_cycles__outgoing (int stack_sz)
 {
-	assert (stack_sz > 0);
-
-	int from = check_cycles__stack [stack_sz-1];
 	int i, j;
 	int s, t;
 	int loop;
+	int to;
+	int from = check_cycles__stack [stack_sz-1];
+
+	assert (stack_sz > 0);
 
 	assert (check_cycles__mark [from] == 0);
 	check_cycles__mark [from] = 2; /* currently in the path */
@@ -319,7 +320,7 @@ static void check_cycles__outgoing (int stack_sz)
 
 		assert (stack_sz < tasks_count);
 
-		int to = arcs_to [i];
+		to = arcs_to [i];
 		check_cycles__stack [stack_sz] = to;
 
 		switch (check_cycles__mark [to]){
