@@ -22,7 +22,7 @@ struct option {
 };
 
 #define getopt_long(argc, argv, shrt_opts, long_opts, index) \
-	(long_opts != NULL ? getopt(argc, argv, shrt_opts) : -1)
+	getopt(argc, argv, shrt_opts)
 
 #endif /* endof __linux__ */
 
