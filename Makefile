@@ -31,6 +31,8 @@ SRCS=		paexec.c wrappers.c tasks.c
 
 LDADD+=		$(MAALIB)
 
+CFLAGS+=	-D_GNU_SOURCE # for glibc-based systems
+
 CFLAGS+=	-DPAEXEC_VERSION='"${VERSION}"'
 CFLAGS+=	-DBUFSIZE=${BUFSIZE}
 
