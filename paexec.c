@@ -991,7 +991,7 @@ static void split_nodes (void)
 static void process_args (int *argc, char ***argv)
 {
 	int c;
-
+#ifdef HAVE_GETOPT_LONG
 	struct option longopts [] = {
 		{ "help",      0, 0, 'h' },
 		{ "version",   0, 0, 'V' },
@@ -1019,9 +1019,15 @@ static void process_args (int *argc, char ***argv)
 
 		{ NULL,        0, 0, 0 },
 	};
+#endif
 
-	while (c = getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W",
+	while (c =
+#ifdef HAVE_GETOPT_LONG
+	       getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W",
 							longopts, NULL),
+#else
+	       getopt (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W"),
+#endif
 		   c != EOF)
 	{
 		switch (c) {
