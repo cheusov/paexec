@@ -38,6 +38,8 @@ CFLAGS+=	-DBUFSIZE=${BUFSIZE}
 
 MKCATPAGES?=	no
 
+all:	paexec.1
+
 ############################################################
 .PHONY: installdirs
 installdirs:
