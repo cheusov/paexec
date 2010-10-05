@@ -38,8 +38,10 @@
 
 static int *deleted_tasks = NULL;
 
-static int *arcs_from = NULL;
-static int *arcs_to   = NULL;
+//static int *arcs_from = NULL;
+//static int *arcs_to   = NULL;
+static lst_List *arcs_outg = NULL;
+static lst_List *arcs_inco = NULL;
 static int arcs_count = 0;
 
 static int *tasks_graph_deg = NULL;
@@ -86,7 +88,9 @@ void tasks__destroy (void)
 
 void tasks__delete_task (int task, int print_task)
 {
-	int i, to;
+	int to;
+	lst_Position p;
+	void *e;
 
 	assert (task < tasks_count);
 	assert (task >= 0);
@@ -99,12 +103,10 @@ void tasks__delete_task (int task, int print_task)
 	}
 
 	if (graph_mode){
-		for (i=0; i < arcs_count; ++i){
-			to = arcs_to [i];
-			if (arcs_from [i] == task){
-				if (tasks_graph_deg [to] > 0)
-					--tasks_graph_deg [to];
-			}
+		LST_ITERATE (arcs_outg [task], p, e){
+			to = (int) e;
+			if (tasks_graph_deg [to] > 0)
+				--tasks_graph_deg [to];
 		}
 
 		if (tasks_graph_deg [task] >= -1){
@@ -124,17 +126,17 @@ void tasks__delete_task (int task, int print_task)
 
 static void delete_task_rec2 (int task)
 {
-	int i, to;
+	int to;
+	lst_Position p;
+	void *e;
 
 	assert (task >= 0);
 
 	tasks__delete_task (task, 1);
 
-	for (i=0; i < arcs_count; ++i){
-		if (arcs_from [i] == task){
-			to = arcs_to [i];
-			delete_task_rec2 (to);
-		}
+	LST_ITERATE (arcs_outg [task], p, e){
+		to = (int) e;
+		delete_task_rec2 (to);
 	}
 }
 
@@ -251,6 +253,14 @@ int tasks__add_task (char *s, int weight)
 		++tasks_count;
 		++remained_tasks_count;
 
+		arcs_outg = (lst_List *) xrealloc (
+			arcs_outg, tasks_count * sizeof (*arcs_outg));
+		arcs_outg [tasks_count-1] = lst_create ();
+
+		arcs_inco = (lst_List *) xrealloc (
+			arcs_inco, tasks_count * sizeof (*arcs_inco));
+		arcs_inco [tasks_count-1] = lst_create ();
+
 		id2task = (char **) xrealloc (
 			id2task, tasks_count * sizeof (*id2task));
 		id2task [tasks_count-1] = s;
@@ -278,13 +288,15 @@ int tasks__add_task (char *s, int weight)
 void tasks__add_task_arc (int task_from, int task_to)
 {
 	++arcs_count;
-	arcs_from = (int *) xrealloc (arcs_from,
-								  arcs_count * sizeof (*arcs_from));
-	arcs_to = (int *) xrealloc (arcs_to,
-								arcs_count * sizeof (*arcs_to));
+	lst_append (arcs_outg [task_from], (void *) task_to);
+	lst_append (arcs_inco [task_to],   (void *) task_from);
+//	arcs_from = (int *) xrealloc (arcs_from,
+//								  arcs_count * sizeof (*arcs_from));
+//	arcs_to = (int *) xrealloc (arcs_to,
+//								arcs_count * sizeof (*arcs_to));
 
-	arcs_from [arcs_count-1] = task_from;
-	arcs_to [arcs_count-1]   = task_to;
+//	arcs_from [arcs_count-1] = task_from;
+//	arcs_to [arcs_count-1]   = task_to;
 
 	++tasks_graph_deg [task_to];
 }
@@ -303,24 +315,23 @@ static int *check_cycles__mark;
 
 static void check_cycles__outgoing (int stack_sz)
 {
-	int i, j;
+	int j;
 	int s, t;
 	int loop;
 	int to;
 	int from = check_cycles__stack [stack_sz-1];
+	lst_Position p;
+	void *e;
 
 	assert (stack_sz > 0);
 
 	assert (check_cycles__mark [from] == 0);
 	check_cycles__mark [from] = 2; /* currently in the path */
 
-	for (i=0; i < arcs_count; ++i){
-		if (arcs_from [i] != from)
-			continue;
-
+	LST_ITERATE (arcs_outg [from], p, e){
+		to = (int) e;
 		assert (stack_sz < tasks_count);
 
-		to = arcs_to [i];
 		check_cycles__stack [stack_sz] = to;
 
 		switch (check_cycles__mark [to]){
@@ -382,75 +393,45 @@ void tasks__check_for_cycles (void)
 	xfree (check_cycles__stack);
 }
 
-static int *tasks_seen;
-static int curr_leaf_node;
+static char *seen = NULL;
 
-static void add_weight_rec (int task_id, int accu)
+static void tasks__make_sum_weights_rec (int *accu_w, int task)
 {
-	/* add accu to all parents' m_id2sum_weight but only once */
+	lst_Position p;
+	void *e;
+	int to;
 
-	int i;
-	int id;
-	int temp_accu;
-
-	if (!tasks_seen [task_id])
-		tasks_seen [task_id] = curr_leaf_node;
-
-	for (i=0; i < arcs_count; ++i){
-		if (arcs_to [i] == task_id){
-			id = arcs_from [i];
-
-			if (tasks_seen [id] == curr_leaf_node)
-				continue;
-
-//			fprintf (stderr, " sum_weight [%s] += %d\n", id2task [id], accu);
-			id2sum_weight [id] += accu;
-
-			if (tasks_seen [id])
-				temp_accu = accu;
-			else
-				temp_accu = accu + id2weight [id];
-
-			add_weight_rec (id, temp_accu);
-		}
+	*accu_w += id2weight [task];
+	seen [task] = 1;
+	LST_ITERATE (arcs_outg [task], p, e){
+		to = (int) e;
+		if (!seen [to])
+			tasks__make_sum_weights_rec (accu_w, to);
 	}
-
-	tasks_seen [task_id] = curr_leaf_node;
 }
 
 void tasks__make_sum_weights (void)
 {
-	int j;
-	int leaf = 0;
-	size_t seen_arr_sz;
+	lst_Position p;
+	void *e;
+	int to;
+	int i;
 
 	if (!graph_mode)
 		return;
 
-	seen_arr_sz = tasks_count * sizeof (*tasks_seen);
-	tasks_seen = (int *) xmalloc (seen_arr_sz);
-	memset (tasks_seen, 0, seen_arr_sz);
+	seen = (char *) xmalloc (tasks_count);
 
-	for (curr_leaf_node=1; curr_leaf_node < tasks_count; ++curr_leaf_node){
-		/* leaf node? */
-		leaf = 1;
+	for (i=1; i < tasks_count; ++i){
+		memset (seen, 0, tasks_count);
 
-		for (j=0; j < arcs_count; ++j){
-			if (arcs_from [j] == curr_leaf_node){
-				leaf = 0;
-				break;
-			}
+		LST_ITERATE (arcs_outg [i], p, e){
+			to = (int) e;
+			tasks__make_sum_weights_rec (&id2sum_weight [i], to);
 		}
-
-		if (!leaf)
-			continue;
-
-		/* yes */
-//		fprintf (stderr, "-%s:\n", id2task [curr_leaf_node]);
-		add_weight_rec (curr_leaf_node, id2sum_weight [curr_leaf_node]);
 	}
 
-	xfree (tasks_seen);
+//	xfree (seen);
 }
 
 void tasks__print_sum_weights (void)
