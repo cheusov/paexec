@@ -27,9 +27,11 @@
 #include "config.h"
 #endif
 
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include <maa.h>
 
@@ -104,7 +106,7 @@ void tasks__delete_task (int task, int print_task)
 
 	if (graph_mode){
 		LST_ITERATE (arcs_outg [task], p, e){
-			to = (int) e;
+			to = (int) (intptr_t) e;
 			if (tasks_graph_deg [to] > 0)
 				--tasks_graph_deg [to];
 		}
@@ -135,7 +137,7 @@ static void delete_task_rec2 (int task)
 	tasks__delete_task (task, 1);
 
 	LST_ITERATE (arcs_outg [task], p, e){
-		to = (int) e;
+		to = (int) (intptr_t) e;
 		delete_task_rec2 (to);
 	}
 }
@@ -288,8 +290,8 @@ int tasks__add_task (char *s, int weight)
 void tasks__add_task_arc (int task_from, int task_to)
 {
 	++arcs_count;
-	lst_append (arcs_outg [task_from], (void *) task_to);
-	lst_append (arcs_inco [task_to],   (void *) task_from);
+	lst_append (arcs_outg [task_from], (void *) (intptr_t) task_to);
+	lst_append (arcs_inco [task_to],   (void *) (intptr_t) task_from);
 //	arcs_from = (int *) xrealloc (arcs_from,
 //								  arcs_count * sizeof (*arcs_from));
 //	arcs_to = (int *) xrealloc (arcs_to,
@@ -329,7 +331,7 @@ static void check_cycles__outgoing (int stack_sz)
 	check_cycles__mark [from] = 2; /* currently in the path */
 
 	LST_ITERATE (arcs_outg [from], p, e){
-		to = (int) e;
+		to = (int) (intptr_t) e;
 		assert (stack_sz < tasks_count);
 
 		check_cycles__stack [stack_sz] = to;
@@ -404,7 +406,7 @@ static void tasks__make_sum_weights_rec (int *accu_w, int task)
 	*accu_w += id2weight [task];
 	seen [task] = 1;
 	LST_ITERATE (arcs_outg [task], p, e){
-		to = (int) e;
+		to = (int) (intptr_t) e;
 		if (!seen [to])
 			tasks__make_sum_weights_rec (accu_w, to);
 	}
@@ -426,7 +428,7 @@ void tasks__make_sum_weights (void)
 		memset (seen, 0, tasks_count);
 
 		LST_ITERATE (arcs_outg [i], p, e){
-			to = (int) e;
+			to = (int) (intptr_t) e;
 			tasks__make_sum_weights_rec (&id2sum_weight [i], to);
 		}
 	}

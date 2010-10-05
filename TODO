@@ -1,3 +1,5 @@
+-N for getting servers from a file
+
 -w option for resorting tasks according to their weights (weights of
  their subtrees). This is for reducing idle time at the end of
  processing.
