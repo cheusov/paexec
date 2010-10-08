@@ -1,5 +1,10 @@
 #!/bin/sh
 
+#EXEPREFIX='valgrind -q'
+#EXEPREFIX='env EF_PROTECT_BELOW=1 ef'
+
+DIFF_PROG=${DIFF_PROG-diff -U10}
+
 print_header (){
     printf '=================================================================\n'
     printf '======= args: %s\n' "$*" | cut_full_path_closed_stdin
@@ -7,12 +12,12 @@ print_header (){
 
 runtest (){
     print_header "$@"
-    $OBJDIR/paexec "$@" 2>&1
+    $EXEPREFIX $OBJDIR/paexec "$@" 2>&1
 }
 
 runtest_resort (){
     print_header "$@"
-    $OBJDIR/paexec "$@" 2>&1 | resort
+    $EXEPREFIX $OBJDIR/paexec "$@" 2>&1 | resort
 }
 
 cut_version (){
@@ -219,7 +224,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c ../examples/make_package/make_package_cmd -n +2 \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c ../examples/make_package/make_package_cmd -n +2 \
 	> $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -244,7 +249,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' \
 	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -269,7 +274,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' \
 	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -294,7 +299,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' \
 	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -319,7 +324,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -343,7 +348,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' \
 	-n +2 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -367,7 +372,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' \
 	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -391,7 +396,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' \
 	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -415,7 +420,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5 \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5 \
 	> $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -440,7 +445,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -465,7 +470,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -488,7 +493,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' \
+    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -519,7 +524,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s \
+    $EXEPREFIX $OBJDIR/paexec -l -s \
 	-c '../examples/make_package/make_package_cmd__xxx_failed "gmake|autoconf"' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
@@ -552,7 +557,7 @@ EOF
 ======= make package test!!!
 EOF
 
-    $OBJDIR/paexec -l -s \
+    $EXEPREFIX $OBJDIR/paexec -l -s \
 	-c '../examples/make_package/make_package_cmd__xxx_failed flex' \
 	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks2
 
@@ -711,7 +716,7 @@ dat5
 dat6
 EOF
 
-    ${OBJDIR}/paexec -s -z -lr -t ../tests/transport_broken_rnd -c : \
+    $EXEPREFIX ${OBJDIR}/paexec -s -z -lr -t ../tests/transport_broken_rnd -c : \
 	-n '0.1 0.15 0.2 0.25 0.3 0' < $OBJDIR/_test.in |
     filter_succeded_tasks | sort -n
 
@@ -725,7 +730,7 @@ EOF
 EOF
 
     awk 'BEGIN {for (i=1; i <= 1000; ++i) {print "dat" i}}' |
-    ${OBJDIR}/paexec -s -z -lr -t ../tests/transport_broken_rnd -c : \
+    $EXEPREFIX ${OBJDIR}/paexec -s -z -lr -t ../tests/transport_broken_rnd -c : \
 	-n '0.01-ns 0.03-ns 0.09-ns 0.09-ns 0.03-ns 0-ns' |
     filter_succeded_tasks | sort -n | cksum
 
@@ -750,7 +755,7 @@ EOF
 
     rm -f "$test_file"
 
-    ${OBJDIR}/paexec -Z1 -s -n '1 2' -c: \
+    $EXEPREFIX ${OBJDIR}/paexec -Z1 -s -n '1 2' -c: \
 	-t "../examples/broken_echo/transport_broken_echo2 $test_file" \
 	< $OBJDIR/_tasks.tmp | grep output | sort
 
@@ -768,7 +773,7 @@ EOF
 EOF
 
     test_tasks1 |
-    ${OBJDIR}/paexec -We -d -c ../examples/make_package/make_package_cmd \
+    $EXEPREFIX ${OBJDIR}/paexec -We -d -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight'
 
     # tests for sum_weight calculation (-W option)
@@ -778,7 +783,7 @@ EOF
 EOF
 
     test_tasks2 |
-    ${OBJDIR}/paexec -We -d -c ../examples/make_package/make_package_cmd \
+    $EXEPREFIX ${OBJDIR}/paexec -We -d -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight'
 
 
@@ -790,7 +795,7 @@ for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
     export PAEXEC_BUFSIZE
 
     if do_test > $OBJDIR/_test.res 2>&1 &&
-	diff -C10 test.out $OBJDIR/_test.res
+	${DIFF_PROG} test.out $OBJDIR/_test.res
     then
 	true
     else
