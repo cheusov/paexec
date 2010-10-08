@@ -1393,7 +1393,6 @@ sum_weight [pkg_online-server]=1
 sum_weight [judyhash]=12
 sum_weight [runawk]=7
 sum_weight [libmaa]=49
-
 sum_weight [paexec]=9
 '
 
