@@ -40,8 +40,6 @@
 
 static int *deleted_tasks = NULL;
 
-//static int *arcs_from = NULL;
-//static int *arcs_to   = NULL;
 static lst_List *arcs_outg = NULL;
 static lst_List *arcs_inco = NULL;
 static int arcs_count = 0;
@@ -292,13 +290,6 @@ void tasks__add_task_arc (int task_from, int task_to)
 	++arcs_count;
 	lst_append (arcs_outg [task_from], (void *) (intptr_t) task_to);
 	lst_append (arcs_inco [task_to],   (void *) (intptr_t) task_from);
-//	arcs_from = (int *) xrealloc (arcs_from,
-//								  arcs_count * sizeof (*arcs_from));
-//	arcs_to = (int *) xrealloc (arcs_to,
-//								arcs_count * sizeof (*arcs_to));
-
-//	arcs_from [arcs_count-1] = task_from;
-//	arcs_to [arcs_count-1]   = task_to;
 
 	++tasks_graph_deg [task_to];
 }
@@ -433,7 +424,7 @@ void tasks__make_sum_weights (void)
 		}
 	}
 
-//	xfree (seen);
+	xfree (seen);
 }
 
 void tasks__print_sum_weights (void)
