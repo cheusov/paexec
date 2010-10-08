@@ -1396,6 +1396,48 @@ sum_weight [libmaa]=49
 sum_weight [paexec]=9
 '
 
+    # tests for sum_weight calculation (-W option)
+    test_tasks2 |
+    runtest -We -c ../examples/make_package/make_package_cmd -n +1 2>&1 |
+    cmp 'paexec -W #4' \
+'libmaa
+success
+
+dictd
+success
+
+dict
+success
+
+judyhash
+success
+
+paexec
+success
+
+runawk
+success
+
+pipestatus
+success
+
+pkg_summary-utils
+success
+
+netcat
+success
+
+pkg_status
+success
+
+pkg_online-client
+success
+
+pkg_online-server
+success
+
+'
+
     test -f $tmpex
     return $?
 }
