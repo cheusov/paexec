@@ -294,8 +294,10 @@ static void init__child_processes (void)
 		if (pids [i] != (pid_t) -1)
 			continue;
 
-		if (!buf_out [i])
-			buf_out [i] = xmalloc (initial_bufsize);
+		if (!buf_out [i]){
+			/* +1 for \0 and -d option */
+			buf_out [i] = xmalloc (initial_bufsize+1);
+		}
 		if (!bufsize_out [i])
 			bufsize_out [i] = initial_bufsize;
 
@@ -873,7 +875,9 @@ static void loop (void)
 
 				if (size_out [i] == bufsize_out [i]){
 					bufsize_out [i] *= 2;
-					buf_out [i] = xrealloc (buf_out [i], bufsize_out [i]);
+
+					/* +1 for \0 and -d option */
+					buf_out [i] = xrealloc (buf_out [i], bufsize_out [i]+1);
 				}
 			}
 		}
