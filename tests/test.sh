@@ -5,11 +5,6 @@
 
 DIFF_PROG=${DIFF_PROG-diff -U10}
 
-print_header (){
-    printf '=================================================================\n'
-    printf '======= args: %s\n' "$*" | cut_full_path_closed_stdin
-}
-
 runtest (){
     $EXEPREFIX $OBJDIR/paexec "$@" 2>&1
 }
@@ -133,17 +128,6 @@ test_tasks3 (){
 EOF
 }
 
-test_tasks4 (){
-    cat <<'EOF'
-task-2 task-1
-task-1 task0
-task0 task10
-task10 task20
-task20 task30
-task30 task10
-EOF
-}
-
 tmpdir="/tmp/paexec-test.$$"
 mkdir -m 0700 "$tmpdir" || exit 60
 
@@ -159,7 +143,7 @@ echo > $tmpex
 cmp (){
     # $1 - progress message
     # $2 - expected text
-    printf '%s... ' "$1" 1>&2
+    printf '    %s... ' "$1" 1>&2
 
     cat > "$tmpfn2"
     printf '%s' "$2" > "$tmpfn1"
@@ -951,7 +935,13 @@ ok
 '
 
     # cycle detection2
-    test_tasks4 | runtest -l -s \
+    printf 'task-2 task-1
+task-1 task0
+task0 task10
+task10 task20
+task20 task30
+task30 task10
+' | runtest -l -s \
 	-c ../examples/make_package/make_package_cmd \
 	-n +5 |
     cmp 'paexec cyclic deps #2' \
@@ -1403,6 +1393,7 @@ sum_weight [pkg_online-server]=1
 sum_weight [judyhash]=12
 sum_weight [runawk]=7
 sum_weight [libmaa]=49
+
 sum_weight [paexec]=9
 '
 
@@ -1410,13 +1401,9 @@ sum_weight [paexec]=9
     return $?
 }
 
-for PAEXEC_BUFSIZE in 5; do # 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
+for PAEXEC_BUFSIZE in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
     printf "PAEXEC_BUFSIZE=%d:\n" $PAEXEC_BUFSIZE
     export PAEXEC_BUFSIZE
 
-    if do_test; then
-	:
-    else
-	exit 1
-    fi
+    do_test || exit
 done

@@ -70,8 +70,8 @@ test : paexec ${.OBJDIR}/transport_closed_stdin; \
 	@echo 'running tests...'; \
 	export OBJDIR=${.OBJDIR}; \
 	if cd ${.CURDIR}/tests && ./test.sh; \
-	then echo '   succeeded'; \
-	else echo '   failed'; false; \
+	then echo 'SUCCEEDED'; \
+	else echo 'FAILED'; false; \
 	fi
 
 ############################################################
