@@ -11,12 +11,10 @@ print_header (){
 }
 
 runtest (){
-#    print_header "$@"
     $EXEPREFIX $OBJDIR/paexec "$@" 2>&1
 }
 
 runtest_resort (){
-#    print_header "$@"
     $EXEPREFIX $OBJDIR/paexec "$@" 2>&1 | resort
 }
 
@@ -467,7 +465,7 @@ usage: paexec [OPTIONS] [files...]
     cmp 'test 160' ''
 
     # -s: all succeeded
-    $EXEPREFIX $OBJDIR/paexec -l -s -c ../examples/make_package/make_package_cmd -n +2 \
+    runtest -l -s -c ../examples/make_package/make_package_cmd -n +2 \
 	> $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -502,7 +500,7 @@ ok100
 '
 
     # -s: byacc fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' \
 	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -536,7 +534,7 @@ ok100
 '
 
     # -s: flex fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' \
 	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -570,7 +568,7 @@ ok100
 '
 
     # -s: libmaa fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' \
 	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -604,7 +602,7 @@ ok100
 '
 
     # -s: m4 fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -636,7 +634,7 @@ ok100
 '
 
     # -s: libjudy fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' \
 	-n +2 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -669,7 +667,7 @@ ok100
 '
 
     # -s: dictem fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' \
 	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -702,7 +700,7 @@ ok100
 '
 
     # -s: glib2 fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' \
 	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -735,7 +733,7 @@ ok100
 '
 
     # -s: gmake fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5 \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5 \
 	> $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -768,7 +766,7 @@ ok100
 '
 
     # -s: autoconf fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -802,7 +800,7 @@ ok100
 '
 
     # -s: dict-server fails
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -833,7 +831,7 @@ ok100
 '
 
     # -s: flex and byacc fail
-    $EXEPREFIX $OBJDIR/paexec -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' \
+    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
     {
@@ -874,7 +872,7 @@ ok100
 '
 
     # -s: gmake and autoconf fail
-    $EXEPREFIX $OBJDIR/paexec -l -s \
+    runtest -l -s \
 	-c '../examples/make_package/make_package_cmd__xxx_failed "gmake|autoconf"' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
 
@@ -918,7 +916,7 @@ ok100
 '
 
     # diamond-like dependancy and failure
-    $EXEPREFIX $OBJDIR/paexec -l -s \
+    runtest -l -s \
 	-c '../examples/make_package/make_package_cmd__xxx_failed flex' \
 	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks2
 
@@ -1265,7 +1263,7 @@ dat5
 dat6
 EOF
 
-    $EXEPREFIX ${OBJDIR}/paexec -s -z -lr -t ../tests/transport_broken_rnd -c : \
+    runtest -s -z -lr -t ../tests/transport_broken_rnd -c : \
 	-n '0.1 0.15 0.2 0.25 0.3 0' < $OBJDIR/_test.in |
     filter_succeded_tasks | sort -n |
     cmp 'test 430' \
@@ -1283,7 +1281,7 @@ EOF
 
     # resistance to transport failure
     awk 'BEGIN {for (i=1; i <= 1000; ++i) {print "dat" i}}' |
-    $EXEPREFIX ${OBJDIR}/paexec -s -z -lr -t ../tests/transport_broken_rnd -c : \
+    runtest -s -z -lr -t ../tests/transport_broken_rnd -c : \
 	-n '0.01-ns 0.03-ns 0.09-ns 0.09-ns 0.03-ns 0-ns' |
     filter_succeded_tasks | sort -n | cksum |
     cmp 'test 440' \
@@ -1304,7 +1302,7 @@ EOF
 
     rm -f "$test_file"
 
-    $EXEPREFIX ${OBJDIR}/paexec -Z1 -s -n '1 2' -c: \
+    runtest -Z1 -s -n '1 2' -c: \
 	-t "../examples/broken_echo/transport_broken_echo2 $test_file" \
 	< $OBJDIR/_tasks.tmp | grep output | sort |
     cmp 'test 450' \
@@ -1368,10 +1366,9 @@ success
 
     # tests for sum_weight calculation (-W option)
 #    test_tasks2 | runtest -We -c ../examples/make_package/make_package_cmd -n +1
-
     # tests for sum_weight calculation (-W option)
     test_tasks1 |
-    $EXEPREFIX ${OBJDIR}/paexec -We -d -c ../examples/make_package/make_package_cmd \
+    runtest -We -d -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'test 470' \
 'sum_weight [pcc]=4
@@ -1392,7 +1389,7 @@ sum_weight [qt4]=14
 
     # tests for sum_weight calculation (-W option)
     test_tasks2 |
-    $EXEPREFIX ${OBJDIR}/paexec -We -d -c ../examples/make_package/make_package_cmd \
+    runtest -We -d -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'test 480' \
 'sum_weight [pipestatus]=6
@@ -1408,7 +1405,6 @@ sum_weight [runawk]=7
 sum_weight [libmaa]=49
 sum_weight [paexec]=9
 '
-
 
     test -f $tmpex
     return $?
