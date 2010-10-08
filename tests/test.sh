@@ -175,22 +175,22 @@ cmp (){
 
 do_test (){
     runtest -V | cut_version |
-cmp 'runtest -V' 'paexec x.y.x written by Aleksey Cheusov
+cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov
 '
 
 #    runtest --version | cut_version
     runtest --version | cut_version |
-cmp 'runtest --version' 'paexec x.y.x written by Aleksey Cheusov
+cmp 'paexec --version' 'paexec x.y.x written by Aleksey Cheusov
 '
 
     runtest -h 2>&1 | cut_help |
-cmp 'runtest -h' 'paexec - parallel executor
+cmp 'paexec -h' 'paexec - parallel executor
          that distributes tasks over CPUs or machines in a network.
 usage: paexec [OPTIONS] [files...]
 '
 
     runtest --help 2>&1 | cut_help |
-cmp 'runtest --help' 'paexec - parallel executor
+cmp 'paexec --help' 'paexec - parallel executor
          that distributes tasks over CPUs or machines in a network.
 usage: paexec [OPTIONS] [files...]
 '
@@ -199,7 +199,7 @@ usage: paexec [OPTIONS] [files...]
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -t ./paexec_notransport -c ../examples/toupper/toupper_cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
-    cmp 'test 10' \
+    cmp 'paexec toupper #1' \
 '1 A
 2 BB
 3 CCC
@@ -212,7 +212,7 @@ usage: paexec [OPTIONS] [files...]
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -t '' -c ../examples/toupper/toupper_cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
-    cmp 'test 20' \
+    cmp 'paexec toupper #2' \
 '1 A
 2 BB
 3 CCC
@@ -224,7 +224,7 @@ usage: paexec [OPTIONS] [files...]
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -c ../examples/toupper/toupper_cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
-    cmp 'test 30' \
+    cmp 'paexec toupper #3' \
 '1 A
 2 BB
 3 CCC
@@ -237,7 +237,7 @@ usage: paexec [OPTIONS] [files...]
     runtest -l -p -t ./paexec_notransport \
 	-c ../examples/toupper/toupper_cmd -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
-    cmp 'test 40' \
+    cmp 'paexec toupper #4' \
 '1 pid A
 2 pid BB
 3 pid CCC
@@ -246,12 +246,11 @@ usage: paexec [OPTIONS] [files...]
 6 pid FFFFFF
 '
 
-    # all_substr
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p -t '' \
 	-c ../examples/toupper/toupper_cmd -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
-    cmp 'test 50' \
+    cmp 'paexec toupper #5' \
 '1 pid A
 2 pid BB
 3 pid CCC
@@ -264,7 +263,7 @@ usage: paexec [OPTIONS] [files...]
     runtest -l -p \
 	-c ../examples/toupper/toupper_cmd -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
-    cmp 'test 60' \
+    cmp 'paexec toupper #6' \
 '1 pid A
 2 pid BB
 3 pid CCC
@@ -273,10 +272,11 @@ usage: paexec [OPTIONS] [files...]
 6 pid FFFFFF
 '
 
+    # all_substr
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -c ../examples/all_substr/all_substr_cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
-    cmp 'test 70' \
+    cmp 'paexec all_substr #1' \
 '1 substr[1,1]=a
 2 substr[1,1]=b
 2 substr[1,2]=bb
@@ -339,7 +339,7 @@ usage: paexec [OPTIONS] [files...]
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -c ../examples/all_substr/all_substr_cmd -n '+9' |
     resort |
-    cmp 'test 80' \
+    cmp 'paexec all_substr #2' \
 '1 substr[1,1]=a
 2 substr[1,1]=b
 2 substr[1,2]=bb
@@ -400,11 +400,11 @@ usage: paexec [OPTIONS] [files...]
 
     # no input
     runtest -c ../examples/all_substr/all_substr_cmd -n +3 < /dev/null |
-    cmp 'test 90' ''
+    cmp 'paexec all_substr #3' ''
 
     # bad command + no input
     runtest -l -c /path/to/bad/prog -n +3 < /dev/null |
-    cmp 'test 100' ''
+    cmp 'paexec bad_command' ''
 
     # bi-i-i-i-i-i-ig result
     awk '
@@ -416,14 +416,14 @@ usage: paexec [OPTIONS] [files...]
     uniq -c |
     head -n 100 |
     awk '{$1 = $1; print $0}' |
-    cmp 'test 110' \
+    cmp 'paexec big_result_cmd' \
 '100000 1234567890-=QWERTYUIOP[]ASDFGHJKL;ZXCVBNM,./ZAQWSXCDERFVBGTYHNMJUIK,.LO
 '
 
     # tests for partially ordered set of tasks (-s option)
     test_tasks3 |
     runtest -e -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 |
-    cmp 'test 120' \
+    cmp 'paexec 1/X #1' \
 '1 1/1=1
 1 success
 1 
@@ -447,22 +447,22 @@ usage: paexec [OPTIONS] [files...]
 
     # -s and no input
     runtest -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 < /dev/null |
-    cmp 'test 130' ''
+    cmp 'paexec 1/X #2' ''
 
     # -s all failed
     runtest -s -l -c '../examples/make_package/make_package_cmd__xxx_failed .' \
 	-n +10 < /dev/null |
-    cmp 'test 140' ''
+    cmp 'paexec all fails #1' ''
 
     # -s all failed
     runtest -s -l -c '../examples/make_package/make_package_cmd__xxx_failed .' \
 	-n +5 < /dev/null |
-    cmp 'test 150' ''
+    cmp 'paexec all fails #2' ''
 
     # -s all failed
     runtest -s -l -c '../examples/make_package/make_package_cmd__xxx_failed .' \
 	-n +1 < /dev/null |
-    cmp 'test 160' ''
+    cmp 'paexec all fails #3' ''
 
     # -s: all succeeded
     runtest -l -s -c ../examples/make_package/make_package_cmd -n +2 \
@@ -483,7 +483,7 @@ usage: paexec [OPTIONS] [files...]
 	test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 	
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 22 && echo ok100
-    } | cmp 'test 170' \
+    } | cmp 'paexec packages #1' \
 'ok1
 ok2
 ok3
@@ -518,7 +518,7 @@ ok100
 	test "`gln wip/dict-client`" = "rf" && echo ok11
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 19 && echo ok100
-    } | cmp 'test 180' \
+    } | cmp 'paexec packages #2' \
 'ok1
 ok2
 ok3
@@ -552,7 +552,7 @@ ok100
 	test "`gln wip/dict-client`" = "rf" && echo ok11
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 19 && echo ok100
-    } | cmp 'test 190' \
+    } | cmp 'paexec packages #3' \
 'ok1
 ok2
 ok3
@@ -586,7 +586,7 @@ ok100
 	test "`gln wip/dict-client`" = "rf" && echo ok11
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 19 && echo ok100
-    } | cmp 'test 200' \
+    } | cmp 'paexec packages #4' \
 'ok1
 ok2
 ok3
@@ -619,7 +619,7 @@ ok100
 	test "`gln wip/dict-server`" = "rf" && echo ok10
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 21 && echo ok100
-    } | cmp 'test 210' \
+    } | cmp 'paexec packages #5' \
 'ok1
 ok2
 ok3
@@ -651,7 +651,7 @@ ok100
 	test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 23 && echo ok100
-    } | cmp 'test 220' \
+    } | cmp 'paexec packages #6' \
 'ok1
 ok2
 ok4
@@ -684,7 +684,7 @@ ok100
 	test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 23 && echo ok100
-    } | cmp 'test 230' \
+    } | cmp 'paexec packages #7' \
 'ok1
 ok3
 ok4
@@ -717,7 +717,7 @@ ok100
 	test "`gln devel/flex`" -lt "`gln wip/dict-server`" && echo ok12
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 23 && echo ok100
-    } | cmp 'test 240' \
+    } | cmp 'paexec packages #8' \
 'ok2
 ok3
 ok4
@@ -750,7 +750,7 @@ ok100
 	test "`gln wip/dict-client`" = "rf" && echo ok13
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 17 && echo ok100
-    } | cmp 'test 250' \
+    } | cmp 'paexec packages #9' \
 'ok1
 ok2
 ok3
@@ -784,7 +784,7 @@ ok100
 	test "`gln wip/dict-client`" = "rf" && echo ok13
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 17 && echo ok100
-    } | cmp 'test 260' \
+    } | cmp 'paexec packages #9' \
 'ok1
 ok2
 ok3
@@ -816,7 +816,7 @@ ok100
 	test "`gln devel/flex`" -lt "`gln wip/dict-client`" && echo ok11
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 23 && echo ok100
-    } | cmp 'test 270' \
+    } | cmp 'paexec packages #10' \
 'ok1
 ok2
 ok3
@@ -855,7 +855,7 @@ ok100
 	    /wip\/dict-client/ {print "ok21"}' $OBJDIR/_test.tmp
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 20 && echo ok100
-    } | cmp 'test 280' \
+    } | cmp 'paexec packages #11' \
 'ok1
 ok2
 ok3
@@ -898,7 +898,7 @@ ok100
 	    /wip\/dict-client/ {print "ok21"}' $OBJDIR/_test.tmp
 
 	test "`awk 'END {print NR}' $OBJDIR/_test.tmp`" -eq 18 && echo ok100
-    } | cmp 'test 290' \
+    } | cmp 'paexec packages #12' \
 'ok1
 ok2
 ok3
@@ -933,7 +933,7 @@ ok100
 	else
 	    echo ok
 	fi
-    } | cmp 'test 300' \
+    } | cmp 'paexec packages #13' \
 'ok1
 ok2
 ok
@@ -943,7 +943,7 @@ ok
     runtest -l -s \
 	-c ../examples/make_package/make_package_cmd \
 	-n +5 < ../examples/make_package/make_package_tasks_cycle |
-    cmp 'test 310' \
+    cmp 'paexec cyclic deps #1' \
 'Cyclic dependancy detected:
   devel/gettext-lib -> devel/gmake
   devel/gmake -> lang/gcc
@@ -954,7 +954,7 @@ ok
     test_tasks4 | runtest -l -s \
 	-c ../examples/make_package/make_package_cmd \
 	-n +5 |
-    cmp 'test 320' \
+    cmp 'paexec cyclic deps #2' \
 'Cyclic dependancy detected:
   task10 -> task20
   task20 -> task30
@@ -970,7 +970,7 @@ task30 task40
 ' | runtest -l -s \
 	-c ../examples/make_package/make_package_cmd \
 	-n +5 |
-    cmp 'test 330' \
+    cmp 'paexec cyclic deps #3' \
 'Cyclic dependancy detected:
   task50 -> task50
 '
@@ -989,7 +989,7 @@ task300 task0
 ' | runtest -l -s \
 	-c ../examples/make_package/make_package_cmd \
 	-n +5 |
-    cmp 'test 340' \
+    cmp 'paexec cyclic deps #4' \
 'Cyclic dependancy detected:
   task0 -> task200
   task200 -> task300
@@ -1007,7 +1007,7 @@ task300 task0
 ' | runtest -s -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '1 2 3 4 5 6' |
-    cmp 'test 350' \
+    cmp 'paexec broken transport #1' \
 "I'll output -1
 -1
 success
@@ -1030,7 +1030,7 @@ cherry
 ' | runtest_resort -el -z \
 	-t ../examples/broken_echo/transport_broken_toupper \
 	-c : -n '4 5 6 7' |
-    cmp 'test 360' \
+    cmp 'paexec broken transport #2' \
 '1 fatal
 1
 1 BILBERRY
@@ -1052,7 +1052,7 @@ cherry
     runtest_resort -Z1 -w \
 	-t ../tests/transport_broken_rnd \
 	-m F= -c: -n '0.5ns-nopostfail 0.5ns-nopostfail 0.5ns-nopostfail' |
-    cmp 'test 370' \
+    cmp 'paexec broken transport #3' \
 'success
 success
 success
@@ -1093,7 +1093,7 @@ success
 ' | runtest -z -g -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '1' |
-    cmp 'test 380' \
+    cmp 'paexec broken transport #4' \
 "I'll output -1
 -1
 success
@@ -1119,7 +1119,7 @@ all nodes failed
 ' | runtest -z -r -g -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '1 2 3 4 5 6 7' |
-    cmp 'test 390' \
+    cmp 'paexec broken transport #5' \
 "1 I'll output -1
 1 -1
 1 success
@@ -1180,7 +1180,7 @@ all nodes failed
 5 6
 ' | runtest -g -z -lre -t $OBJDIR/transport_closed_stdin -c : \
 	-n '0 1 2 3 4 5 6 7 8' |
-    cmp 'test 400' \
+    cmp 'paexec broken transport #6' \
 "0 1 I'll output 0
 0 1 0
 0 1 success
@@ -1233,7 +1233,7 @@ all nodes failed
     runtest -z -r -g -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '4' |
-    cmp 'test 410' \
+    cmp 'paexec broken transport #7' \
 '4 fatal
 4 
 all nodes failed
@@ -1243,7 +1243,7 @@ all nodes failed
     echo mama | runtest -z -r -g -i -E \
 	-t ../examples/broken_echo/transport_broken_echo -c ':' \
 	-n '4' | 
-    cmp 'test 420' \
+    cmp 'paexec broken transport #8' \
 '4 mama
 4 fatal
 4 
@@ -1266,7 +1266,7 @@ EOF
     runtest -s -z -lr -t ../tests/transport_broken_rnd -c : \
 	-n '0.1 0.15 0.2 0.25 0.3 0' < $OBJDIR/_test.in |
     filter_succeded_tasks | sort -n |
-    cmp 'test 430' \
+    cmp 'paexec broken transport #9' \
 '1 libmaa
 2 paexec
 3 dict-client
@@ -1284,7 +1284,7 @@ EOF
     runtest -s -z -lr -t ../tests/transport_broken_rnd -c : \
 	-n '0.01-ns 0.03-ns 0.09-ns 0.09-ns 0.03-ns 0-ns' |
     filter_succeded_tasks | sort -n | cksum |
-    cmp 'test 440' \
+    cmp 'paexec broken transport #10' \
 '3878868009 10786
 '
 
@@ -1305,7 +1305,7 @@ EOF
     runtest -Z1 -s -n '1 2' -c: \
 	-t "../examples/broken_echo/transport_broken_echo2 $test_file" \
 	< $OBJDIR/_tasks.tmp | grep output | sort |
-    cmp 'test 450' \
+    cmp 'paexec broken transport #11' \
 'output 1
 output 10
 output 2
@@ -1319,7 +1319,7 @@ output 6
 
     # tests for weighted nodes of graph (-W option)
     test_tasks1 | runtest -We -c ../examples/make_package/make_package_cmd -n +1 |
-    cmp 'test 460' \
+    cmp 'paexec -W #1' \
 'qt4
 success
 
@@ -1370,7 +1370,7 @@ success
     test_tasks1 |
     runtest -We -d -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
-    cmp 'test 470' \
+    cmp 'paexec -W #2' \
 'sum_weight [pcc]=4
 sum_weight [gcc]=10
 sum_weight [tcl]=8
@@ -1391,7 +1391,7 @@ sum_weight [qt4]=14
     test_tasks2 |
     runtest -We -d -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
-    cmp 'test 480' \
+    cmp 'paexec -W #3' \
 'sum_weight [pipestatus]=6
 sum_weight [pkg_status]=1
 sum_weight [pkg_summary-utils]=5
@@ -1419,13 +1419,4 @@ for PAEXEC_BUFSIZE in 5; do # 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000; do
     else
 	exit 1
     fi
-#    if do_test > $OBJDIR/_test.res 2>&1 &&
-#	${DIFF_PROG} test.out $OBJDIR/_test.res
-#    then
-#	true
-#    else
-#	echo "paexec fails (PAEXEC_BUFSIZE=$PAEXEC_BUFSIZE)" 1>&2
-#	exit 1
-#    fi
-#    printf "done\n\n"
 done
