@@ -1308,7 +1308,7 @@ output 6
     rm -f "$test_file"
 
     # tests for weighted nodes of graph (-W option)
-    test_tasks1 | runtest -We -c ../examples/make_package/make_package_cmd -n +1 |
+    test_tasks1 | runtest -W1 -e -c ../examples/make_package/make_package_cmd -n +1 |
     cmp 'paexec -W #1' \
 'qt4
 success
@@ -1355,10 +1355,8 @@ success
 '
 
     # tests for sum_weight calculation (-W option)
-#    test_tasks2 | runtest -We -c ../examples/make_package/make_package_cmd -n +1
-    # tests for sum_weight calculation (-W option)
     test_tasks1 |
-    runtest -We -d -c ../examples/make_package/make_package_cmd \
+    runtest -W1 -e -d -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W #2' \
 'sum_weight [pcc]=4
@@ -1379,7 +1377,7 @@ sum_weight [qt4]=14
 
     # tests for sum_weight calculation (-W option)
     test_tasks2 |
-    runtest -We -d -c ../examples/make_package/make_package_cmd \
+    runtest -edW1 -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W #3' \
 'sum_weight [pipestatus]=6
@@ -1398,7 +1396,7 @@ sum_weight [paexec]=9
 
     # tests for sum_weight calculation (-W option)
     test_tasks2 |
-    runtest -We -c ../examples/make_package/make_package_cmd -n +1 2>&1 |
+    runtest -eW1 -c ../examples/make_package/make_package_cmd -n +1 2>&1 |
     cmp 'paexec -W #4' \
 'libmaa
 success

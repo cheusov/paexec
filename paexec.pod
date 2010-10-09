@@ -272,14 +272,17 @@ Set alternative messages instead of default 'success', 'failure' and
 'fatal'. An empty 'fatal' message means it will not be output to
 stdout in case of fatal error.
 
-=item B<-W>
+=item B<-W> <num>
 
-Each task in the input graph has its own weight.  Heavier tasks are
+Each task in the input graph has its own weight which is used to
+select a "better" task to calculate.  If I<num> is 0, weights are
+ignored, this is the default. If I<num> is 1, heavier tasks are
 processed first in order to mimimize a total time of calculation, a
-weight of task is a sum of its own weight and weights of all tasks
-that depend on it, directly or indirectly. Weights are specified with
-a help of "weight:" keyword. If weight is not specified it defaults to 1.
-The following is the sample for input graph of tasks.
+weight of task is a sum of its own weight (specified on input)
+and weights of all tasks depending on it, directly or
+indirectly. Weights are specified with a help of "weight:" keyword. If
+it is not specified it defaults to 1.  The following is the sample
+for input graph of tasks.
 
   weight: gtk2 30
   weight: glib2 20

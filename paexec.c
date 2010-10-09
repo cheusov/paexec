@@ -1027,10 +1027,10 @@ static void process_args (int *argc, char ***argv)
 
 	while (c =
 #ifdef HAVE_GETOPT_LONG
-	       getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W",
+	       getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W:",
 							longopts, NULL),
 #else
-	       getopt (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W"),
+	       getopt (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W:"),
 #endif
 		   c != EOF)
 	{
@@ -1105,7 +1105,7 @@ static void process_args (int *argc, char ***argv)
 
 				break;
 			case 'W':
-				use_weights = 1;
+				use_weights = atoi (optarg);
 				graph_mode  = 1;
 				break;
 			default:
