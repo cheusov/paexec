@@ -38,6 +38,15 @@ CFLAGS+=	-DBUFSIZE=${BUFSIZE}
 
 MKCATPAGES?=	no
 
+REALOWN!=	id -un
+REALGRP!=	id -gn
+BINOWN?=	${REALOWN}
+BINGRP?=	${REALGRP}
+MANOWN?=	${BINOWN}
+MANGRP?=	${BINGRP}
+SHAREOWN?=	${BINOWN}
+SHAREGRP?=	${BINGRP}
+
 all:	paexec.1
 
 ############################################################
