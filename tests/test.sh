@@ -5,6 +5,12 @@
 
 DIFF_PROG=${DIFF_PROG-diff -U10}
 
+OBJDIR=${OBJDIR-..}
+SRCDIR=${SRCDIR-..}
+
+PATH=$SRCDIR:OBJDIR:$PATH
+export PATH
+
 runtest (){
     $EXEPREFIX $OBJDIR/paexec "$@" 2>&1
 }
@@ -1434,6 +1440,70 @@ success
 pkg_online-server
 success
 
+'
+
+    # tests for paexec_reorder
+    printf \
+'2 TABLE1
+2 TABLE2
+1 APPLE1
+2 TABLE3
+2 TABLE4
+2 
+1 APPLE2
+3 GREEN1
+3 GREEN2
+3 GREEN3
+1 APPLE3
+1 APPLE4
+1 
+3 GREEN4
+3 
+' | paexec_reorder | cmp 'paexec_reorder #1' \
+'TABLE1
+TABLE2
+TABLE3
+TABLE4
+APPLE1
+APPLE2
+APPLE3
+APPLE4
+GREEN1
+GREEN2
+GREEN3
+GREEN4
+'
+
+
+    printf \
+'2 TABLE1
+2 TABLE2
+1 APPLE1
+2 TABLE3
+2 TABLE4
+2 
+1 APPLE2
+3 GREEN1
+3 GREEN2
+3 GREEN3
+1 APPLE3
+1 APPLE4
+1 
+3 GREEN4
+3 
+' | paexec_reorder -l | cmp 'paexec_reorder #1' \
+'2 TABLE1
+2 TABLE2
+2 TABLE3
+2 TABLE4
+1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN4
 '
 
     test -f $tmpex

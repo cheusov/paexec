@@ -28,19 +28,24 @@
 
 ############################################################
 #.begin-str help
-# paexec_reorder - takes output of 'paexec -le' on input and outputs
-#     results in normal order, that is one full task,
-#     then another full task etc. without "slicing"
+# paexec_reorder - takes output of 'paexec -le' or 'paexec -gle' on
+#     input and outputs ordered results, that is without "slicing".
 # usage: paexec_reorder [OPTIONS]
 # OPTIONS:
 #    -h|--help                  display this help
-#    -s                         remove leading space
+#    -g                         Expects output of "paexec -gle",
+#                               by default -- "paexec -gle".
+#    -S                         remove leading space
+#    -l                         prepand output line with the task number
+#                               given on input
 #.end-str
 ############################################################
 
 BEGIN {
 	bad_input_msg = "bad input, did you run paexec -sle?"
-	remove_spc = getarg("s")
+	remove_spc  = getarg("S")
+	graph_mode  = getarg("g")
+	output_task = getarg("l")
 }
 
 {
@@ -48,9 +53,11 @@ BEGIN {
 }
 
 $0 ~ /^[0-9]+ $/ {
-	if (status [$1] == "success" || status [$1] == "failure"){
+	if (!graph_mode || status [$1] == "success" || status [$1] == "failure"){
 		cnt = count [$1]
-		for (i=1; i < cnt; ++i){
+		for (i=1; i <= cnt; ++i){
+			if (output_task)
+				printf "%s ", $1
 			print line [$1, i]
 			delete line [$1, i]
 		}
@@ -64,7 +71,8 @@ $0 ~ /^[0-9]+ $/ {
 }
 
 {
-	status [$1] = $2
+	if (graph_mode)
+		status [$1] = $2
 
 	num = $1
 	sub(/^[0-9]+ /, "", $0)
