@@ -15,8 +15,13 @@ licence:                                                   MIT license
 
                              INSTALLATION
 
-0) BSD make is required. I name it 'bmake' but its real name may
-   vary.  pmake or just make are possible variants.
+0) Maybe paexec is already packaged for you platform. See PACKAGES
+   section below and your system's package management tools.
+
+1) BSD make is required. I name it 'bmake' but its real name may
+   vary.  pmake or just make are possible names on some platforms.
+
+             !!! GNU make IS NOT GOOD !!!
 
    If you need to change the default building options,
    run bmake like this
@@ -25,7 +30,7 @@ licence:                                                   MIT license
 
    See example section below
 
-1) "libmaa" library is required to build paexec. It is a part of
+2) "libmaa" library is required to build paexec. It is a part of
    "dict" project http://sourceforge.net/projects/dict
 
    Quick sample of building:
@@ -36,22 +41,22 @@ licence:                                                   MIT license
        gmake
        gmake install
 
-   NOTE: gmake is GNU make here! Under most Linux distros
+   NOTE: gmake is GNU make here! On most Linux distros
    it is named make.
 
-2) Uncompress paexec tarball you've downloaded like this
+3) Uncompress paexec tarball you've downloaded like this
    gzip -dc paexec-X-Y-Z.tar.gz | tar -xf-
 
-3) cd paexec-X-Y-Z
+4) cd paexec-X-Y-Z
 
-4) bmake
+5) bmake
 
-5) bmake test
+6) bmake test
    If this stage fails on your system, PLEASE LET ME NOW.
 
-6) (optional!) bmake install-dirs
+7) (optional!) bmake installdirs
 
-7) bmake install
+8) bmake install
 
 There are a lot of Makefile variables that can be changed during
 building and installation.
@@ -72,6 +77,7 @@ for all others - see make's documentation and .mk files)
  MANOWN - man page owner
  MANGRP - man page group
 
+------------------------------
 Examples of building and installing:
 
  1)  bmake all install-dirs install
@@ -106,3 +112,26 @@ Examples of building and installing:
      used for this.
 
      NOTE: No, I'll not use autotools
+
+======================================================================
+
+                           PACKAGES
+
+  1) NetBSD, DragonFlyBSD, Linux, Solaris, ... (pkgsrc)
+
+    PAEXEC is packaged in pkgsrc as wip/paexec.
+
+  2) FreeBSD
+
+    PAEXEC is packaged in FreeBSD ports as devel/paexec.
+
+  3) Debian/lenny/x86
+
+    Add the following lines
+
+        deb     http://mova.org/~cheusov/pub/debian       lenny    main
+        deb-src http://mova.org/~cheusov/pub/debian       lenny    main
+
+    to /etc/apt/sources.list and then using apt or aptitude commands.
+    Binary packages are available only for Debian/Lenny/i386.
+    Ubuntu users need to recompile the package for their system.
