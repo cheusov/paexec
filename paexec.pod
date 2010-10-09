@@ -272,6 +272,29 @@ Set alternative messages instead of default 'success', 'failure' and
 'fatal'. An empty 'fatal' message means it will not be output to
 stdout in case of fatal error.
 
+=item B<-W>
+
+Each task in the input graph has its own weight.  Heavier tasks are
+processed first in order to mimimize a total time of calculation, a
+weight of task is a sum of its own weight and weights of all tasks
+that depend on it, directly or indirectly. Weights are specified with
+a help of "weight:" keyword. If weight is not specified it defaults to 1.
+The following is the sample for input graph of tasks.
+
+  weight: gtk2 30
+  weight: glib2 20
+  gtk2 firefox
+  weight: firefox 200
+  glib2 gtk2
+  weight: qt4 200
+  weight: kcachegrind 2
+  qt4 kcachegrind
+  qt4 djview4
+  tiff djview4
+  png djview4
+  weight: twm 1
+  weight: gqview 4
+
 =back
 
 =head1 EXAMPLES
