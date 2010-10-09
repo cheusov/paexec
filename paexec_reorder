@@ -53,7 +53,7 @@ function print_results (task,        cnt,i){
 		cnt = count [task]
 		for (i=1; i <= cnt; ++i){
 			if (output_task)
-				printf "%s ", $1
+				printf "%s ", task
 			print line [task, i]
 			delete line [task, i]
 		}
@@ -79,20 +79,23 @@ $0 ~ /^[0-9]+ $/ {
 	if (graph_mode)
 		status [$1] = $2
 
-	num = $1
+	task = $1
 	sub(/^[0-9]+ /, "", $0)
-	cnt = ++count [num]
+	cnt = ++count [task]
 
 	if (remove_spc)
 		sub(/^ /, "", $0)
-	line [num, cnt] = $0
+	line [task, cnt] = $0
+
+	if (task > task_max)
+		task_max = task
 }
 
 END {
 	# output of "paexec -l" (without -e) is also allowed, obviously
 	# this requires more memory for reordering results, so applying
 	# option -e is strongly recomended.
-	for (i in count){
+	for (i=1; i <= task_max; ++i){
 		print_results(i)
 	}
 }

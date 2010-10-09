@@ -1582,6 +1582,41 @@ failure
 3 failure
 '
 
+    # tests for paexec_reorder -gl
+    printf \
+'2 TABLE1
+2 TABLE2
+1 APPLE1
+2 TABLE3
+2 TABLE4
+2 success
+1 APPLE2
+3 GREEN1
+3 GREEN2
+3 GREEN3
+1 APPLE3
+1 APPLE4
+1 success
+3 GREEN???
+3 failure
+' | paexec_reorder -gl | cmp 'paexec_reorder -gl #2' \
+'1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+1 success
+2 TABLE1
+2 TABLE2
+2 TABLE3
+2 TABLE4
+2 success
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN???
+3 failure
+'
+
     #
     test -f $tmpex
     return $?
