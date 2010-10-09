@@ -1,3 +1,8 @@
+paexec_reorder:
+  -e
+  -f for reordering using multiple files
+  -O for reordering using sort(1), or -Mm, -Mf, -Ms
+
 -N for getting servers from a file
 
 -w option for resorting tasks according to their weights (weights of
