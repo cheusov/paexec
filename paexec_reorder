@@ -49,12 +49,20 @@ BEGIN {
 }
 
 function print_results (task,        cnt,i){
-	cnt = count [task]
-	for (i=1; i <= cnt; ++i){
-		if (output_task)
-			printf "%s ", $1
-		print line [task, i]
-		delete line [task, i]
+	if (!graph_mode || status [task] == "success" || status [task] == "failure"){
+		cnt = count [task]
+		for (i=1; i <= cnt; ++i){
+			if (output_task)
+				printf "%s ", $1
+			print line [task, i]
+			delete line [task, i]
+		}
+
+		count [task] = 0
+	}else if (status [task] == "fatal"){
+		count [task] = 0
+	}else{
+		abort(bad_input_msg)
 	}
 }
 
@@ -63,14 +71,7 @@ function print_results (task,        cnt,i){
 }
 
 $0 ~ /^[0-9]+ $/ {
-	if (!graph_mode || status [$1] == "success" || status [$1] == "failure"){
-		print_results($1)
-		count [$1] = 0
-	}else if (status [$1] == "fatal"){
-		count [$1] = 0
-	}else{
-		abort(bad_input_msg)
-	}
+	print_results($1)
 	next
 }
 

@@ -1564,7 +1564,7 @@ failure
 3 GREEN???
 3 failure
 3 
-' | paexec_reorder -gl | cmp 'paexec_reorder -gl' \
+' | paexec_reorder -gl | cmp 'paexec_reorder -gl #1' \
 '2 TABLE1
 2 TABLE2
 2 TABLE3
