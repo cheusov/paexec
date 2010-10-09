@@ -1546,7 +1546,12 @@ failure
 
     # tests for paexec_reorder -gl
     printf \
-'2 TABLE1
+'3 foo
+3 bar
+1 blablabla
+1 fatal
+1 
+2 TABLE1
 2 TABLE2
 1 APPLE1
 2 TABLE3
@@ -1554,6 +1559,8 @@ failure
 2 success
 2 
 1 APPLE2
+3 fatal
+3 
 3 GREEN1
 3 GREEN2
 3 GREEN3
