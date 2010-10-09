@@ -20,7 +20,7 @@ MAALIB?=		-lmaa
 BUFSIZE?=		4096
 
 ############################################################
-.include "Makefile.version"
+.include "version.mk"
 
 BIRTHDATE=	2008-01-25
 
