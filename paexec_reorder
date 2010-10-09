@@ -48,19 +48,23 @@ BEGIN {
 	output_task = getarg("l")
 }
 
+function print_results (task,        cnt,i){
+	cnt = count [task]
+	for (i=1; i <= cnt; ++i){
+		if (output_task)
+			printf "%s ", $1
+		print line [task, i]
+		delete line [task, i]
+	}
+}
+
 {
 	assert(NF > 0 && $0 ~ /^[0-9]+ /, bad_input_msg "1")
 }
 
 $0 ~ /^[0-9]+ $/ {
 	if (!graph_mode || status [$1] == "success" || status [$1] == "failure"){
-		cnt = count [$1]
-		for (i=1; i <= cnt; ++i){
-			if (output_task)
-				printf "%s ", $1
-			print line [$1, i]
-			delete line [$1, i]
-		}
+		print_results($1)
 		count [$1] = 0
 	}else if (status [$1] == "fatal"){
 		count [$1] = 0
@@ -81,4 +85,13 @@ $0 ~ /^[0-9]+ $/ {
 	if (remove_spc)
 		sub(/^ /, "", $0)
 	line [num, cnt] = $0
+}
+
+END {
+	# output of "paexec -l" (without -e) is also allowed, obviously
+	# this requires more memory for reordering results, so applying
+	# option -e is strongly recomended.
+	for (i in count){
+		print_results(i)
+	}
 }

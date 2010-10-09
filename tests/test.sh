@@ -1456,31 +1456,31 @@ success
 3 GREEN3
 1 APPLE3
 1 APPLE4
-1 
 3 GREEN4
 3 
-' | paexec_reorder | cmp 'paexec_reorder #1' \
+' | paexec_reorder | cmp 'paexec_reorder' \
 'TABLE1
 TABLE2
 TABLE3
 TABLE4
-APPLE1
-APPLE2
-APPLE3
-APPLE4
 GREEN1
 GREEN2
 GREEN3
 GREEN4
+APPLE1
+APPLE2
+APPLE3
+APPLE4
 '
 
 
+    # tests for paexec_reorder -l
     printf \
-'2 TABLE1
-2 TABLE2
+'2 fatal 1
+2 fatal 2
 1 APPLE1
-2 TABLE3
-2 TABLE4
+2 fatal 3
+2 fatal 4
 2 
 1 APPLE2
 3 GREEN1
@@ -1491,11 +1491,11 @@ GREEN4
 1 
 3 GREEN4
 3 
-' | paexec_reorder -l | cmp 'paexec_reorder #1' \
-'2 TABLE1
-2 TABLE2
-2 TABLE3
-2 TABLE4
+' | paexec_reorder -l | cmp 'paexec_reorder -l' \
+'2 fatal 1
+2 fatal 2
+2 fatal 3
+2 fatal 4
 1 APPLE1
 1 APPLE2
 1 APPLE3
@@ -1506,6 +1506,83 @@ GREEN4
 3 GREEN4
 '
 
+    # tests for paexec_reorder -g
+    printf \
+'2 TABLE1
+2 TABLE2
+1 APPLE1
+2 TABLE3
+2 TABLE4
+2 success
+2 
+1 APPLE2
+3 GREEN1
+3 GREEN2
+3 GREEN3
+1 APPLE3
+1 APPLE4
+1 success
+1 
+3 GREEN???
+3 failure
+3 
+' | paexec_reorder -g | cmp 'paexec_reorder -g' \
+'TABLE1
+TABLE2
+TABLE3
+TABLE4
+success
+APPLE1
+APPLE2
+APPLE3
+APPLE4
+success
+GREEN1
+GREEN2
+GREEN3
+GREEN???
+failure
+'
+
+    # tests for paexec_reorder -gl
+    printf \
+'2 TABLE1
+2 TABLE2
+1 APPLE1
+2 TABLE3
+2 TABLE4
+2 success
+2 
+1 APPLE2
+3 GREEN1
+3 GREEN2
+3 GREEN3
+1 APPLE3
+1 APPLE4
+1 success
+1 
+3 GREEN???
+3 failure
+3 
+' | paexec_reorder -gl | cmp 'paexec_reorder -gl' \
+'2 TABLE1
+2 TABLE2
+2 TABLE3
+2 TABLE4
+2 success
+1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+1 success
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN???
+3 failure
+'
+
+    #
     test -f $tmpex
     return $?
 }
