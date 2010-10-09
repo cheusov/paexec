@@ -34,7 +34,7 @@
 # OPTIONS:
 #    -h|--help                  display this help
 #    -g                         Expects output of "paexec -gle",
-#                               by default -- "paexec -gle".
+#                               by default -- "paexec -le".
 #    -S                         remove leading space
 #    -l                         prepand output line with the task number
 #                               given on input
