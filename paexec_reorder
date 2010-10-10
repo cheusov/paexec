@@ -45,7 +45,7 @@
 #       s                       use sort(1) command
 #       f                       use multiple temporary files
 # In -g -Mm and -g -Mf modes, portions of the results followed by "fatal" marker
-# are cut off.
+# are automatically cut off.
 #.end-str
 ############################################################
 
