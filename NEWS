@@ -1,4 +1,34 @@
 ======================================================================
+Version 0.15.0, by Aleksey Cheusov, Sun, 10 Oct 2010 18:06:31 +0300
+
+  After some thoughts I decided to switch from plain mk-files to
+  mk-configure build system. It provides very cool features and makes
+  development drammatically easier. It also makes Makefiles much
+  cleaner and easier. Installation instructions has been updated in
+  README file.
+
+  PAEXEC reads the tasks from stdin and distributes them to all
+  available hosts or CPU. If some tasks are easy and can be made
+  quickly while others require much more CPU time it makes sense to
+  reorder tasks calcultion in order to reduce total calculation time
+  and reduce computers/CPUs idle time. For this purpose -W<num> option
+  is added to paexec(1) using weights assigned to each tasks. At the
+  moment only two values are allowed for <num>: 0 -- do not use
+  weights at all, 1 -- run heavier tasks first as soon as possible.
+
+  New tool paexec_reorder(1) for reordering sliced output of
+  paexec(1).  It is written in runawk. So, you'll need it at run time.
+
+  FIXED: 1 byte buffer overflow if -d option is applied.
+
+  Documentation update.  Tons of new regression tests.  Regression
+  tests framework has been significantly reworked.  Clean-ups.
+
+  README: notes about my Debian/Lenny/x86 repository.
+
+  Minor fixes (warning messages) for different compilers.
+
+======================================================================
 Version 0.14.0, by Aleksey Cheusov, Sun,  3 Jan 2010 12:38:54 +0200
 
   fixed: "paexec -z" without -s never worked.  Now it is fine.
@@ -16,7 +46,7 @@ Version 0.14.0, by Aleksey Cheusov, Sun,  3 Jan 2010 12:38:54 +0200
 
   Other minor fixes and code clean-ups.
 
-s======================================================================
+======================================================================
 Version 0.13.0, by Aleksey Cheusov, Sat,  7 Mar 2009 19:17:03 +0200
 
   FIXED: When 'paexec -s' retreives 10000 tasks, it allocates
