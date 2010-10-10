@@ -1,0 +1,85 @@
+=head1 NAME
+
+paexec_reorder - reorder sliced output of "paexec -l"
+
+=head1 SYNOPSIS
+
+B<paexec_reorder> [I<OPTIONS>] [I<files...>]
+
+=head1 DESCRIPTION
+
+B<paexec> with -l option produces a sliced output where results of
+different tasks are intermixed. The intent of B<paexec_reorder> is to
+produce ordered output where results for all tasks follow each other
+without intermixing. It is strongly recomended to send output of
+"paexec -le" or paexec -gle" to the input of B<paexec_reorder>. Otherwise
+more memory or disk space for temporary files will be required.
+
+=head1 OPTIONS
+
+=over 6
+
+=item B<-h>|B<--help>
+
+Display help information.
+
+=item B<-M> I<method>
+
+If I<method> is I<m>, result is reordered in memory, this is the default.
+If it is I<f>, temporary files are used for reordering. If I<s>, B<sort(1)>
+command is used.
+
+=item B<-l>
+
+Prepand output line with the task number given on input
+
+=item B<-g>
+
+By default output of "paexec -le" is expected on input. With I<-g>
+option, output of "paexec -gle" is expected. In this case B<paexec_reorder>
+will react on "fatal" B<paexec's> keyword.
+
+=item B<-S>
+
+Remove leading space from result lines.
+
+=back
+
+=head1 EXAMPLES
+
+=over 6
+
+ paexec -t '/usr/bin/ssh -x' -n 'host1 host2 host3' \
+        -l -c ~/bin/complex_task | paexec_reorder
+
+ paexec -gEI -lr -n 'host1 host2 host3' \
+   -c command -t /usr/bin/rsh < tasks.txt | paexec_reorder -lgS -Mf
+
+ For other examples, see examples/ directory
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 6
+
+=item I<TMPDIR>
+
+I<tempnam(3)> is used for creating temporary directory.
+See the appropriate man page.
+
+=back
+
+=head1 BUGS/FEEDBACK
+
+Please send any comments, questions, bug reports etc. to me by e-mail
+or (even better) register them at sourceforge project home.  Feature
+requests are also welcomed.
+
+=head1 HOME
+
+L<http://sourceforge.net/projects/paexec>
+
+=head1 SEE ALSO
+L<paexec(1)>
+L<tempnam(3)>

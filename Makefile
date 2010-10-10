@@ -29,6 +29,10 @@ WARNS?=		4
 PROG=		paexec
 SRCS=		paexec.c wrappers.c tasks.c
 
+SCRIPTS=	paexec_reorder
+
+MAN=		paexec.1 paexec_reorder.1
+
 LDADD+=		$(MAALIB)
 
 CFLAGS+=	-D_GNU_SOURCE # for glibc-based systems
@@ -60,10 +64,12 @@ installdirs:
 .endif
 .endif
 
-paexec.1 : paexec.pod
-	$(POD2MAN) -s 1 -r 'parallel executor' -n paexec \
-	   -c 'PAEXEC manual page' ${.ALLSRC} > ${.TARGET}
-paexec.html : paexec.pod
+.SUFFIXES: .1 .pod .html
+
+.pod.1:
+	$(POD2MAN) -s 1 -r '' -n ${.IMPSRC:R} \
+	   -c '' ${.ALLSRC} > ${.TARGET}
+.pod.html:
 	$(POD2HTML) --infile=${.ALLSRC} --outfile=${.TARGET}
 
 ##################################################
