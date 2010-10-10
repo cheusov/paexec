@@ -1727,6 +1727,26 @@ failure
 3 failure
 '
 
+    # tests for paexec_reorder -gl -Ms
+    paexec_reorder_input5 | paexec_reorder -gl -Ms |
+    cmp 'paexec_reorder -gl -Ms' \
+'1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+1 success
+2 TABLE1
+2 TABLE2
+2 TABLE3
+2 TABLE4
+2 success
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN???
+3 failure
+'
+
     # tests for paexec_reorder -Mf
     paexec_reorder_input1 | paexec_reorder -Mf |
     cmp 'paexec_reorder -Mf' \
@@ -1798,6 +1818,26 @@ failure
 3  GREEN2
 3  GREEN3
 3  GREEN???
+3 failure
+'
+
+    # tests for paexec_reorder -gl -Mf
+    paexec_reorder_input5 | paexec_reorder -gl -Mf |
+    cmp 'paexec_reorder -gl -Mf' \
+'1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+1 success
+2 TABLE1
+2 TABLE2
+2 TABLE3
+2 TABLE4
+2 success
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN???
 3 failure
 '
 
