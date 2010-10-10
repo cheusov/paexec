@@ -3,11 +3,11 @@
 paexec: Small program that processes a list of tasks in parallel
         on different CPUs, computers in a network or whatever else.
         Full documentation is available in paexec.1 manual page
-        and paexec.html
+        and paexec.pod
 
 author:                                  Aleksey Cheusov <vle@gmx.net>
 
-project's home page:            http://sourceforge.net/projects/paexec
+project's home page:           http://sourceforge.net/projects/paexec/
 
 licence:                                                   MIT license
 
@@ -15,107 +15,77 @@ licence:                                                   MIT license
 
                              INSTALLATION
 
-0) Maybe paexec is already packaged for you platform. See PACKAGES
-   section below and your system's package management tools.
+0)
+   Maybe paexec is already packaged for your platform. See PACKAGES
+   section below and your system's packages management tools.
 
-1) BSD make is required. I name it 'bmake' but its real name may
-   vary.  pmake or just make are possible names on some platforms.
+1)
+   We need bmake (portable version of NetBSD make) for building paexec.
+   I'd recommend to use latest stable version.
+
+   http://crufty.net/help/sjg/bmake.html
 
              !!! GNU make IS NOT GOOD !!!
 
-   If you need to change the default building options,
-   run bmake like this
+2)
+   We also need mk-configure >= 0.20.0.
 
-     env [YOUR_ASSIGNMENTS] bmake <target>
+   http://sourceforge.net/projects/mk-configure/
+
+3)
+   "libmaa" library is also needed. It is a part of
+   "dict" project available here:
+
+   http://sourceforge.net/projects/dict/
+
+4)
+   If you want to change the default building options,
+   run mkcmake like this
+
+     env [YOUR_ASSIGNMENTS] mkcmake <target>
 
    See example section below
 
-2) "libmaa" library is required to build paexec. It is a part of
-   "dict" project http://sourceforge.net/projects/dict/
-
-   How to build it:
-
-       gzip -dc /home/cheusov/downloads/dictd-X.Y.Z.tar.gz  | tar -xf-
-       cd dictd-X-Y-Z/libmaa
-       ./configure
-       gmake
-       gmake install
-
-   NOTE: gmake is GNU make here! On most Linux distros, MacOS-X and
-   some others it is named make.
-
-3) Uncompress paexec tarball you've downloaded like this
-   gzip -dc paexec-X-Y-Z.tar.gz | tar -xf-
-
 4) cd paexec-X-Y-Z
 
-5) bmake
+5) mkcmake
 
-6) bmake test
+6) mkcmake test
    If this stage fails on your system, PLEASE LET ME NOW.
 
-7) (optional!) bmake installdirs
+7) mkcmake install
 
-8) bmake install
+8)
+   paexec_reorder utility is written in RunAWK, so we'll need RunAWK at runtime.
 
-9)
-   paexec_reorder utility is written using RunAWK, so you'll need at runtime.
    http://sourceforge.net/projects/runawk/
 
-There are a lot of Makefile variables that can be changed during
+There is a lot of Makefile variables that can be changed during
 building and installation.
 paexec's own variables (All they are in the begining of Makefile):
 
   PREFIX         - where paexec is installed to
-  LIBMAA         - linker option for linking "maa" library
-
-BSD make's variables (most commonly used,
-for all others - see make's documentation and .mk files)
-
- BINDIR - where paexec executable itself is installed to
- MANDIR - where manual pages are installed to
-
- BINOWN - paexec executable owner
- BINGRP - paexec executable group
-
- MANOWN - man page owner
- MANGRP - man page group
+  DESTDIR        - fake root for installation
+  CFLAGS
+  LDFLAGS
+  LDADD
+  ...
 
 ------------------------------
 Examples of building and installing:
 
- 1)  bmake all install-dirs install
+ 1)  env PREFIX=/usr DESTDIR=/tmp/fake-root mkcmake all install
 
- 2)  env CC=icc \
+ 2)  env CC='icc -no-gcc' \
        PREFIX=/home/cheusov/local \
        CPPFLAGS='-I/usr/pkg/include' \
        LDFLAGS='-L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib' \
        LDADD=-lextralib \
-       CFLAGS='-Werror -Wall' \
-       BINOWN=cheusov \
-       BINGRP=users \
-       MANOWN=cheusov \
-       MANGRP=users \
-       MKCATPAGES=no \
-          bmake -s all install-dirs install
+          mkcmake -s all install
 
- 3)  paexec uses the non-portable getopt_long(3) present in *BSD and
-     Linux OSes. On other systems (Solaris, HP-UX, Interix etc.)
-     paexec will be build without support for long options by default.
-
-     But you still can support them like the following
-
-     echo '[your declarations are here]' > ./config.h
-
-     env \
-       CPPFLAGS='-DNO_PORTABHACKS_H=1 -DHAVE_CONFIG_H=1' \
-       LDFLAGS='-lgetopt_long' \
-          bmake -s all install-dirs install
-
-     For example, NetBSD's portability library (libnbcompat) may be
-     used for this.
-
-     NOTE: No, I'll not use autotools
+ 3) paexec uses getopt_long(3) for handling long options. On some
+     systems it is not available. On such platforms paexec will
+     support only short options.
 
 ======================================================================
 
