@@ -134,6 +134,118 @@ test_tasks3 (){
 EOF
 }
 
+paexec_reorder_input1 (){
+    cat <<'EOF'
+2 TABLE1
+2 TABLE2
+1 APPLE1
+2 TABLE3
+2 TABLE4
+2 
+1 APPLE2
+3 GREEN1
+3 GREEN2
+3 GREEN3
+1 APPLE3
+1 APPLE4
+3 GREEN4
+3 
+EOF
+}
+
+paexec_reorder_input2 (){
+    cat <<'EOF'
+2 fatal 1
+2 fatal 2
+1 APPLE1
+2 fatal 3
+2 fatal 4
+2 
+1 APPLE2
+3 GREEN1
+3 GREEN2
+3 GREEN3
+1 APPLE3
+1 APPLE4
+1 
+3 GREEN4
+3 
+EOF
+}
+
+paexec_reorder_input3 (){
+    cat <<'EOF'
+2  TABLE1
+2  TABLE2
+1  APPLE1
+2  TABLE3
+2  TABLE4
+2 success
+2 
+1  APPLE2
+3  GREEN1
+3  GREEN2
+3  GREEN3
+1  APPLE3
+1  APPLE4
+1 success
+1 
+3  GREEN???
+3 failure
+3 
+EOF
+}
+
+paexec_reorder_input4 (){
+    cat <<'EOF'
+3  foo
+3  bar
+1  blablabla
+1 fatal
+1 
+2  TABLE1
+2  TABLE2
+1  APPLE1
+2  TABLE3
+2  TABLE4
+2 success
+2 
+1  APPLE2
+3 fatal
+3 
+3  GREEN1
+3  GREEN2
+3  GREEN3
+1  APPLE3
+1  APPLE4
+1 success
+1 
+3  GREEN???
+3 failure
+3 
+EOF
+}
+
+paexec_reorder_input5 (){
+    cat <<'EOF'
+2 TABLE1
+2 TABLE2
+1 APPLE1
+2 TABLE3
+2 TABLE4
+2 success
+1 APPLE2
+3 GREEN1
+3 GREEN2
+3 GREEN3
+1 APPLE3
+1 APPLE4
+1 success
+3 GREEN???
+3 failure
+EOF
+}
+
 tmpdir="/tmp/paexec-test.$$"
 mkdir -m 0700 "$tmpdir" || exit 60
 
@@ -1443,22 +1555,8 @@ success
 '
 
     # tests for paexec_reorder
-    printf \
-'2 TABLE1
-2 TABLE2
-1 APPLE1
-2 TABLE3
-2 TABLE4
-2 
-1 APPLE2
-3 GREEN1
-3 GREEN2
-3 GREEN3
-1 APPLE3
-1 APPLE4
-3 GREEN4
-3 
-' | paexec_reorder | cmp 'paexec_reorder' \
+    paexec_reorder_input1 | paexec_reorder |
+    cmp 'paexec_reorder' \
 'TABLE1
 TABLE2
 TABLE3
@@ -1473,25 +1571,9 @@ APPLE3
 APPLE4
 '
 
-
     # tests for paexec_reorder -l
-    printf \
-'2 fatal 1
-2 fatal 2
-1 APPLE1
-2 fatal 3
-2 fatal 4
-2 
-1 APPLE2
-3 GREEN1
-3 GREEN2
-3 GREEN3
-1 APPLE3
-1 APPLE4
-1 
-3 GREEN4
-3 
-' | paexec_reorder -l | cmp 'paexec_reorder -l' \
+    paexec_reorder_input2 | paexec_reorder -l |
+    cmp 'paexec_reorder -l' \
 '2 fatal 1
 2 fatal 2
 2 fatal 3
@@ -1507,26 +1589,8 @@ APPLE4
 '
 
     # tests for paexec_reorder -g
-    printf \
-'2 TABLE1
-2 TABLE2
-1 APPLE1
-2 TABLE3
-2 TABLE4
-2 success
-2 
-1 APPLE2
-3 GREEN1
-3 GREEN2
-3 GREEN3
-1 APPLE3
-1 APPLE4
-1 success
-1 
-3 GREEN???
-3 failure
-3 
-' | paexec_reorder -g | cmp 'paexec_reorder -g' \
+    paexec_reorder_input3 | paexec_reorder -gS |
+    cmp 'paexec_reorder -gS' \
 'TABLE1
 TABLE2
 TABLE3
@@ -1544,34 +1608,9 @@ GREEN???
 failure
 '
 
-    # tests for paexec_reorder -gl
-    printf \
-'3 foo
-3 bar
-1 blablabla
-1 fatal
-1 
-2 TABLE1
-2 TABLE2
-1 APPLE1
-2 TABLE3
-2 TABLE4
-2 success
-2 
-1 APPLE2
-3 fatal
-3 
-3 GREEN1
-3 GREEN2
-3 GREEN3
-1 APPLE3
-1 APPLE4
-1 success
-1 
-3 GREEN???
-3 failure
-3 
-' | paexec_reorder -gl | cmp 'paexec_reorder -gl #1' \
+    # tests for paexec_reorder -glS
+    paexec_reorder_input4 | paexec_reorder -glS |
+    cmp 'paexec_reorder -glS' \
 '2 TABLE1
 2 TABLE2
 2 TABLE3
@@ -1590,23 +1629,8 @@ failure
 '
 
     # tests for paexec_reorder -gl
-    printf \
-'2 TABLE1
-2 TABLE2
-1 APPLE1
-2 TABLE3
-2 TABLE4
-2 success
-1 APPLE2
-3 GREEN1
-3 GREEN2
-3 GREEN3
-1 APPLE3
-1 APPLE4
-1 success
-3 GREEN???
-3 failure
-' | paexec_reorder -gl | cmp 'paexec_reorder -gl #2' \
+    paexec_reorder_input5 | paexec_reorder -gl |
+    cmp 'paexec_reorder -gl' \
 '1 APPLE1
 1 APPLE2
 1 APPLE3
@@ -1621,6 +1645,159 @@ failure
 3 GREEN2
 3 GREEN3
 3 GREEN???
+3 failure
+'
+
+    # tests for paexec_reorder -Ms
+    paexec_reorder_input1 | paexec_reorder -Ms |
+    cmp 'paexec_reorder -Ms' \
+'APPLE1
+APPLE2
+APPLE3
+APPLE4
+TABLE1
+TABLE2
+TABLE3
+TABLE4
+GREEN1
+GREEN2
+GREEN3
+GREEN4
+'
+
+    # tests for paexec_reorder -l -Ms
+    paexec_reorder_input2 | paexec_reorder -l -Ms |
+    cmp 'paexec_reorder -l -Ms' \
+'1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+2 fatal 1
+2 fatal 2
+2 fatal 3
+2 fatal 4
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN4
+'
+
+    # tests for paexec_reorder -gS -Ms
+    paexec_reorder_input3 | paexec_reorder -gS -Ms |
+    cmp 'paexec_reorder -gS -Ms' \
+'APPLE1
+APPLE2
+APPLE3
+APPLE4
+success
+TABLE1
+TABLE2
+TABLE3
+TABLE4
+success
+GREEN1
+GREEN2
+GREEN3
+GREEN???
+failure
+'
+
+    # tests for paexec_reorder -gl -Ms
+    paexec_reorder_input4 | paexec_reorder -gl -Ms |
+    cmp 'paexec_reorder -gl -Ms' \
+'1  blablabla
+1 fatal
+1  APPLE1
+1  APPLE2
+1  APPLE3
+1  APPLE4
+1 success
+2  TABLE1
+2  TABLE2
+2  TABLE3
+2  TABLE4
+2 success
+3  foo
+3  bar
+3 fatal
+3  GREEN1
+3  GREEN2
+3  GREEN3
+3  GREEN???
+3 failure
+'
+
+    # tests for paexec_reorder -Mf
+    paexec_reorder_input1 | paexec_reorder -Mf |
+    cmp 'paexec_reorder -Mf' \
+'TABLE1
+TABLE2
+TABLE3
+TABLE4
+GREEN1
+GREEN2
+GREEN3
+GREEN4
+APPLE1
+APPLE2
+APPLE3
+APPLE4
+'
+
+    # tests for paexec_reorder -l -Mf
+    paexec_reorder_input2 | paexec_reorder -l -Mf |
+    cmp 'paexec_reorder -l -Mf' \
+'2 fatal 1
+2 fatal 2
+2 fatal 3
+2 fatal 4
+1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN4
+'
+
+    # tests for paexec_reorder -gS -Mf
+    paexec_reorder_input3 | paexec_reorder -gS -Mf |
+    cmp 'paexec_reorder -gS -Mf' \
+'TABLE1
+TABLE2
+TABLE3
+TABLE4
+success
+APPLE1
+APPLE2
+APPLE3
+APPLE4
+success
+GREEN1
+GREEN2
+GREEN3
+GREEN???
+failure
+'
+
+    # tests for paexec_reorder -gl -Mf
+    paexec_reorder_input4 | paexec_reorder -gl -Mf |
+    cmp 'paexec_reorder -gl -Mf' \
+'2  TABLE1
+2  TABLE2
+2  TABLE3
+2  TABLE4
+2 success
+1  APPLE1
+1  APPLE2
+1  APPLE3
+1  APPLE4
+1 success
+3  GREEN1
+3  GREEN2
+3  GREEN3
+3  GREEN???
 3 failure
 '
 

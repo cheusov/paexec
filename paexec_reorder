@@ -25,6 +25,8 @@
 
 #use "alt_assert.awk"
 #use "power_getopt.awk"
+#use "tmpfile.awk"
+#use "xsystem.awk"
 
 ############################################################
 #.begin-str help
@@ -38,16 +40,38 @@
 #    -S                         remove leading space
 #    -l                         prepand output line with the task number
 #                               given on input
+#    =M <method>                method of resorting result line, where method is
+#       m                       temporary data in memory (the default)
+#       s                       use sort(1) command
+#       f                       use multiple temporary files
+# In -g -Mm and -g -Mf modes, portions of the results followed by "fatal" marker
+# are cut off.
 #.end-str
 ############################################################
 
 BEGIN {
 	bad_input_msg = "bad input, did you run paexec -sle?"
+	method = 1
 	remove_spc  = getarg("S")
 	graph_mode  = getarg("g")
 	output_task = getarg("l")
+
+	method      = getarg("M")
+	if (method == "s")
+		method = 2
+	else if (method == "f")
+		method = 3
+	else
+		method = 1
+
+	# -Ms
+	if (output_task)
+		sort_cmd = "sort -k2n -k1n -t ' ' | cut -f 2- -d ' '"
+	else
+		sort_cmd = "sort -k2n -k1n -t ' ' | cut -f 3- -d ' '"
 }
 
+# -Mm
 function print_results (task,        cnt,i){
 	if (!graph_mode || status [task] == "success" || status [task] == "failure"){
 		cnt = count [task]
@@ -66,11 +90,73 @@ function print_results (task,        cnt,i){
 	}
 }
 
+# common code
 {
 	assert(NF > 0 && $0 ~ /^[0-9]+ /, bad_input_msg "1")
+	if (task > task_max)
+		task_max = task
 }
 
-$0 ~ /^[0-9]+ $/ {
+# -Ms
+method == 2 {
+	if (!/^[0-9]+ $/){
+		if (remove_spc){
+			num = $1
+			sub(/^[0-9]+  ?/, "", $0)
+			print NR, num, $0 | sort_cmd
+		}else{
+			print NR, $0 | sort_cmd
+		}
+	}
+
+	next
+}
+
+# -Mf
+function print_results_file (task,      cmd,fn){
+	if (task in count){
+		fn = runawk_tmpdir "/" task
+		xclose(fn)
+		cmd = sprintf("cat '%s' && rm '%s'", fn, fn)
+		xsystem(cmd)
+		delete count [task]
+	}
+}
+
+method == 3 {
+	if (/^[0-9]+ $/){
+		if (!graph_mode || status [$1] != "fatal"){
+			print_results_file(task)
+		}else{
+			fn = runawk_tmpdir "/" task
+			xclose(fn)
+			xsystem("rm '" fn "'")
+			delete count [task]
+		}
+	}else{
+		if (graph_mode)
+			status [$1] = $2
+
+		task = $1
+		count [task] = 1
+
+		if (remove_spc)
+			sub(/^[0-9]+  ?/, "")
+		else
+			sub(/^[0-9]+ /, "")
+
+		fn = runawk_tmpdir "/" task
+		if (output_task)
+			print task, $0 > fn
+		else
+			print $0 > fn
+	}
+
+	next
+}
+
+# -Mm
+/^[0-9]+ $/ {
 	print_results($1)
 	next
 }
@@ -86,16 +172,21 @@ $0 ~ /^[0-9]+ $/ {
 	if (remove_spc)
 		sub(/^ /, "", $0)
 	line [task, cnt] = $0
-
-	if (task > task_max)
-		task_max = task
 }
 
 END {
 	# output of "paexec -l" (without -e) is also allowed, obviously
 	# this requires more memory for reordering results, so applying
 	# option -e is strongly recomended.
-	for (i=1; i <= task_max; ++i){
-		print_results(i)
+	if (method == 1){
+		# -Mm
+		for (i=1; i <= task_max; ++i){
+			print_results(i)
+		}
+	}else if (method == 3){
+		# -Mf
+		for (i=1; i <= task_max; ++i){
+			print_results_file(i)
+		}
 	}
 }
