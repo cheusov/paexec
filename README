@@ -25,7 +25,7 @@ licence:                                                   MIT license
 
    http://crufty.net/help/sjg/bmake.html
 
-             !!! GNU make IS NOT GOOD !!!
+   NOTE:    !!! GNU make IS NOT GOOD !!!
 
 2)
    We also need mk-configure >= 0.20.0.
@@ -61,10 +61,10 @@ licence:                                                   MIT license
    http://sourceforge.net/projects/runawk/
 
 There is a lot of Makefile variables that can be changed during
-building and installation.
-paexec's own variables (All they are in the begining of Makefile):
+build and installation.
 
-  PREFIX         - where paexec is installed to
+  PREFIX         - where paexec paexec_reorder is installed to
+  MANDIR         - root directory for manual pages
   DESTDIR        - fake root for installation
   CFLAGS
   LDFLAGS
@@ -72,7 +72,7 @@ paexec's own variables (All they are in the begining of Makefile):
   ...
 
 ------------------------------
-Examples of building and installing:
+Examples of build and installing:
 
  1)  env PREFIX=/usr DESTDIR=/tmp/fake-root mkcmake all install
 
@@ -80,7 +80,7 @@ Examples of building and installing:
        PREFIX=/home/cheusov/local \
        CPPFLAGS='-I/usr/pkg/include' \
        LDFLAGS='-L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib' \
-       LDADD=-lextralib \
+       LDADD=-lnbcompat \
           mkcmake -s all install
 
  3) paexec uses getopt_long(3) for handling long options. On some
