@@ -24,6 +24,7 @@ licence:                                                   MIT license
    I'd recommend to use latest stable version.
 
    http://crufty.net/help/sjg/bmake.html
+   http://freshmeat.net/projects/bmake/
 
    NOTE:    !!! GNU make IS NOT GOOD !!!
 
@@ -46,16 +47,19 @@ licence:                                                   MIT license
 
    See example section below
 
-4) cd paexec-X-Y-Z
+5) Uncompress tarball you've downloaded like this
+   gzip -dc paexec-X-Y-Z.tar.gz | tar -xf-
 
-5) mkcmake
+6) cd paexec-X-Y-Z
 
-6) mkcmake test
-   If this stage fails on your system, PLEASE LET ME NOW.
+7) mkcmake
 
-7) mkcmake install
+8) mkcmake test
+   If this step fails on your system, PLEASE LET ME NOW.
 
-8)
+9) mkcmake install
+
+10)
    paexec_reorder utility is written in RunAWK, so we'll need RunAWK at runtime.
 
    http://sourceforge.net/projects/runawk/
@@ -66,10 +70,13 @@ build and installation.
   PREFIX         - where paexec paexec_reorder is installed to
   MANDIR         - root directory for manual pages
   DESTDIR        - fake root for installation
+  CPPFLAGS
   CFLAGS
   LDFLAGS
   LDADD
   ...
+
+  See mk-configure(7) for details.
 
 ------------------------------
 Examples of build and installing:
@@ -91,7 +98,7 @@ Examples of build and installing:
 
                            PACKAGES
 
-  1) NetBSD, DragonFlyBSD, Linux, Solaris, ... (pkgsrc)
+  1) NetBSD, DragonFlyBSD, Linux, Solaris... (pkgsrc)
 
     PAEXEC is packaged in pkgsrc as wip/paexec.
 
