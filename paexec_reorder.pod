@@ -31,7 +31,7 @@ command is used.
 
 =item B<-l>
 
-Prepand output line with the task number given on input
+Prepand output line with the task number.
 
 =item B<-g>
 
@@ -41,7 +41,7 @@ will react on "fatal" B<paexec's> keyword.
 
 =item B<-S>
 
-Remove leading space from result lines.
+Remove leading space character.
 
 =back
 
