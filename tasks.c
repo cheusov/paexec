@@ -31,7 +31,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+#if HAVE_TYPE_INTPTR_T_STDINT_H
 #include <stdint.h>
+#elif HAVE_TYPE_INTPTR_T_INTTYPES_H
+#include <inttypes.h>
+#endif /* header file intptr_t */
 
 #include <maa.h>
 
