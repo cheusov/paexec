@@ -6,12 +6,12 @@ OBJDIR_paexec ?=	${MAKEOBJDIR}
 OBJDIR_broken_echo ?=	${MAKEOBJDIR}
 .else
 OBJDIR_paexec ?=	${.CURDIR}
-OBJDIR_broken_echo ?=	${.CURDIR}/examples/broken_echo
+OBJDIR_broken_echo ?=	${.CURDIR}/tests/broken_echo
 .endif
 
 #
 .PHONY : test
-test : all-paexec all-examples
+test : all-paexec all-tests
 	@echo 'running tests...'; \
 	export OBJDIR=${.OBJDIR}; \
 	export PATH=${OBJDIR_broken_echo}:${OBJDIR_paexec}:$$PATH; \

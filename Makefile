@@ -1,6 +1,6 @@
 BIRTHDATE=	2008-01-25
 
-SUBPRJ=		paexec examples
+SUBPRJ=		paexec tests
 SUBPRJ_DFLT=	paexec
 
 .include "test.mk"

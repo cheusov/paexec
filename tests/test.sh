@@ -1102,7 +1102,7 @@ task300 task0
 3 4
 4 5
 ' | runtest -s -E \
-	-t ../examples/broken_echo/transport_broken_echo -c ':' \
+	-t ../tests/broken_echo/transport_broken_echo -c ':' \
 	-n '1 2 3 4 5 6' |
     cmp 'paexec broken transport #1' \
 "I'll output -1
@@ -1125,7 +1125,7 @@ pear
 plum
 cherry
 ' | runtest_resort -el -z \
-	-t ../examples/broken_echo/transport_broken_toupper \
+	-t ../tests/broken_echo/transport_broken_toupper \
 	-c : -n '4 5 6 7' |
     cmp 'paexec broken transport #2' \
 '1 fatal
@@ -1188,7 +1188,7 @@ success
     printf '%s' '-1 0
 0 1
 ' | runtest -z -g -E \
-	-t ../examples/broken_echo/transport_broken_echo -c ':' \
+	-t ../tests/broken_echo/transport_broken_echo -c ':' \
 	-n '1' |
     cmp 'paexec broken transport #4' \
 "I'll output -1
@@ -1214,7 +1214,7 @@ all nodes failed
 4 5
 5 6
 ' | runtest -z -r -g -E \
-	-t ../examples/broken_echo/transport_broken_echo -c ':' \
+	-t ../tests/broken_echo/transport_broken_echo -c ':' \
 	-n '1 2 3 4 5 6 7' |
     cmp 'paexec broken transport #5' \
 "1 I'll output -1
@@ -1328,7 +1328,7 @@ all nodes failed
         }
     }' |
     runtest -z -r -g -E \
-	-t ../examples/broken_echo/transport_broken_echo -c ':' \
+	-t ../tests/broken_echo/transport_broken_echo -c ':' \
 	-n '4' |
     cmp 'paexec broken transport #7' \
 '4 fatal
@@ -1338,7 +1338,7 @@ all nodes failed
 
     # resistance to transport failure
     echo mama | runtest -z -r -g -i -E \
-	-t ../examples/broken_echo/transport_broken_echo -c ':' \
+	-t ../tests/broken_echo/transport_broken_echo -c ':' \
 	-n '4' | 
     cmp 'paexec broken transport #8' \
 '4 mama
@@ -1400,7 +1400,7 @@ EOF
     rm -f "$test_file"
 
     runtest -Z1 -s -n '1 2' -c: \
-	-t "../examples/broken_echo/transport_broken_echo2 $test_file" \
+	-t "../tests/broken_echo/transport_broken_echo2 $test_file" \
 	< $OBJDIR/_tasks.tmp | grep output | sort |
     cmp 'paexec broken transport #11' \
 'output 1
