@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Calculates 1/$1 values
-../../paexec -s -l -c "`pwd`/1_div_X_cmd" -n +1 <<EOF
+paexec -s -l -c "`pwd`/1_div_X_cmd" -n +1 <<EOF
 1 2
 2 3
 3 4
