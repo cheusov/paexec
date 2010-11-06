@@ -1,5 +1,3 @@
-- stdint.h is not available on old OpenBSDs.
-
 - sys/select.h is not available on ancient HP-UX
 
 -
