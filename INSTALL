@@ -1,0 +1,82 @@
+======================================================================
+
+                             INSTALLATION
+
+0)
+   Maybe paexec is already packaged for your platform. See PACKAGES
+   section below and your system's packages management tools.
+
+1)
+   We need bmake (portable version of NetBSD make) for building paexec.
+   I'd recommend to use latest stable version.
+
+   http://crufty.net/help/sjg/bmake.html
+   http://freshmeat.net/projects/bmake/
+
+   NOTE:    !!! GNU make IS NOT GOOD !!!
+
+2)
+   We also need mk-configure >= 0.20.0.
+
+   http://sourceforge.net/projects/mk-configure/
+
+3)
+   "libmaa" library is also needed. It is a part of
+   "dict" project available here:
+
+   http://sourceforge.net/projects/dict/
+
+4)
+   If you want to change the default building options,
+   run mkcmake like this
+
+     env [YOUR_ASSIGNMENTS] mkcmake <target>
+
+   See example section below
+
+5) Uncompress tarball you've downloaded like this
+   gzip -dc paexec-X-Y-Z.tar.gz | tar -xf-
+
+6) cd paexec-X-Y-Z
+
+7) mkcmake
+
+8) mkcmake test
+   If this step fails on your system, PLEASE LET ME NOW.
+
+9) mkcmake install
+
+10)
+   paexec_reorder utility is written in RunAWK, so we'll need RunAWK at runtime.
+
+   http://sourceforge.net/projects/runawk/
+
+There is a lot of Makefile variables that can be changed during
+build and installation.
+
+  PREFIX         - where paexec paexec_reorder is installed to
+  MANDIR         - root directory for manual pages
+  DESTDIR        - fake root for installation
+  CPPFLAGS
+  CFLAGS
+  LDFLAGS
+  LDADD
+  ...
+
+  See mk-configure(7) for details.
+
+------------------------------
+Examples of build and installing:
+
+ 1)  env PREFIX=/usr DESTDIR=/tmp/fake-root mkcmake all install
+
+ 2)  env CC='icc -no-gcc' \
+       PREFIX=/home/cheusov/local \
+       CPPFLAGS='-I/usr/pkg/include' \
+       LDFLAGS='-L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib' \
+       LDADD=-lnbcompat \
+          mkcmake -s all install
+
+ 3) paexec uses getopt_long(3) for handling long options. On some
+     systems it is not available. On such platforms paexec will
+     support only short options.
