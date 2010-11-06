@@ -280,19 +280,8 @@ do_test (){
 cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov
 '
 
-#    runtest --version | cut_version
-    runtest --version | cut_version |
-cmp 'paexec --version' 'paexec x.y.x written by Aleksey Cheusov
-'
-
     runtest -h 2>&1 | cut_help |
 cmp 'paexec -h' 'paexec - parallel executor
-         that distributes tasks over CPUs or machines in a network.
-usage: paexec [OPTIONS] [files...]
-'
-
-    runtest --help 2>&1 | cut_help |
-cmp 'paexec --help' 'paexec - parallel executor
          that distributes tasks over CPUs or machines in a network.
 usage: paexec [OPTIONS] [files...]
 '

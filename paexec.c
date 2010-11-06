@@ -65,42 +65,41 @@ paexec - parallel executor\n\
          that distributes tasks over CPUs or machines in a network.\n\
 usage: paexec [OPTIONS] [files...]\n\
 OPTIONS:\n\
-  -h --help                give this help\n\
-  -V --version             show version\n\
+  -h               give this help\n\
+  -V               show version\n\
 \n\
-  -n --nodes <nodes|+num>  list of nodes|number of subprocesses\n\
-  -c --cmd <command>       path to a command\n\
-  -t --transport <trans>   path to a transport program\n\
+  -n <nodes|+num>  list of nodes|number of subprocesses\n\
+  -c <command>     path to a command\n\
+  -t <trans>       path to a transport program\n\
 \n\
-  -r --show-node           include a node (or a number) to the output\n\
-  -l --show-line           include 0-based task number to the output\n\
-  -p --show-pid            include a pid of subprocess to the output\n\
+  -r               include a node (or a number) to the output\n\
+  -l               include 0-based task number to the output\n\
+  -p               include a pid of subprocess to the output\n\
 \n\
-  -e --eot                 print an empty line when end-of-task is reached\n\
-  -E --eot-flush           implies -e and flushes stdout\n\
+  -e               print an empty line when end-of-task is reached\n\
+  -E               implies -e and flushes stdout\n\
 \n\
-  -i --i2o                 copy input lines (i.e. tasks) to stdout\n\
-  -I --i2o-flush           implies -i and flushes stdout\n\
+  -i               copy input lines (i.e. tasks) to stdout\n\
+  -I               implies -i and flushes stdout\n\
 \n\
-  -s --pos\n\
-  -g --graph               graph of tasks is given on stdin, by default a list of\n\
-                           independent tasks is read from stdin\n\
+  -s|-g            graph of tasks is given on stdin, by default a list of\n\
+                   independent tasks is read from stdin\n\
 \n\
-  -d --debug               debug mode, for debugging only\n\
+  -d               debug mode, for debugging only\n\
 \n\
-  -z --resistant           failed nodes are marked as dead\n\
-  -Z <timeout>             timeout to restart faild command, imply -z\n\
-  -w                       wait for restoring nodes (needs -Z)\n\
+  -z               failed nodes are marked as dead\n\
+  -Z <timeout>     timeout to restart faild command, imply -z\n\
+  -w               wait for restoring nodes (needs -Z)\n\
 \n\
-  -W                       heavier tasks are processed first, a weight\n\
-                           of task is a sum of its own weight and weights\n\
-                           of all tasks that depend on it,\n\
-                           directly or indirectly\n\
+  -W               heavier tasks are processed first, a weight\n\
+                   of task is a sum of its own weight and weights\n\
+                   of all tasks that depend on it,\n\
+                   directly or indirectly\n\
 \n\
   -m s=<success>\n\
   -m f=<failure>\n\
-  -m F=<fatal>             set alternative messages instead of default\n\
-                           'success', 'failure' and 'fatal'.\n\
+  -m F=<fatal>     set alternative messages instead of default\n\
+                   'success', 'failure' and 'fatal'.\n\
 -n and -c are mandatory options\n\
 \n\
 ");
@@ -997,43 +996,50 @@ static void process_args (int *argc, char ***argv)
 	int c;
 #ifdef HAVE_GETOPT_LONG
 	struct option longopts [] = {
-		{ "help",      0, 0, 'h' },
-		{ "version",   0, 0, 'V' },
+		{ "help",      0, 0, 1000 + 'h' },
+		{ "version",   0, 0, 1000 + 'V' },
 
-		{ "nodes",     1, 0, 'n' },
-		{ "cmd",       1, 0, 'c' },
-		{ "transport", 1, 0, 't' },
+		{ "nodes",     1, 0, 1000 + 'n' },
+		{ "cmd",       1, 0, 1000 + 'c' },
+		{ "transport", 1, 0, 1000 + 't' },
 
-		{ "show-node", 0, 0, 'r' },
-		{ "show-line", 0, 0, 'l' },
-		{ "show-pid",  0, 0, 'p' },
+		{ "show-node", 0, 0, 1000 + 'r' },
+		{ "show-line", 0, 0, 1000 + 'l' },
+		{ "show-pid",  0, 0, 1000 + 'p' },
 
-		{ "eot",       0, 0, 'e' },
-		{ "eot-flush", 0, 0, 'E' },
+		{ "eot",       0, 0, 1000 + 'e' },
+		{ "eot-flush", 0, 0, 1000 + 'E' },
 
-		{ "i2o",       0, 0, 'i' },
-		{ "i2o-flush", 0, 0, 'I' },
+		{ "i2o",       0, 0, 1000 + 'i' },
+		{ "i2o-flush", 0, 0, 1000 + 'I' },
 
-		{ "pos",       0, 0, 's' },
-		{ "graph",     0, 0, 'g' },
+		{ "pos",       0, 0, 1000 + 's' },
+		{ "graph",     0, 0, 1000 + 'g' },
 
-		{ "debug",     0, 0, 'd' },
+		{ "debug",     0, 0, 1000 + 'd' },
 
-		{ "resistant", 0, 0, 'z' },
+		{ "resistant", 0, 0, 1000 + 'z' },
 
 		{ NULL,        0, 0, 0 },
 	};
 #endif
 
+	static const char optstring [] = "hVdvrlpeEiIwzZ:n:c:t:sgm:W:";
+
 	while (c =
 #ifdef HAVE_GETOPT_LONG
-	       getopt_long (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W:",
-							longopts, NULL),
+		   getopt_long (*argc, *argv, optstring, longopts, NULL),
 #else
-	       getopt (*argc, *argv, "hVdvrlpeEiIwzZ:n:c:t:sgm:W:"),
+		   getopt (*argc, *argv, optstring),
 #endif
 		   c != EOF)
 	{
+		if (c >= 1000){
+			fprintf (stderr, "Long options will be removed in "
+			                 "the future, please don't use them!\n\n\n\n");
+			c %= 1000;
+		}
+
 		switch (c) {
 			case 'V':
 				printf ("paexec %s written by Aleksey Cheusov\n", PAEXEC_VERSION);
