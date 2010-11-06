@@ -12,11 +12,11 @@ PATH=$SRCDIR:OBJDIR:$PATH
 export PATH
 
 runtest (){
-    $EXEPREFIX $OBJDIR/paexec "$@" 2>&1
+    $EXEPREFIX paexec "$@" 2>&1
 }
 
 runtest_resort (){
-    $EXEPREFIX $OBJDIR/paexec "$@" 2>&1 | resort
+    $EXEPREFIX paexec "$@" 2>&1 | resort
 }
 
 cut_version (){
@@ -1275,7 +1275,7 @@ all nodes failed
 3 4
 4 5
 5 6
-' | runtest -g -z -lre -t $OBJDIR/transport_closed_stdin -c : \
+' | runtest -g -z -lre -t transport_closed_stdin -c : \
 	-n '0 1 2 3 4 5 6 7 8' |
     cmp 'paexec broken transport #6' \
 "0 1 I'll output 0
