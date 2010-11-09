@@ -5,7 +5,7 @@ CLEANFILES +=		_test.in
 OBJDIR_paexec ?=	${MAKEOBJDIR}
 OBJDIR_broken_echo ?=	${MAKEOBJDIR}
 .else
-OBJDIR_paexec ?=	${.CURDIR}
+OBJDIR_paexec ?=	${.CURDIR}/paexec
 OBJDIR_broken_echo ?=	${.CURDIR}/tests/broken_echo
 .endif
 

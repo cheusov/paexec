@@ -8,9 +8,6 @@ DIFF_PROG=${DIFF_PROG-diff -U10}
 OBJDIR=${OBJDIR-..}
 SRCDIR=${SRCDIR-..}
 
-PATH=$SRCDIR:OBJDIR:$PATH
-export PATH
-
 runtest (){
     $EXEPREFIX paexec "$@" 2>&1
 }
