@@ -24,7 +24,10 @@
 #ifndef _WRAPPERS_H_
 #define _WRAPPERS_H_
 
+#if HAVE_HEADER_SYS_SELECT_H
 #include <sys/select.h>
+#endif
+#include <sys/time.h> /* On ancient HP-UX select(2) is declared here */
 #include <unistd.h>
 #include <signal.h>
 
