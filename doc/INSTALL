@@ -46,7 +46,21 @@
 
 9) mkcmake install
 
-10)
+10) If you also want to install examples/, run the following command
+
+   mkcmake install-examples
+
+   By default examples/ directory is installed to ${DOCDIR}/paexec/.
+   For changing it, set EGDIR environment variable.
+
+11) If you also want to install README, NEWS, TODO, run the following command
+
+   mkcmake install-doc
+
+   By default do files are installed to ${PREFIX}/share/doc/.
+   For changing it, set EGDIR environment variable.
+
+12)
    paexec_reorder utility is written in RunAWK, so we'll need RunAWK at runtime.
 
    http://sourceforge.net/projects/runawk/
@@ -68,15 +82,21 @@ build and installation.
 ------------------------------
 Examples of build and installing:
 
- 1)  env PREFIX=/usr DESTDIR=/tmp/fake-root mkcmake all install
+ 1)  export PREFIX=/usr SYSCONFDIR=/etc
+     mkcmake all
+     env DESTDIR=/tmp/fake-root mkcmake install
 
- 2)  env CC='icc -no-gcc' \
+ 2)  export PREFIX=/usr SYSCONFDIR=/etc
+     mkcmake all examples
+     env DESTDIR=/tmp/fake-root mkcmake install install-examples
+
+ 3)  env CC='icc' \
        PREFIX=/home/cheusov/local \
        CPPFLAGS='-I/usr/pkg/include' \
-       LDFLAGS='-L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib' \
+       LDFLAGS='-L/usr/pkg/lib -R/usr/pkg/lib' \
        LDADD=-lnbcompat \
           mkcmake -s all install
 
- 3) paexec uses getopt_long(3) for handling long options. On some
+ 4) paexec uses getopt_long(3) for handling long options. On some
      systems it is not available. On such platforms paexec will
      support only short options.
