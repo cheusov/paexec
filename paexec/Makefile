@@ -5,6 +5,7 @@ BUFSIZE?=		4096
 BIRTHDATE=	2008-01-25
 
 WARNS?=		4
+WARNERR?=	no
 
 PROG=		paexec
 SRCS=		paexec.c wrappers.c tasks.c
