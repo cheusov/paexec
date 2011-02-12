@@ -50,7 +50,8 @@
 
    mkcmake install-examples
 
-   By default examples/ directory is installed to ${DOCDIR}/paexec/.
+   By default examples/ directory is installed
+   to ${DATADIR}/doc/paexec/examples/.
    For changing it, set EGDIR environment variable.
 
 11) If you also want to install README, NEWS, TODO, run the following command
@@ -60,7 +61,15 @@
    By default do files are installed to ${PREFIX}/share/doc/.
    For changing it, set EGDIR environment variable.
 
-12)
+12) paexec project consists of the following subprojects: paexec
+   (paexec and paexec_reorder executables and appropriate manual
+   pages), doc (README etc.), examples (examples of use).  By default
+   only "paexec" is built and installed. You can build and install
+   other subprojects like the following.
+
+   env SUBPRJ_DFLT='paexec examples doc' mkcmake all install
+
+13)
    paexec_reorder utility is written in RunAWK, so we'll need RunAWK at runtime.
 
    http://sourceforge.net/projects/runawk/
@@ -82,7 +91,7 @@ build and installation.
 ------------------------------
 Examples of build and installing:
 
- 1)  export PREFIX=/usr SYSCONFDIR=/etc
+ 1)  export PREFIX=/usr SYSCONFDIR=/etc MANDIR=/usr/share/man
      mkcmake all
      env DESTDIR=/tmp/fake-root mkcmake install
 
