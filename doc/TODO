@@ -3,8 +3,6 @@
 
 - paargs - xargs-like tool for distributed computing
 
-- sys/select.h is not available on ancient HP-UX
-
 -
   -n:</path/to/file> for getting nodes from a file
   -n%'node_[1-20,21-30]'
