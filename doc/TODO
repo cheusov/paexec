@@ -1,3 +1,8 @@
+- -W2 - weight itself
+  -W3 - max weight in subtree
+
+- paargs - xargs-like tool for distributed computing
+
 - sys/select.h is not available on ancient HP-UX
 
 -
