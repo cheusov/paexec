@@ -34,22 +34,27 @@
 #     input and outputs ordered results, that is without "slicing".
 # usage: paexec_reorder [OPTIONS]
 # OPTIONS:
-#    -h|--help                  display this help
-#    -g                         Expects output of "paexec -gle",
-#                               by default -- "paexec -le".
-#    -S                         remove leading space
-#    -l                         prepand output line with the task number
-#                               given on input
-#    =M <method>                method of resorting result line, where method is
-#       m                       temporary data in memory (the default)
-#       s                       use sort(1) command
-#       f                       use multiple temporary files
+#    -h              display this help
+#    -g              expects output of "paexec -gle",
+#                    by default -- "paexec -le".
+#    -S              remove leading space
+#    -l              prepand output line with the task number
+#                    given on input
+#    =M <method>     method of resorting result line, where method is
+#       m            temporary data in memory (the default)
+#       s            use sort(1) command
+#       f            use multiple temporary files
 # In -g -Mm and -g -Mf modes, portions of the results followed by "fatal" marker
 # are automatically cut off.
 #.end-str
 ############################################################
 
 BEGIN {
+	if (getarg("h")){
+		print_help()
+		exitnow(0)
+	}
+
 	bad_input_msg = "bad input, did you run paexec -sle?"
 	method = 1
 	remove_spc  = getarg("S")
