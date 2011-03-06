@@ -25,6 +25,7 @@ void tasks__destroy (void);
 const char *tasks__get_new_task (void);
 void tasks__mark_task_as_failed (int taskid);
 void tasks__make_sum_weights (void);
+void tasks__make_max_weights (void);
 void tasks__print_sum_weights (void);
 
 #endif // _TASKS_H_

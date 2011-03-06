@@ -432,6 +432,46 @@ void tasks__make_sum_weights (void)
 	xfree (seen);
 }
 
+static void tasks__make_max_weights_rec (int *accu_w, int task)
+{
+	lst_Position p;
+	void *e;
+	int to;
+
+	int curr_w = id2weight [task];
+	*accu_w = (*accu_w < curr_w ? curr_w : *accu_w);
+	seen [task] = 1;
+	LST_ITERATE (arcs_outg [task], p, e){
+		to = (int) (intptr_t) e;
+		if (!seen [to])
+			tasks__make_max_weights_rec (accu_w, to);
+	}
+}
+
+void tasks__make_max_weights (void)
+{
+	lst_Position p;
+	void *e;
+	int to;
+	int i;
+
+	if (!graph_mode)
+		return;
+
+	seen = (char *) xmalloc (tasks_count);
+
+	for (i=1; i < tasks_count; ++i){
+		memset (seen, 0, tasks_count);
+
+		LST_ITERATE (arcs_outg [i], p, e){
+			to = (int) (intptr_t) e;
+			tasks__make_max_weights_rec (&id2sum_weight [i], to);
+		}
+	}
+
+	xfree (seen);
+}
+
 void tasks__print_sum_weights (void)
 {
 	int i;

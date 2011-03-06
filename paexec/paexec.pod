@@ -272,17 +272,24 @@ Set alternative messages instead of default 'success', 'failure' and
 'fatal'. An empty 'fatal' message means it will not be output to
 stdout in case of fatal error.
 
-=item B<-W> <num>
+=item B<-W> I<num>
 
-Each task in the input graph has its own weight which is used to
-select a "better" task to calculate.  If I<num> is 0, weights are
-ignored, this is the default. If I<num> is 1, heavier tasks are
-processed first in order to mimimize a total time of calculation, a
-weight of task is a sum of its own weight (specified on input)
-and weights of all tasks depending on it, directly or
-indirectly. Weights are specified with a help of "weight:" keyword. If
-it is not specified it defaults to 1.  The following is the sample
-for input graph of tasks.
+When multiple machines or CPUs are used for tasks processing, it makes sense
+to start "heavier" tasks as soon as possible in order to minimize total 
+calculatiion time.
+If B<-W> is specified, special weight is assigned to each tasks
+which is used for reordering tasks.
+If I<num> is 0, weights themselves are used for reordering tasks.
+The bigger weight is, the more priority of the task is.
+If I<num> is 1, the total weight of task is a sum of its own weight
+(specified on input)
+and weights of all tasks depending on it directly or indirectly.
+If I<num> is 2, the total weight of task is a maximum value of task's own
+weight
+and weights of all tasks depending on it directly or indirectly.
+Weights are specified with a help of "weight:" keyword. If
+weight is not specified, it defaults to 1.  The following is the example
+for input graph of tasks with weights.
 
   weight: gtk2 30
   weight: glib2 20
@@ -305,9 +312,10 @@ for input graph of tasks.
 =over 6
 
  paexec -t '/usr/bin/ssh -x' -n 'host1 host2 host3' \
-        -l -c ~/bin/complex_task
+        -le -g -c ~/bin/complex_task < tasks.txt |
+ paexec_reorder -Mf -Sl
 
- paexec -n +4 -c ~/bin/oggenc_wrapper
+ ls -1 *.wav | paexec -n +4 -c ~/bin/oggenc_wrapper
 
  paexec -EI -lr -n 'host1 host2 host3' \
                 -c command -t /usr/bin/rsh |

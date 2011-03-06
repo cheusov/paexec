@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2008 Aleksey Cheusov <vle@gmx.net>
+ * Copyright (c) 2007-2011 Aleksey Cheusov <vle@gmx.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -491,7 +491,15 @@ static void init (void)
 	tasks__check_for_cycles ();
 
 	/**/
-	tasks__make_sum_weights ();
+	switch (use_weights){
+		case 1:
+			tasks__make_sum_weights ();
+			break;
+		case 2:
+			tasks__make_max_weights ();
+			break;
+	}
+
 	if (debug)
 		tasks__print_sum_weights ();
 
@@ -1132,6 +1140,10 @@ static void process_args (int *argc, char ***argv)
 
 	if (!arg_cmd){
 		err_fatal (NULL, "-c option is mandatory!\n");
+	}
+
+	if (use_weights < 0 || use_weights > 2){
+		err_fatal (NULL, "Only -W1 and -W2 are supported!\n");
 	}
 }
 

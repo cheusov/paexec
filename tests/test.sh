@@ -1411,9 +1411,9 @@ output 6
 
     rm -f "$test_file"
 
-    # tests for weighted nodes of graph (-W option)
-    test_tasks1 | runtest -W1 -e -c ../examples/make_package/make_package_cmd -n +1 |
-    cmp 'paexec -W #1' \
+    # tests for weighted nodes of graph (-W0 option)
+    test_tasks1 | runtest -W0 -e -c ../examples/make_package/make_package_cmd -n +1 |
+    cmp 'paexec -W0 #1' \
 'qt4
 success
 
@@ -1458,11 +1458,11 @@ success
 
 '
 
-    # tests for sum_weight calculation (-W option)
+    # tests for max_weight calculation (-W0 option)
     test_tasks1 |
-    runtest -W1 -e -d -c ../examples/make_package/make_package_cmd \
+    runtest -W0 -e -d -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
-    cmp 'paexec -W #2' \
+    cmp 'paexec -W0 #2' \
 'sum_weight [pcc]=4
 sum_weight [gcc]=10
 sum_weight [tcl]=8
@@ -1479,11 +1479,140 @@ sum_weight [mk-configure]=1
 sum_weight [qt4]=14
 '
 
-    # tests for sum_weight calculation (-W option)
+    # tests for max_weight calculation (-W0 option)
+    test_tasks2 |
+    runtest -edW0 -c ../examples/make_package/make_package_cmd \
+	-n +1 2>&1 | grep '^sum_weight' |
+    cmp 'paexec -W0 #3' \
+'sum_weight [pipestatus]=1
+sum_weight [pkg_status]=1
+sum_weight [pkg_summary-utils]=2
+sum_weight [dict]=15
+sum_weight [pkg_online-client]=1
+sum_weight [netcat]=1
+sum_weight [dictd]=20
+sum_weight [pkg_online-server]=1
+sum_weight [judyhash]=12
+sum_weight [runawk]=2
+sum_weight [libmaa]=5
+sum_weight [paexec]=4
+'
+
+    # tests for sum_weight calculation (-W0 option)
+    test_tasks2 |
+    runtest -eW0 -c ../examples/make_package/make_package_cmd -n +1 2>&1 |
+    cmp 'paexec -W0 #4' \
+'judyhash
+success
+
+libmaa
+success
+
+dictd
+success
+
+dict
+success
+
+paexec
+success
+
+runawk
+success
+
+pipestatus
+success
+
+pkg_summary-utils
+success
+
+pkg_status
+success
+
+netcat
+success
+
+pkg_online-client
+success
+
+pkg_online-server
+success
+
+'
+
+    # tests for weighted nodes of graph (-W1 option)
+    test_tasks1 | runtest -W1 -e -c ../examples/make_package/make_package_cmd -n +1 |
+    cmp 'paexec -W1 #1' \
+'qt4
+success
+
+kde
+success
+
+gnome
+success
+
+mplayer
+success
+
+gcc
+success
+
+glibc
+success
+
+tcl
+success
+
+python
+success
+
+pike
+success
+
+ruby
+success
+
+pcc
+success
+
+dictd
+success
+
+runawk
+success
+
+mk-configure
+success
+
+'
+
+    # tests for sum_weight calculation (-W1 option)
+    test_tasks1 |
+    runtest -W1 -e -d -c ../examples/make_package/make_package_cmd \
+	-n +1 2>&1 | grep '^sum_weight' |
+    cmp 'paexec -W1 #2' \
+'sum_weight [pcc]=4
+sum_weight [gcc]=10
+sum_weight [tcl]=8
+sum_weight [glibc]=9
+sum_weight [python]=7
+sum_weight [dictd]=3
+sum_weight [mplayer]=11
+sum_weight [pike]=6
+sum_weight [ruby]=5
+sum_weight [gnome]=12
+sum_weight [kde]=13
+sum_weight [runawk]=2
+sum_weight [mk-configure]=1
+sum_weight [qt4]=14
+'
+
+    # tests for sum_weight calculation (-W1 option)
     test_tasks2 |
     runtest -edW1 -c ../examples/make_package/make_package_cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
-    cmp 'paexec -W #3' \
+    cmp 'paexec -W1 #3' \
 'sum_weight [pipestatus]=6
 sum_weight [pkg_status]=1
 sum_weight [pkg_summary-utils]=5
@@ -1498,10 +1627,10 @@ sum_weight [libmaa]=49
 sum_weight [paexec]=9
 '
 
-    # tests for sum_weight calculation (-W option)
+    # tests for sum_weight calculation (-W1 option)
     test_tasks2 |
     runtest -eW1 -c ../examples/make_package/make_package_cmd -n +1 2>&1 |
-    cmp 'paexec -W #4' \
+    cmp 'paexec -W1 #4' \
 'libmaa
 success
 
@@ -1530,6 +1659,135 @@ netcat
 success
 
 pkg_status
+success
+
+pkg_online-client
+success
+
+pkg_online-server
+success
+
+'
+
+    # tests for weighted nodes of graph (-W2 option)
+    test_tasks1 | runtest -W2 -e -c ../examples/make_package/make_package_cmd -n +1 |
+    cmp 'paexec -W2 #1' \
+'qt4
+success
+
+kde
+success
+
+gnome
+success
+
+mplayer
+success
+
+gcc
+success
+
+glibc
+success
+
+tcl
+success
+
+python
+success
+
+pike
+success
+
+ruby
+success
+
+pcc
+success
+
+dictd
+success
+
+runawk
+success
+
+mk-configure
+success
+
+'
+
+    # tests for max_weight calculation (-W2 option)
+    test_tasks1 |
+    runtest -W2 -e -d -c ../examples/make_package/make_package_cmd \
+	-n +1 2>&1 | grep '^sum_weight' |
+    cmp 'paexec -W2 #2' \
+'sum_weight [pcc]=4
+sum_weight [gcc]=10
+sum_weight [tcl]=8
+sum_weight [glibc]=9
+sum_weight [python]=7
+sum_weight [dictd]=3
+sum_weight [mplayer]=11
+sum_weight [pike]=6
+sum_weight [ruby]=5
+sum_weight [gnome]=12
+sum_weight [kde]=13
+sum_weight [runawk]=2
+sum_weight [mk-configure]=1
+sum_weight [qt4]=14
+'
+
+    # tests for max_weight calculation (-W2 option)
+    test_tasks2 |
+    runtest -edW2 -c ../examples/make_package/make_package_cmd \
+	-n +1 2>&1 | grep '^sum_weight' |
+    cmp 'paexec -W2 #3' \
+'sum_weight [pipestatus]=2
+sum_weight [pkg_status]=1
+sum_weight [pkg_summary-utils]=2
+sum_weight [dict]=15
+sum_weight [pkg_online-client]=1
+sum_weight [netcat]=1
+sum_weight [dictd]=20
+sum_weight [pkg_online-server]=1
+sum_weight [judyhash]=12
+sum_weight [runawk]=2
+sum_weight [libmaa]=20
+sum_weight [paexec]=4
+'
+
+    # tests for sum_weight calculation (-W2 option)
+    test_tasks2 |
+    runtest -eW2 -c ../examples/make_package/make_package_cmd -n +1 2>&1 |
+    cmp 'paexec -W2 #4' \
+'libmaa
+success
+
+dictd
+success
+
+dict
+success
+
+judyhash
+success
+
+paexec
+success
+
+pipestatus
+success
+
+runawk
+success
+
+pkg_summary-utils
+success
+
+pkg_status
+success
+
+netcat
 success
 
 pkg_online-client
