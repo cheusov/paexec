@@ -1,6 +1,3 @@
-- -W2 - weight itself
-  -W3 - max weight in subtree
-
 - paargs - xargs-like tool for distributed computing
 
 -
