@@ -1,4 +1,4 @@
-#!/usr/bin/awk -f
+#!@awk@ -f
 
 {
 	if ($1 != 0){

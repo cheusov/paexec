@@ -1,4 +1,4 @@
-#!/usr/bin/awk -f
+#!@awk@ -f
 
 {
 	# here we print all not empty substrings
