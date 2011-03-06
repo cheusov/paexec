@@ -1,4 +1,4 @@
-#!/usr/bin/awk -f
+#!@awk@ -f
 
 function sleep (secs){
 	if (!nosleep && 0 != system("sleep " secs)){

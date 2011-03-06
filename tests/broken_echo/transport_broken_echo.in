@@ -1,8 +1,8 @@
-#!/usr/bin/awk -f
+#!@awk@ -f
 
 BEGIN {
 	if (ARGC != 3){
-		print "usage: transport_broken_toupper id ''" > "/dev/stderr"
+		print "usage: transport_broken_echo id ''" > "/dev/stderr"
 		exit 77
 	}
 
@@ -19,12 +19,14 @@ BEGIN {
 }
 
 {
+	print "I'll output " $1
 	if ($1 == id && id >= 1){
 		# emulate broken TASK==NODE where NODE >= 1
 		exit 1
 	}
 
-	print toupper($1) # uppering input
+	print $1          # echoing input
+	print "success"   # This is a keyword! Not a random word ;-)
 
 	print ""          # end of task marker
 	fflush()          # end of task MUST BE FLUSHED!!!

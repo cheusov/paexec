@@ -11,7 +11,7 @@ OBJDIR_broken_echo ?=	${.CURDIR}/tests/broken_echo
 
 #
 .PHONY : test
-test : all-paexec all-tests
+test : all-paexec all-examples all-tests
 	@echo 'running tests...'; \
 	export OBJDIR=${.OBJDIR}; \
 	export PATH=${OBJDIR_broken_echo}:${OBJDIR_paexec}:$$PATH; \
