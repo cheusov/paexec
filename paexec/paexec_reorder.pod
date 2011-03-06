@@ -19,7 +19,7 @@ more memory or disk space for temporary files will be required.
 
 =over 6
 
-=item B<-h>|B<--help>
+=item B<-h>
 
 Display help information.
 
