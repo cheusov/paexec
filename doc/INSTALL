@@ -46,38 +46,43 @@
 
 9) mkcmake install
 
-10) If you also want to install examples/, run the following command
+10) If you also want to install examples, run the following command
 
    mkcmake all-examples install-examples
 
-   By default examples/ directory is installed
+   By default examples are installed
    to ${DATADIR}/doc/paexec/examples/.
    For changing it, set EGDIR environment variable.
 
-11) If you also want to install README, NEWS, TODO, run the following command
+11) If you also want to install README, NEWS, TODO etc., run the
+    following command
 
-   mkcmake install-doc
+   mkcmake all-doc install-doc
 
-   By default do files are installed to ${PREFIX}/share/doc/.
-   For changing it, set EGDIR environment variable.
+   By default these files are installed to ${PREFIX}/share/doc/.
+   For changing it, set DOCDIR environment variable.
 
-12) paexec project consists of the following subprojects: paexec
-   (paexec and paexec_reorder executables and appropriate manual
-   pages), doc (README etc.), examples (examples of use).  By default
-   only "paexec" is built and installed. You can build and install
-   other subprojects like the following.
+12) paexec project consists of the following subprojects:
+     - paexec (paexec and paexec_reorder executables and appropriate
+               manual pages)
+     - doc (README, NEWS etc.)
+     - examples (examples of use).
+   By default only "paexec" is built and installed. You can build and
+   install all "subprojects" like the following.
 
    env SUBPRJ_DFLT='paexec examples doc' mkcmake all install
 
 13)
-   paexec_reorder utility is written in RunAWK, so we'll need RunAWK at runtime.
+   paexec_reorder utility is written in RunAWK, so we'll need RunAWK
+   at runtime.
 
    http://sourceforge.net/projects/runawk/
 
+14)
 There is a lot of Makefile variables that can be changed during
 build and installation.
 
-  PREFIX         - where paexec paexec_reorder is installed to
+  PREFIX         - where paexec and paexec_reorder are installed to
   MANDIR         - root directory for manual pages
   DESTDIR        - fake root for installation
   CPPFLAGS
@@ -89,23 +94,15 @@ build and installation.
   See mk-configure(7) for details.
 
 ------------------------------
-Examples of build and installing:
+Examples of build and installation:
 
  1)  export PREFIX=/usr SYSCONFDIR=/etc MANDIR=/usr/share/man
+     export SUBPRJ_DFLT='paexec examples doc'
      mkcmake all
      env DESTDIR=/tmp/fake-root mkcmake install
 
- 2)  export PREFIX=/usr SYSCONFDIR=/etc
-     mkcmake all examples
-     env DESTDIR=/tmp/fake-root mkcmake install install-examples
-
- 3)  env CC='icc' \
-       PREFIX=/home/cheusov/local \
+ 2)  env CC='icc' \
+       PREFIX=/usr/pkg \
        CPPFLAGS='-I/usr/pkg/include' \
-       LDFLAGS='-L/usr/pkg/lib -R/usr/pkg/lib' \
-       LDADD=-lnbcompat \
+       LDFLAGS='-L/usr/pkg/lib -Wl,-rpath -Wl,/usr/pkg/lib' \
           mkcmake -s all install
-
- 4) paexec uses getopt_long(3) for handling long options. On some
-     systems it is not available. On such platforms paexec will
-     support only short options.
