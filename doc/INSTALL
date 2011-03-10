@@ -3,8 +3,8 @@
                              INSTALLATION
 
 0)
-   Maybe paexec is already packaged for your platform. See PACKAGES
-   section below and your system's packages management tools.
+   Maybe paexec has been already packaged for your platform. See PACKAGES
+   section below and your system package management tools.
 
 1)
    We need bmake (portable version of NetBSD make) for building paexec.
@@ -27,10 +27,10 @@
    http://sourceforge.net/projects/dict/
 
 4)
-   If you want to change the default building options,
+   If you want to change the default build options,
    run mkcmake like this
 
-     env [YOUR_ASSIGNMENTS] mkcmake <target>
+     env [YOUR_ASSIGNMENTS] mkcmake <target> [YOUR_ASSIGNMENTS]
 
    See example section below
 
@@ -42,13 +42,13 @@
 7) mkcmake
 
 8) mkcmake test
-   If this step fails on your system, PLEASE LET ME NOW.
+   If this step fails on your system, please let me now.
 
 9) mkcmake install
 
 10) If you also want to install examples/, run the following command
 
-   mkcmake install-examples
+   mkcmake all-examples install-examples
 
    By default examples/ directory is installed
    to ${DATADIR}/doc/paexec/examples/.

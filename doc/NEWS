@@ -1,4 +1,28 @@
 ======================================================================
+Version 0.16.0, by Aleksey Cheusov, Thu, 10 Mar 2011 14:50:32 +0200
+
+  Project's structure has been reorganized. Now the top-level Makefile
+  uses mkc.subprj.mk. This adds a lot of flexibility in building the
+  project and development.
+  See doc/INSTALL for updated installation instructions.
+
+  New modes for reordering tasks were added: -W0 and -W2
+  See the manual page for details about option -W.
+
+  Long options are considered deprecated. They are still supported but
+  will be remove in the future. Please use POSIX short options. At the
+  moment use of them produces warning message on stderr.
+
+  Fix the compilation bug on old versions of OpenBSD (at least <=3.8)
+  and probably other systems where intptr_t is declared in inttypes.h
+  but not in stdint.h
+
+  Fix for 'mkcmake test' failure on Solaris and HP-UX because their
+  /usr/bin/awk sucks. On these platforms now it is possible to run the
+  following command.
+    env AWK=/full/path/to/gawk mkcmake all test
+
+======================================================================
 Version 0.15.0, by Aleksey Cheusov, Sun, 10 Oct 2010 18:06:31 +0300
 
   After some thoughts I decided to switch from plain mk-files to
