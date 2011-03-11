@@ -1,5 +1,5 @@
 ======================================================================
-Version 0.16.0, by Aleksey Cheusov, Thu, 10 Mar 2011 14:50:32 +0200
+Version 0.16, by Aleksey Cheusov, Fri, 11 Mar 2011 11:58:31 +0200
 
   Project's structure has been reorganized. Now the top-level Makefile
   uses mkc.subprj.mk. This adds a lot of flexibility in building the
@@ -10,8 +10,8 @@ Version 0.16.0, by Aleksey Cheusov, Thu, 10 Mar 2011 14:50:32 +0200
   See the manual page for details about option -W.
 
   Long options are considered deprecated. They are still supported but
-  will be remove in the future. Please use POSIX short options. At the
-  moment use of them produces warning message on stderr.
+  will be removed in the future. Please use POSIX short options. At
+  the moment use of them produces warning message on stderr.
 
   Fix the compilation bug on old versions of OpenBSD (at least <=3.8)
   and probably other systems where intptr_t is declared in inttypes.h
