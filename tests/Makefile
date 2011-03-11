@@ -5,6 +5,7 @@ ${f} : ${f}.in
 CLEANFILES += ${f}
 .endfor
 
-SUBPRJ    =	broken_echo
+SUBPRJ =	broken_echo
+SUBPRJ_DFLT =	${SUBPRJ}
 
 .include <mkc.subprj.mk>
