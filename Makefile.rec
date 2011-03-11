@@ -3,6 +3,7 @@ BUFSIZE ?=	4096
 
 #
 EGDIR ?=	${DATADIR}/doc/paexec/examples
+DOCDIR ?=	${DATADIR}/doc/paexec
 
 # Those poor souls who run Solaris can set AWK to /path/to/gawk
 AWK ?=			/usr/bin/awk
