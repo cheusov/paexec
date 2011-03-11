@@ -1,7 +1,7 @@
 FILES    =	COPYRIGHT NEWS README TODO
 FILESDIR =	${DOCDIR}
 
-.if exists("../ChangeLog")
+.if exists(../ChangeLog)
 FILES +=	../ChangeLog
 .endif
 
