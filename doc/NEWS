@@ -1,4 +1,11 @@
 ======================================================================
+Version 0.16.1, by Aleksey Cheusov, Wed, 23 Mar 2011 00:14:15 +0200
+
+  paexec.1 and paexec_reorder.1 are included to paexec-0.16.1.tgz.
+  Just like in paexec<=0.15.1 pod2man is not needed
+  for building paexec.
+
+======================================================================
 Version 0.16, by Aleksey Cheusov, Fri, 11 Mar 2011 11:58:31 +0200
 
   Project's structure has been reorganized. Now the top-level Makefile
