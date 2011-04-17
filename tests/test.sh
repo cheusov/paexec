@@ -249,7 +249,8 @@ mkdir -m 0700 "$tmpdir" || exit 60
 tmpfn1="$tmpdir/1"
 tmpfn2="$tmpdir/2"
 tmpfn3="$tmpdir/3"
-tmpex="$tmpdir/4"
+tmpfn4="$tmpdir/4"
+tmpex="$tmpdir/5"
 
 trap "rm -rf $tmpdir" 0 INT QUIT TERM HUP
 
@@ -370,7 +371,71 @@ usage: paexec [OPTIONS] [files...]
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -c ../examples/all_substr/all_substr_cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
-    cmp 'paexec all_substr #1' \
+    cmp 'paexec all_substr #1.1' \
+'1 substr[1,1]=a
+2 substr[1,1]=b
+2 substr[1,2]=bb
+2 substr[2,1]=b
+3 substr[1,1]=c
+3 substr[1,2]=cc
+3 substr[1,3]=ccc
+3 substr[2,1]=c
+3 substr[2,2]=cc
+3 substr[3,1]=c
+4 substr[1,1]=d
+4 substr[1,2]=dd
+4 substr[1,3]=ddd
+4 substr[1,4]=dddd
+4 substr[2,1]=d
+4 substr[2,2]=dd
+4 substr[2,3]=ddd
+4 substr[3,1]=d
+4 substr[3,2]=dd
+4 substr[4,1]=d
+5 substr[1,1]=e
+5 substr[1,2]=ee
+5 substr[1,3]=eee
+5 substr[1,4]=eeee
+5 substr[1,5]=eeeee
+5 substr[2,1]=e
+5 substr[2,2]=ee
+5 substr[2,3]=eee
+5 substr[2,4]=eeee
+5 substr[3,1]=e
+5 substr[3,2]=ee
+5 substr[3,3]=eee
+5 substr[4,1]=e
+5 substr[4,2]=ee
+5 substr[5,1]=e
+6 substr[1,1]=f
+6 substr[1,2]=ff
+6 substr[1,3]=fff
+6 substr[1,4]=ffff
+6 substr[1,5]=fffff
+6 substr[1,6]=ffffff
+6 substr[2,1]=f
+6 substr[2,2]=ff
+6 substr[2,3]=fff
+6 substr[2,4]=ffff
+6 substr[2,5]=fffff
+6 substr[3,1]=f
+6 substr[3,2]=ff
+6 substr[3,3]=fff
+6 substr[3,4]=ffff
+6 substr[4,1]=f
+6 substr[4,2]=ff
+6 substr[4,3]=fff
+6 substr[5,1]=f
+6 substr[5,2]=ff
+6 substr[6,1]=f
+'
+
+    # all_substr
+    printf '1\n2\n3\n4\n5\n6\n7\n8\n9\n' > "$tmpfn4"
+    printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
+    runtest -l -c ../examples/all_substr/all_substr_cmd \
+	-n ":$tmpfn4" | resort |
+    cmp 'paexec all_substr #1.2' \
 '1 substr[1,1]=a
 2 substr[1,1]=b
 2 substr[1,2]=bb

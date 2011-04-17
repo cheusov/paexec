@@ -924,7 +924,7 @@ static void loop (void)
 	wait_for_childs ();
 }
 
-static void split_nodes__plus_notation (void)
+static void split_nodes__count (void)
 {
 	int i;
 
@@ -985,12 +985,41 @@ static void split_nodes__list (void)
 	}
 }
 
+static void split_nodes__file (void)
+{
+	char node [4096];
+	FILE *fd = fopen (arg_nodes+1, "r");
+	size_t len = 0;
+
+	if (!fd)
+		err_fatal_errno (NULL, "Cannot obtain a list of nodes");
+
+	while (fgets (node, sizeof (node), fd)){
+		len = strlen (node);
+		if (len > 0 && node [len-1] == '\n')
+			node [len-1] = 0;
+
+		++nodes_count;
+
+		nodes = xrealloc (
+			nodes,
+			nodes_count * sizeof (*nodes));
+
+		nodes [nodes_count - 1] = xstrdup (node);
+	}
+
+	fclose (fd);
+}
+
 static void split_nodes (void)
 {
 	unsigned char c0 = arg_nodes [0];
 	if (c0 == '+'){
 		/* "+NUM" format */
-		split_nodes__plus_notation ();
+		split_nodes__count ();
+	}else if (c0 == ':'){
+		/* "+NUM" format */
+		split_nodes__file ();
 	}else if (isalnum (c0) || c0 == '/' || c0 == '_'){
 		/* list of nodes */
 		split_nodes__list ();
