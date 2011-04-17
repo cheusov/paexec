@@ -109,14 +109,15 @@ Command with its arguments
 
 Transport command
 
-=item B<-n> I<nodes>
+=item B<-n> I<+nodes>
 
-=item B<-n> I<+number>
+A number of commands to run in parallel.
 
-List of nodes (e.g. hostnames) separated by space character or (+
-notation) a number of nodes.
+=item B<-n> I<number>
 
-Path to I<command>
+List of nodes separated by space character. The first character must be
+alphanumeric, `_' or `/'. All other characters are reserved
+for future extensions.
 
 =item B<-r>
 

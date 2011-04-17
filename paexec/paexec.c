@@ -39,6 +39,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <signal.h>
+#include <ctype.h>
 #include <sys/wait.h>
 #include <errno.h>
 
@@ -639,11 +640,11 @@ static void send_to_node (void)
 			print_EOT (n);
 
 			if (alive_nodes_count == 0 && !wait_mode){
-				exit_with_error ("loop", "all nodes failed");
+				exit_with_error (NULL, "all nodes failed");
 			}
 			return;
 		}else{
-			err_fatal_errno ("send_to_node", "write() failed:");
+			err_fatal_errno (NULL, "Sending task to the node failed:");
 		}
 	}
 }
@@ -929,7 +930,7 @@ static void split_nodes__plus_notation (void)
 
 	nodes_count = (int) strtol (arg_nodes + 1, NULL, 10);
 	if (nodes_count == (int) LONG_MAX)
-		err_fatal_errno ("split_nodes", "invalid option -n:");
+		err_fatal_errno (NULL, "invalid option -n:");
 
 	nodes = xmalloc (nodes_count * sizeof (nodes [0]));
 
@@ -986,17 +987,20 @@ static void split_nodes__list (void)
 
 static void split_nodes (void)
 {
-	if (arg_nodes [0] == '+'){
+	unsigned char c0 = arg_nodes [0];
+	if (c0 == '+'){
 		/* "+NUM" format */
 		split_nodes__plus_notation ();
-	}else{
+	}else if (isalnum (c0) || c0 == '/' || c0 == '_'){
 		/* list of nodes */
 		split_nodes__list ();
+	}else{
+		err_fatal (NULL, "invalid argument for option -n\n");
 	}
 
 	/* final check */
 	if (nodes_count == 0)
-		err_fatal ("split_nodes", "invalid option -n:\n");
+		err_fatal (NULL, "invalid argument for option -n\n");
 }
 
 static void process_args (int *argc, char ***argv)
@@ -1219,7 +1223,7 @@ int main (int argc, char **argv)
 	block_signals ();
 
 	maa_init ("paexec");
-	log_stream ("paexec", stderr);
+	/* log_stream ("paexec", stderr); */
 
 	process_args (&argc, &argv);
 

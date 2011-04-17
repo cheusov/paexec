@@ -283,6 +283,12 @@ cmp 'paexec -h' 'paexec - parallel executor
 usage: paexec [OPTIONS] [files...]
 '
 
+    # bad -n arg
+    runtest -l -t dummy -c dummy -n ',bad arg' < /dev/null 2>&1 |
+    cmp 'paexec bad -n' \
+'paexec: invalid argument for option -n
+'
+
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -t ./paexec_notransport -c ../examples/toupper/toupper_cmd \
