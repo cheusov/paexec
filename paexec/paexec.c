@@ -58,6 +58,7 @@
 #include "wrappers.h"
 #include "common.h"
 #include "tasks.h"
+#include "nodes.h"
 
 static void usage (void)
 {
@@ -137,8 +138,6 @@ static int max_fd   = 0;
 
 static char *buf_stdin      = NULL;
 
-static char **nodes    = NULL;
-static int nodes_count = 0;
 static int alive_nodes_count = 0;
 
 static int show_pid      = 0;
@@ -924,114 +923,6 @@ static void loop (void)
 	wait_for_childs ();
 }
 
-static void split_nodes__count (void)
-{
-	int i;
-
-	nodes_count = (int) strtol (arg_nodes + 1, NULL, 10);
-	if (nodes_count == (int) LONG_MAX)
-		err_fatal_errno (NULL, "invalid option -n:");
-
-	nodes = xmalloc (nodes_count * sizeof (nodes [0]));
-
-	for (i=0; i < nodes_count; ++i){
-		char num [50];
-		snprintf (num, sizeof (num), "%d", i);
-		nodes [i] = xstrdup (num);
-	}
-}
-
-static void split_nodes__list (void)
-{
-	char *last = NULL;
-	char *p = arg_nodes;
-	char c;
-
-	/* "node1 nodes2 ..." format */
-	for (;;){
-		c = *p;
-
-		switch (c){
-			case ' ':
-			case '\t':
-			case '\r':
-			case '\n':
-			case 0:
-				if (last){
-					*p = 0;
-
-					++nodes_count;
-
-					nodes = xrealloc (
-						nodes,
-						nodes_count * sizeof (*nodes));
-
-					nodes [nodes_count - 1] = xstrdup (last);
-
-					last = NULL;
-				}
-				break;
-			default:
-				if (!last){
-					last = p;
-				}
-				break;
-		}
-
-		if (!c)
-			break;
-
-		++p;
-	}
-}
-
-static void split_nodes__file (void)
-{
-	char node [4096];
-	FILE *fd = fopen (arg_nodes+1, "r");
-	size_t len = 0;
-
-	if (!fd)
-		err_fatal_errno (NULL, "Cannot obtain a list of nodes");
-
-	while (fgets (node, sizeof (node), fd)){
-		len = strlen (node);
-		if (len > 0 && node [len-1] == '\n')
-			node [len-1] = 0;
-
-		++nodes_count;
-
-		nodes = xrealloc (
-			nodes,
-			nodes_count * sizeof (*nodes));
-
-		nodes [nodes_count - 1] = xstrdup (node);
-	}
-
-	fclose (fd);
-}
-
-static void split_nodes (void)
-{
-	unsigned char c0 = arg_nodes [0];
-	if (c0 == '+'){
-		/* "+NUM" format */
-		split_nodes__count ();
-	}else if (c0 == ':'){
-		/* "+NUM" format */
-		split_nodes__file ();
-	}else if (isalnum (c0) || c0 == '/' || c0 == '_'){
-		/* list of nodes */
-		split_nodes__list ();
-	}else{
-		err_fatal (NULL, "invalid argument for option -n\n");
-	}
-
-	/* final check */
-	if (nodes_count == 0)
-		err_fatal (NULL, "invalid argument for option -n\n");
-}
-
 static void process_args (int *argc, char ***argv)
 {
 	int c;
@@ -1166,7 +1057,7 @@ static void process_args (int *argc, char ***argv)
 	}
 
 	if (arg_nodes){
-		split_nodes ();
+		nodes_create (arg_nodes);
 	}else{
 		err_fatal (NULL, "-n option is mandatory!\n");
 	}
@@ -1193,13 +1084,7 @@ static void free_memory (void)
 	if (arg_cmd)
 		xfree (arg_cmd);
 
-	if (nodes){
-		for (i=0; i < nodes_count; ++i){
-			if (nodes [i])
-				xfree (nodes [i]);
-		}
-		xfree (nodes);
-	}
+	nodes_destroy ();
 
 	if (fd_in)
 		xfree (fd_in);
