@@ -8,7 +8,7 @@ WARNS     ?=	4
 WARNERR   ?=	no
 
 PROG       =	paexec
-SRCS       =	paexec.c wrappers.c tasks.c nodes.c
+SRCS       =	paexec.c wrappers.c tasks.c nodes.c signals.c
 
 SCRIPTS    =	paexec_reorder
 

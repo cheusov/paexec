@@ -38,9 +38,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <limits.h>
-#include <signal.h>
 #include <ctype.h>
-#include <sys/wait.h>
 #include <errno.h>
 
 /***********************************************************/
@@ -59,6 +57,7 @@
 #include "common.h"
 #include "tasks.h"
 #include "nodes.h"
+#include "signals.h"
 
 static void usage (void)
 {
@@ -358,83 +357,6 @@ static void mark_node_as_dead (int node)
 
 	tasks__mark_task_as_failed (node2taskid [node]);
 	--alive_nodes_count;
-}
-
-static int sigalrm_tics = 0;
-static void handler_sigalrm (int dummy attr_unused)
-{
-	++sigalrm_tics;
-	alarm (1);
-}
-
-static void handler_sigchld (int dummy attr_unused)
-{
-	int status;
-	pid_t pid;
-
-	while (pid = waitpid(-1, &status, WNOHANG), pid > 0){
-	}
-}
-
-static void set_sigalrm_handler (void)
-{
-	struct sigaction sa;
-
-	sa.sa_handler = handler_sigalrm;
-	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction (SIGALRM, &sa, NULL);
-}
-
-static void set_sigchld_handler (void)
-{
-	struct sigaction sa;
-
-	sa.sa_handler = handler_sigchld;
-	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction (SIGCHLD, &sa, NULL);
-}
-
-static void ignore_sigpipe (void)
-{
-	struct sigaction sa;
-
-	sa.sa_handler = SIG_IGN;
-	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction (SIGPIPE, &sa, NULL);
-}
-
-static void block_signals (void)
-{
-	sigset_t set;
-
-	sigemptyset (&set);
-	xsigaddset (&set, SIGALRM);
-	xsigaddset (&set, SIGCHLD);
-
-	xsigprocmask (SIG_BLOCK, &set, NULL);
-}
-
-static void unblock_signals (void)
-{
-	sigset_t set;
-
-	sigemptyset (&set);
-	xsigaddset (&set, SIGALRM);
-	xsigaddset (&set, SIGCHLD);
-
-	xsigprocmask (SIG_UNBLOCK, &set, NULL);
-}
-
-static void wait_for_sigalrm (void)
-{
-	sigset_t set;
-
-	sigemptyset (&set);
-
-	sigsuspend (&set);
 }
 
 static void init (void)

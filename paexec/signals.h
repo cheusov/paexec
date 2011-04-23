@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2008 Aleksey Cheusov <vle@gmx.net>
+ * Copyright (c) 2007-2011 Aleksey Cheusov <vle@gmx.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -21,20 +21,13 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _WRAPPERS_H_
-#define _WRAPPERS_H_
+extern int sigalrm_tics;
 
-#if HAVE_HEADER_SYS_SELECT_H
-#include <sys/select.h>
-#endif
-#include <sys/time.h> /* On ancient HP-UX select(2) is declared here */
-#include <unistd.h>
-#include <signal.h>
-#include <stdio.h>
-
-void nonblock (int fd);
-char * xfgetln(FILE *fp, size_t *len);
-void xsigprocmask (int how, const sigset_t *set, sigset_t *oset);
-void xsigaddset (sigset_t *set, int signo);
-
-#endif /* _WRAPPERS_H_ */
+void block_signals (void);
+void unblock_signals (void);
+void ignore_sigpipe (void);
+void wait_for_sigalrm (void);
+void handler_sigchld (int dummy);
+void set_sigalrm_handler (void);
+void set_sigchld_handler (void);
+void handler_sigalrm (int dummy);
