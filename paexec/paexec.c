@@ -69,7 +69,9 @@ OPTIONS:\n\
   -h               give this help\n\
   -V               show version\n\
 \n\
-  -n <nodes|+num>  list of nodes|number of subprocesses\n\
+  -n <+num>        number of subprocesses to run\n\
+  -n <nodes>       list of nodes separated by space character\n\
+  -n <:filename>   filename containing a list of nodes, one node per line\n\
   -c <command>     path to a command\n\
   -t <trans>       path to a transport program\n\
 \n\
