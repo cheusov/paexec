@@ -3,7 +3,9 @@ BIRTHDATE   =	2008-01-25
 PROJECTNAME =	paexec
 
 SUBPRJ      =	paexec:tests examples doc
-SUBPRJ_DFLT ?=	paexec
+SUBPRJ_DFLT?=	paexec
+
+MKC_REQD    =	0.23.0
 
 .PHONY: manpages
 manpages:
