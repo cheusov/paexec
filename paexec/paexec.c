@@ -170,6 +170,8 @@ static int resistance_last_restart = 0;
 
 static int wait_mode = 0;
 
+static int exec_mode = 0;
+
 static int use_weights = 0;
 
 static void exit_with_error (const char * routine attr_unused, const char *msg);
@@ -880,7 +882,7 @@ static void process_args (int *argc, char ***argv)
 	};
 #endif
 
-	static const char optstring [] = "hVdvrlpeEiIwzZ:n:c:t:sgm:W:";
+	static const char optstring [] = "hVdvrlpeEiIwzZ:n:c:t:sgm:W:x";
 
 	while (c =
 #ifdef HAVE_GETOPT_LONG
@@ -970,6 +972,9 @@ static void process_args (int *argc, char ***argv)
 				use_weights = atoi (optarg);
 				graph_mode  = 1;
 				break;
+			case 'x':
+				exec_mode = 1;
+				break;
 			default:
 				usage ();
 				exit (1);
@@ -992,6 +997,28 @@ static void process_args (int *argc, char ***argv)
 
 	if (use_weights < 0 || use_weights > 2){
 		err_fatal (NULL, "Only -W1 and -W2 are supported!\n");
+	}
+
+	if (exec_mode){
+		char cmd [4096];
+		char shq_cmd [4096];
+
+		snprintf (cmd, sizeof (cmd),
+				  "while read f; do"
+				  "  res=`%s \"$f\"`; printf '%%s\\n' \"$res\" | awk '{print \" \" $0}';"
+				  "  echo;"
+				  "done", arg_cmd);
+		if ((size_t)-1 == shquote (cmd, shq_cmd, sizeof (shq_cmd))){
+			err_fatal (NULL, "Internal error1! (buffer size)\n");
+		}
+
+		snprintf (cmd, sizeof (cmd), "/bin/sh -c %s", shq_cmd);
+		if (strlen (cmd) == sizeof (cmd)-1){
+			err_fatal (NULL, "Internal error2! (buffer size)\n");
+		}
+
+		xfree (arg_cmd);
+		arg_cmd = xstrdup (cmd);
 	}
 }
 
