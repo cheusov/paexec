@@ -1,6 +1,6 @@
-INSCRIPTS  =	toupper_cmd
+INSCRIPTS  =	cmd
 
-SCRIPTS    =	${INSCRIPTS} toupper_run
+SCRIPTS    =	${INSCRIPTS} run
 SCRIPTSDIR =	${EGDIR}/${.CURDIR:T}
 
 .include <mkc.subprj.mk>

@@ -3,7 +3,7 @@
 # Converts all strings to upper case in parallel.
 # Subprocesses are run on the same host where paexec is run.
 # Input may contains empty lines.
-paexec -lp -c "`pwd`/toupper_cmd" -n +10 <<EOF
+paexec -lp -c "`pwd`/cmd" -n +10 <<EOF
 dictd  is  a  server  for  the Dictionary Server Protocol (DICT).
 
 The book is red.

@@ -292,7 +292,7 @@ usage: paexec [OPTIONS] [files...]
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -t ./paexec_notransport -c ../examples/toupper/toupper_cmd \
+    runtest -l -t ./paexec_notransport -c ../examples/toupper/cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec toupper #1' \
 '1 A
@@ -305,7 +305,7 @@ usage: paexec [OPTIONS] [files...]
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -t '' -c ../examples/toupper/toupper_cmd \
+    runtest -l -t '' -c ../examples/toupper/cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec toupper #2' \
 '1 A
@@ -317,7 +317,7 @@ usage: paexec [OPTIONS] [files...]
 '
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c ../examples/toupper/toupper_cmd \
+    runtest -l -c ../examples/toupper/cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec toupper #3' \
 '1 A
@@ -330,7 +330,7 @@ usage: paexec [OPTIONS] [files...]
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p -t ./paexec_notransport \
-	-c ../examples/toupper/toupper_cmd -n '+2' |
+	-c ../examples/toupper/cmd -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
     cmp 'paexec toupper #4' \
 '1 pid A
@@ -343,7 +343,7 @@ usage: paexec [OPTIONS] [files...]
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p -t '' \
-	-c ../examples/toupper/toupper_cmd -n '+2' |
+	-c ../examples/toupper/cmd -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
     cmp 'paexec toupper #5' \
 '1 pid A
@@ -356,7 +356,7 @@ usage: paexec [OPTIONS] [files...]
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p \
-	-c ../examples/toupper/toupper_cmd -n '+2' |
+	-c ../examples/toupper/cmd -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
     cmp 'paexec toupper #6' \
 '1 pid A
