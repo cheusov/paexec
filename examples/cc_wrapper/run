@@ -2,7 +2,7 @@
 
 # here we compile .c sources in parallel on two hosts: localhost and chen
 # a la distcc
-paexec -c "env CC=gcc CFLAGS=-O2 `pwd`/cc_wrapper_cmd" \
+paexec -c "env CC=gcc CFLAGS=-O2 `pwd`/cmd" \
              -n 'host1 host2' \
              -t '/usr/bin/ssh -x' <<EOF
 $PWD/func1.c

@@ -1,6 +1,6 @@
-INSCRIPTS  =	all_substr_cmd
+INSCRIPTS  =	cmd
 
-SCRIPTS    =	${INSCRIPTS} all_substr_run
+SCRIPTS    =	${INSCRIPTS} run
 SCRIPTSDIR =	${EGDIR}/${.CURDIR:T}
 
 .include <mkc.subprj.mk>

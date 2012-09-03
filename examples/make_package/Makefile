@@ -1,7 +1,7 @@
-INSCRIPTS   =	make_package_cmd make_package_cmd__xxx_failed
+INSCRIPTS   =	cmd cmd__xxx_failed
 
 SCRIPTS     =	${INSCRIPTS}
-FILES      !=	echo make_package_tasks*
+FILES      !=	echo tasks*
 
 FILESDIR    =	${EGDIR}/${.CURDIR:T}
 SCRIPTSDIR ?=	${FILESDIR}

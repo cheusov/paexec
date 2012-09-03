@@ -369,7 +369,7 @@ usage: paexec [OPTIONS] [files...]
 
     # all_substr
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c ../examples/all_substr/all_substr_cmd \
+    runtest -l -c ../examples/all_substr/cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec all_substr #1.1' \
 '1 substr[1,1]=a
@@ -433,7 +433,7 @@ usage: paexec [OPTIONS] [files...]
     # all_substr
     printf '1\n2\n3\n4\n5\n6\n7\n8\n9\n' > "$tmpfn4"
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c ../examples/all_substr/all_substr_cmd \
+    runtest -l -c ../examples/all_substr/cmd \
 	-n ":$tmpfn4" | resort |
     cmp 'paexec all_substr #1.2' \
 '1 substr[1,1]=a
@@ -496,7 +496,7 @@ usage: paexec [OPTIONS] [files...]
 
     # all_substr
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c ../examples/all_substr/all_substr_cmd -n '+9' |
+    runtest -l -c ../examples/all_substr/cmd -n '+9' |
     resort |
     cmp 'paexec all_substr #2' \
 '1 substr[1,1]=a
@@ -558,7 +558,7 @@ usage: paexec [OPTIONS] [files...]
 '
 
     # no input
-    runtest -c ../examples/all_substr/all_substr_cmd -n +3 < /dev/null |
+    runtest -c ../examples/all_substr/cmd -n +3 < /dev/null |
     cmp 'paexec all_substr #3' ''
 
     # bad command + no input
@@ -581,7 +581,7 @@ usage: paexec [OPTIONS] [files...]
 
     # tests for partially ordered set of tasks (-s option)
     test_tasks3 |
-    runtest -e -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 |
+    runtest -e -s -l -c ../examples/1_div_X/cmd -n +10 |
     cmp 'paexec 1/X #1' \
 '1 1/1=1
 1 success
@@ -605,27 +605,27 @@ usage: paexec [OPTIONS] [files...]
 '
 
     # -s and no input
-    runtest -s -l -c ../examples/1_div_X/1_div_X_cmd -n +10 < /dev/null |
+    runtest -s -l -c ../examples/1_div_X/cmd -n +10 < /dev/null |
     cmp 'paexec 1/X #2' ''
 
     # -s all failed
-    runtest -s -l -c '../examples/make_package/make_package_cmd__xxx_failed .' \
+    runtest -s -l -c '../examples/make_package/cmd__xxx_failed .' \
 	-n +10 < /dev/null |
     cmp 'paexec all fails #1' ''
 
     # -s all failed
-    runtest -s -l -c '../examples/make_package/make_package_cmd__xxx_failed .' \
+    runtest -s -l -c '../examples/make_package/cmd__xxx_failed .' \
 	-n +5 < /dev/null |
     cmp 'paexec all fails #2' ''
 
     # -s all failed
-    runtest -s -l -c '../examples/make_package/make_package_cmd__xxx_failed .' \
+    runtest -s -l -c '../examples/make_package/cmd__xxx_failed .' \
 	-n +1 < /dev/null |
     cmp 'paexec all fails #3' ''
 
     # -s: all succeeded
-    runtest -l -s -c ../examples/make_package/make_package_cmd -n +2 \
-	> $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c ../examples/make_package/cmd -n +2 \
+	> $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -659,8 +659,8 @@ ok100
 '
 
     # -s: byacc fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed byacc' \
-	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed byacc' \
+	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -693,8 +693,8 @@ ok100
 '
 
     # -s: flex fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed flex' \
-	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed flex' \
+	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -727,8 +727,8 @@ ok100
 '
 
     # -s: libmaa fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libmaa' \
-	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed libmaa' \
+	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -761,8 +761,8 @@ ok100
 '
 
     # -s: m4 fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed m4' \
-	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed m4' \
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -793,8 +793,8 @@ ok100
 '
 
     # -s: libjudy fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed libjudy' \
-	-n +2 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed libjudy' \
+	-n +2 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -826,8 +826,8 @@ ok100
 '
 
     # -s: dictem fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dictem' \
-	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed dictem' \
+	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -859,8 +859,8 @@ ok100
 '
 
     # -s: glib2 fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed glib2' \
-	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed glib2' \
+	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln textproc/dictem`" -gt 0 && echo ok2
@@ -892,8 +892,8 @@ ok100
 '
 
     # -s: gmake fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed gmake' -n +5 \
-	> $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed gmake' -n +5 \
+	> $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -925,8 +925,8 @@ ok100
 '
 
     # -s: autoconf fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed autoconf' \
-	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed autoconf' \
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -959,8 +959,8 @@ ok100
 '
 
     # -s: dict-server fails
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed dict-server' \
-	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed dict-server' \
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -990,8 +990,8 @@ ok100
 '
 
     # -s: flex and byacc fail
-    runtest -l -s -c '../examples/make_package/make_package_cmd__xxx_failed "flex|byacc"' \
-	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+    runtest -l -s -c '../examples/make_package/cmd__xxx_failed "flex|byacc"' \
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -1032,8 +1032,8 @@ ok100
 
     # -s: gmake and autoconf fail
     runtest -l -s \
-	-c '../examples/make_package/make_package_cmd__xxx_failed "gmake|autoconf"' \
-	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks
+	-c '../examples/make_package/cmd__xxx_failed "gmake|autoconf"' \
+	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -1076,8 +1076,8 @@ ok100
 
     # diamond-like dependancy and failure
     runtest -l -s \
-	-c '../examples/make_package/make_package_cmd__xxx_failed flex' \
-	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/make_package_tasks2
+	-c '../examples/make_package/cmd__xxx_failed flex' \
+	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/tasks2
 
     {
 	test "`gln devel/flex`" = f && echo ok1
@@ -1100,8 +1100,8 @@ ok
 
     # cycle detection1
     runtest -l -s \
-	-c ../examples/make_package/make_package_cmd \
-	-n +5 < ../examples/make_package/make_package_tasks_cycle |
+	-c ../examples/make_package/cmd \
+	-n +5 < ../examples/make_package/tasks_cycle |
     cmp 'paexec cyclic deps #1' \
 'Cyclic dependancy detected:
   devel/gettext-lib -> devel/gmake
@@ -1117,7 +1117,7 @@ task10 task20
 task20 task30
 task30 task10
 ' | runtest -l -s \
-	-c ../examples/make_package/make_package_cmd \
+	-c ../examples/make_package/cmd \
 	-n +5 |
     cmp 'paexec cyclic deps #2' \
 'Cyclic dependancy detected:
@@ -1133,7 +1133,7 @@ task20 task30
 task50 task50
 task30 task40
 ' | runtest -l -s \
-	-c ../examples/make_package/make_package_cmd \
+	-c ../examples/make_package/cmd \
 	-n +5 |
     cmp 'paexec cyclic deps #3' \
 'Cyclic dependancy detected:
@@ -1152,7 +1152,7 @@ task100 task110
 task200 task300
 task300 task0
 ' | runtest -l -s \
-	-c ../examples/make_package/make_package_cmd \
+	-c ../examples/make_package/cmd \
 	-n +5 |
     cmp 'paexec cyclic deps #4' \
 'Cyclic dependancy detected:
@@ -1483,7 +1483,7 @@ output 6
     rm -f "$test_file"
 
     # tests for weighted nodes of graph (-W0 option)
-    test_tasks1 | runtest -W0 -e -c ../examples/make_package/make_package_cmd -n +1 |
+    test_tasks1 | runtest -W0 -e -c ../examples/make_package/cmd -n +1 |
     cmp 'paexec -W0 #1' \
 'qt4
 success
@@ -1531,7 +1531,7 @@ success
 
     # tests for max_weight calculation (-W0 option)
     test_tasks1 |
-    runtest -W0 -e -d -c ../examples/make_package/make_package_cmd \
+    runtest -W0 -e -d -c ../examples/make_package/cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W0 #2' \
 'sum_weight [pcc]=4
@@ -1552,7 +1552,7 @@ sum_weight [qt4]=14
 
     # tests for max_weight calculation (-W0 option)
     test_tasks2 |
-    runtest -edW0 -c ../examples/make_package/make_package_cmd \
+    runtest -edW0 -c ../examples/make_package/cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W0 #3' \
 'sum_weight [pipestatus]=1
@@ -1571,7 +1571,7 @@ sum_weight [paexec]=4
 
     # tests for sum_weight calculation (-W0 option)
     test_tasks2 |
-    runtest -eW0 -c ../examples/make_package/make_package_cmd -n +1 2>&1 |
+    runtest -eW0 -c ../examples/make_package/cmd -n +1 2>&1 |
     cmp 'paexec -W0 #4' \
 'judyhash
 success
@@ -1612,7 +1612,7 @@ success
 '
 
     # tests for weighted nodes of graph (-W1 option)
-    test_tasks1 | runtest -W1 -e -c ../examples/make_package/make_package_cmd -n +1 |
+    test_tasks1 | runtest -W1 -e -c ../examples/make_package/cmd -n +1 |
     cmp 'paexec -W1 #1' \
 'qt4
 success
@@ -1660,7 +1660,7 @@ success
 
     # tests for sum_weight calculation (-W1 option)
     test_tasks1 |
-    runtest -W1 -e -d -c ../examples/make_package/make_package_cmd \
+    runtest -W1 -e -d -c ../examples/make_package/cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W1 #2' \
 'sum_weight [pcc]=4
@@ -1681,7 +1681,7 @@ sum_weight [qt4]=14
 
     # tests for sum_weight calculation (-W1 option)
     test_tasks2 |
-    runtest -edW1 -c ../examples/make_package/make_package_cmd \
+    runtest -edW1 -c ../examples/make_package/cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W1 #3' \
 'sum_weight [pipestatus]=6
@@ -1700,7 +1700,7 @@ sum_weight [paexec]=9
 
     # tests for sum_weight calculation (-W1 option)
     test_tasks2 |
-    runtest -eW1 -c ../examples/make_package/make_package_cmd -n +1 2>&1 |
+    runtest -eW1 -c ../examples/make_package/cmd -n +1 2>&1 |
     cmp 'paexec -W1 #4' \
 'libmaa
 success
@@ -1741,7 +1741,7 @@ success
 '
 
     # tests for weighted nodes of graph (-W2 option)
-    test_tasks1 | runtest -W2 -e -c ../examples/make_package/make_package_cmd -n +1 |
+    test_tasks1 | runtest -W2 -e -c ../examples/make_package/cmd -n +1 |
     cmp 'paexec -W2 #1' \
 'qt4
 success
@@ -1789,7 +1789,7 @@ success
 
     # tests for max_weight calculation (-W2 option)
     test_tasks1 |
-    runtest -W2 -e -d -c ../examples/make_package/make_package_cmd \
+    runtest -W2 -e -d -c ../examples/make_package/cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W2 #2' \
 'sum_weight [pcc]=4
@@ -1810,7 +1810,7 @@ sum_weight [qt4]=14
 
     # tests for max_weight calculation (-W2 option)
     test_tasks2 |
-    runtest -edW2 -c ../examples/make_package/make_package_cmd \
+    runtest -edW2 -c ../examples/make_package/cmd \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W2 #3' \
 'sum_weight [pipestatus]=2
@@ -1829,7 +1829,7 @@ sum_weight [paexec]=4
 
     # tests for sum_weight calculation (-W2 option)
     test_tasks2 |
-    runtest -eW2 -c ../examples/make_package/make_package_cmd -n +1 2>&1 |
+    runtest -eW2 -c ../examples/make_package/cmd -n +1 2>&1 |
     cmp 'paexec -W2 #4' \
 'libmaa
 success

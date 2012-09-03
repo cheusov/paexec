@@ -176,7 +176,7 @@ The line before it shows an EXIT STATUS of the task.
 The word "failure" means failure, "success" - success and
 "fatal" means that the current task is reassigned to another node
 (and restarted, of course) (see option -z).
-See examples/1_div_x/1_div_X_cmd for the sample.
+See examples/1_div_x/cmd for the sample.
 An input line (paexec's stdin) should contain
 either single task without spaces inside
 or two tasks separated by single space character,
@@ -190,7 +190,7 @@ word is output followed by a list of tasks failed because of it.
 
  Samples:
 
-   tasks (examples/make_package/make_package_tasks file)
+   tasks (examples/make_package/tasks file)
 
      textproc/dictem
      devel/autoconf wip/libmaa
@@ -205,7 +205,7 @@ word is output followed by a list of tasks failed because of it.
      devel/glib2
      devel/libjudy
 
-   command (examples/make_package/make_package_cmd__flex)
+   command (examples/make_package/cmd__flex)
 
      #!/usr/bin/awk -f
      {
@@ -219,8 +219,8 @@ word is output followed by a list of tasks failed because of it.
         fflush()
      }
 
-   output of "paexec -s -l -c make_package_cmd__flex -n +10 \
-              < make_package_tasks"
+   output of "paexec -s -l -c cmd__flex -n +10 \
+              < tasks"
 
      3 devel/autoconf
      3 success

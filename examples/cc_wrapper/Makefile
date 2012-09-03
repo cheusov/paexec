@@ -1,4 +1,4 @@
-SCRIPTS     =	cc_wrapper_cmd cc_wrapper_run
+SCRIPTS     =	cmd run
 FILES      !=	echo *.c
 
 FILESDIR    =	${EGDIR}/${.CURDIR:T}
