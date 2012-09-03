@@ -101,8 +101,9 @@ OPTIONS:\n\
 \n\
   -m s=<success>\n\
   -m f=<failure>\n\
-  -m F=<fatal>     set alternative messages instead of default\n\
-                   'success', 'failure' and 'fatal'.\n\
+  -m F=<fatal>\n\
+  -m t=<eot>       set alternative messages instead of default 'success',\n\
+                   'failure', 'fatal' and '' (end-of-task marker).\n\
 -n and -c are mandatory options\n\
 \n\
 ");
@@ -163,6 +164,7 @@ static int end_of_stdin = 0;
 static const char *poset_success = "success";
 static const char *poset_failure = "failure";
 static const char *poset_fatal   = "fatal";
+static const char *poset_eot = "";
 
 static int resistant = 0;
 static int resistance_timeout = 0;
@@ -517,7 +519,7 @@ static void print_line (int num, const char *line)
 static void print_EOT (int num)
 {
 	if (print_eot){
-		print_line (num, "");
+		print_line (num, poset_eot);
 		if (flush_eot)
 			fflush (stdout);
 	}
@@ -578,6 +580,7 @@ static int unblock_select_block (
 {
 	int ret;
 	char msg [200];
+
 	unblock_signals ();
 
 	do {
@@ -591,6 +594,7 @@ static int unblock_select_block (
 	}
 
 	block_signals ();
+
 	return ret;
 }
 
@@ -701,6 +705,7 @@ static void loop (void)
 				}
 
 				if (cnt == -1 || cnt == 0){
+					/* read error or unexpected end of file */
 					if (resistant){
 						FD_CLR (fd_out [i], &rset);
 						mark_node_as_dead (i);
@@ -737,7 +742,7 @@ static void loop (void)
 
 						curr_line = buf_out_i + printed;
 
-						if (printed == j){
+						if (!strcmp (curr_line, poset_eot)){
 							/* end of task marker */
 							assert (busy [i] == 1);
 
@@ -749,7 +754,7 @@ static void loop (void)
 								fd_in [i] = -1;
 							}
 
-							/* an empty line means end-of-task */
+							/* EOT line means end-of-task */
 							if (graph_mode){
 								switch (ret_codes [i]){
 									case rt_failure:
@@ -961,6 +966,8 @@ static void process_args (int *argc, char ***argv)
 					poset_failure = xstrdup (optarg+2);
 				else if (optarg [0] == 'F' && optarg [1] == '=')
 					poset_fatal = xstrdup (optarg+2);
+				else if (optarg [0] == 't' && optarg [1] == '=')
+					poset_eot = xstrdup (optarg+2);
 				else{
 					err_fatal (NULL, "bad argument for -m\n");
 				}
