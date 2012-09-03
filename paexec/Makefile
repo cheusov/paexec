@@ -28,5 +28,8 @@ MKC_CHECK_HEADERS    =	sys/select.h
 
 CLEANFILES           =  *~ core* *.1 *.html ktrace* ChangeLog *.tmp
 
+.PHONY: _manpages
+_manpages: ${MAN}
+
 ############################################################
 .include <mkc.prog.mk>

@@ -7,12 +7,14 @@ SUBPRJ_DFLT?=	paexec
 
 MKC_REQD    =	0.23.0
 
+TARGETS    +=	_manpages
+
 .PHONY: manpages
-manpages:
-	set -e; \
-	MKC_CACHEDIR=`pwd`; export MKC_CACHEDIR; \
-	cd paexec; ${MAKE} paexec.1 paexec_reorder.1; cd ..; \
-	rm -f _mkc_*
+manpages: _manpages
+	rm ${MKC_CACHEDIR}/_mkc*
+
+clean: clean-examples clean-tests
+cleandir: cleandir-examples cleandir-tests
 
 .include "test.mk"
 .include <mkc.subprj.mk>
