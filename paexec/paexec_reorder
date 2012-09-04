@@ -78,7 +78,10 @@ BEGIN {
 
 # -Mm
 function print_results (task,        cnt,i){
-	if (!graph_mode || status [task] == "success" || status [task] == "failure"){
+	if (graph_mode && !(task in pline))
+		return
+
+	if (!graph_mode || pline [task] == "success" || ppline [task] == "failure"){
 		cnt = count [task]
 		for (i=1; i <= cnt; ++i){
 			if (output_task)
@@ -88,7 +91,7 @@ function print_results (task,        cnt,i){
 		}
 
 		count [task] = 0
-	}else if (status [task] == "fatal"){
+	}else if (pline [task] == "fatal"){
 		count [task] = 0
 	}else{
 		abort(bad_input_msg)
@@ -97,7 +100,7 @@ function print_results (task,        cnt,i){
 
 # common code
 {
-	assert(NF > 0 && $0 ~ /^[0-9]+ /, bad_input_msg "1")
+	assert(NF > 0 && $0 ~ /^[0-9]+ /, bad_input_msg)
 	if (task > task_max)
 		task_max = task
 }
@@ -130,7 +133,7 @@ function print_results_file (task,      cmd,fn){
 
 method == 3 {
 	if (/^[0-9]+ $/){
-		if (!graph_mode || status [$1] != "fatal"){
+		if (!graph_mode || pline [$1] != "fatal"){
 			print_results_file(task)
 		}else{
 			fn = runawk_tmpdir "/" task
@@ -139,8 +142,10 @@ method == 3 {
 			delete count [task]
 		}
 	}else{
-		if (graph_mode)
-			status [$1] = $2
+		if (graph_mode){
+			ppline [$1] = pline [$1]
+			pline [$1] = $2
+		}
 
 		task = $1
 		count [task] = 1
@@ -167,8 +172,10 @@ method == 3 {
 }
 
 {
-	if (graph_mode)
-		status [$1] = $2
+	if (graph_mode){
+		ppline [$1] = pline [$1]
+		pline [$1] = $2
+	}
 
 	task = $1
 	sub(/^[0-9]+ /, "", $0)

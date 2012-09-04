@@ -131,6 +131,22 @@ test_tasks3 (){
 EOF
 }
 
+test_tasks4 (){
+    cat <<'EOF'
+1 2
+2 3
+3 4
+4 5
+5 0
+0 7
+7 8
+8 9
+5 10
+10 11
+11 12
+EOF
+}
+
 paexec_reorder_input1 (){
     cat <<'EOF'
 2 TABLE1
@@ -189,6 +205,7 @@ paexec_reorder_input3 (){
 1 
 3  GREEN???
 3 failure
+3 4 5
 3 
 EOF
 }
@@ -219,6 +236,7 @@ paexec_reorder_input4 (){
 1 
 3  GREEN???
 3 failure
+3 4 5
 3 
 EOF
 }
@@ -240,6 +258,7 @@ paexec_reorder_input5 (){
 1 success
 3 GREEN???
 3 failure
+3 4 5
 EOF
 }
 
@@ -607,6 +626,32 @@ usage: paexec [OPTIONS] [files...]
     # -s and no input
     runtest -s -l -c ../examples/1_div_X/cmd -n +10 < /dev/null |
     cmp 'paexec 1/X #2' ''
+
+    # paexec_reorder + failure
+    test_tasks4 |
+    runtest -se -l -c ../examples/1_div_X/cmd -n +1 |
+    paexec_reorder -gl |
+    cmp 'paexec 1/X #3' \
+'1 1/1=1
+1 success
+2 1/2=0.5
+2 success
+3 1/3=0.333333
+3 success
+4 1/4=0.25
+4 success
+5 1/5=0.2
+5 success
+6 Cannot calculate 1/0
+6 failure
+6 0 7 8 9 
+10 1/10=0.1
+10 success
+11 1/11=0.0909091
+11 success
+12 1/12=0.0833333
+12 success
+'
 
     # -s all failed
     runtest -s -l -c '../examples/make_package/cmd__xxx_failed .' \
@@ -1921,6 +1966,7 @@ GREEN2
 GREEN3
 GREEN???
 failure
+4 5
 '
 
     # tests for paexec_reorder -glS
@@ -1941,6 +1987,7 @@ failure
 3 GREEN3
 3 GREEN???
 3 failure
+3 4 5
 '
 
     # tests for paexec_reorder -gl
@@ -1961,6 +2008,7 @@ failure
 3 GREEN3
 3 GREEN???
 3 failure
+3 4 5
 '
 
     # tests for paexec_reorder -Ms
@@ -2015,6 +2063,7 @@ GREEN2
 GREEN3
 GREEN???
 failure
+4 5
 '
 
     # tests for paexec_reorder -gl -Ms
@@ -2040,6 +2089,7 @@ failure
 3  GREEN3
 3  GREEN???
 3 failure
+3 4 5
 '
 
     # tests for paexec_reorder -gl -Ms
@@ -2060,6 +2110,7 @@ failure
 3 GREEN3
 3 GREEN???
 3 failure
+3 4 5
 '
 
     # tests for paexec_reorder -Mf
@@ -2114,6 +2165,7 @@ GREEN2
 GREEN3
 GREEN???
 failure
+4 5
 '
 
     # tests for paexec_reorder -gl -Mf
@@ -2134,6 +2186,7 @@ failure
 3  GREEN3
 3  GREEN???
 3 failure
+3 4 5
 '
 
     # tests for paexec_reorder -gl -Mf
@@ -2154,6 +2207,7 @@ failure
 3 GREEN3
 3 GREEN???
 3 failure
+3 4 5
 '
 
     #
