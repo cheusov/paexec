@@ -2,19 +2,32 @@ BIRTHDATE   =	2008-01-25
 
 PROJECTNAME =	paexec
 
-SUBPRJ      =	paexec:tests examples doc
+SUBPRJ      =	paexec:tests doc
 SUBPRJ_DFLT?=	paexec
 
 MKC_REQD    =	0.23.0
 
+# new recursive target for making a distribution tarball
 TARGETS    +=	_manpages
+
+examples    =	1_div_X all_substr cc_wrapper make_package toupper
+.for d in ${examples}
+SUBPRJ     +=	examples/${d}:tests examples/${d}:examples
+.endfor
+
+tests       =	transp_closed_stdin scripts
+.for d in ${tests}
+SUBPRJ     +=	tests/${d}:tests
+.endfor
 
 .PHONY: manpages
 manpages: _manpages
 	rm ${MKC_CACHEDIR}/_mkc*
 
-clean: clean-examples clean-tests
-cleandir: cleandir-examples cleandir-tests
+test: all-tests
+	@:
 
-.include "test.mk"
+clean: clean-tests
+cleandir: cleandir-tests
+
 .include <mkc.subprj.mk>

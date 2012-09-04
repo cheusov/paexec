@@ -6,4 +6,4 @@ FILES      !=	echo tasks*
 FILESDIR    =	${EGDIR}/${.CURDIR:T}
 SCRIPTSDIR ?=	${FILESDIR}
 
-.include <mkc.subprj.mk>
+.include <mkc.files.mk>

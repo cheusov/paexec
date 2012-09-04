@@ -1,11 +1,12 @@
-.for f in big_result_cmd transport_broken_rnd
-all: ${f}
-${f} : ${f}.in
-	sed 's|@awk@|${AWK}|g' ${f}.in > $@; chmod +x $@
-CLEANFILES += ${f}
-.endfor
+CLEANFILES +=	_test.in _tasks.tmp _test.tmp
 
-SUBPRJ =	broken_echo
-SUBPRJ_DFLT =	${SUBPRJ}
+all:
+	@echo 'running tests...'; \
+	export OBJDIR=${.OBJDIR}; \
+	export PATH=${.CURDIR}/tests/broken_echo:${OBJDIR_paexec}:$$PATH; \
+	if cd ${.CURDIR} && ./test.sh; \
+	then echo 'SUCCEEDED'; \
+	else echo 'FAILED'; false; \
+	fi
 
-.include <mkc.subprj.mk>
+.include <mkc.files.mk>

@@ -292,7 +292,7 @@ usage: paexec [OPTIONS] [files...]
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -t ./paexec_notransport -c ../examples/toupper/cmd \
+    runtest -l -t ./scripts/paexec_notransport -c ../examples/toupper/cmd \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec toupper #1' \
 '1 A
@@ -329,7 +329,7 @@ usage: paexec [OPTIONS] [files...]
 '
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -p -t ./paexec_notransport \
+    runtest -l -p -t ./scripts/paexec_notransport \
 	-c ../examples/toupper/cmd -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
     cmp 'paexec toupper #4' \
@@ -571,7 +571,7 @@ usage: paexec [OPTIONS] [files...]
 	for (i=0; i < 10; ++i) {
 	    print "1234567890-=qwertyuiop[]asdfghjkl;zxcvbnm,./zaqwsxcderfvbgtyhnmjuik,.lo";
 	}
-    }' | runtest -c ../tests/big_result_cmd -n '+9' |
+    }' | runtest -c scripts/big_result_cmd -n '+9' |
     uniq -c |
     head -n 100 |
     awk '{$1 = $1; print $0}' |
@@ -1170,7 +1170,7 @@ task300 task0
 3 4
 4 5
 ' | runtest -s -E \
-	-t ../tests/broken_echo/transport_broken_echo -c ':' \
+	-t scripts/transport_broken_echo -c ':' \
 	-n '1 2 3 4 5 6' |
     cmp 'paexec broken transport #1' \
 "I'll output -1
@@ -1193,7 +1193,7 @@ pear
 plum
 cherry
 ' | runtest_resort -el -z \
-	-t ../tests/broken_echo/transport_broken_toupper \
+	-t scripts/transport_broken_toupper \
 	-c : -n '4 5 6 7' |
     cmp 'paexec broken transport #2' \
 '1 fatal
@@ -1215,7 +1215,7 @@ cherry
     # -Z + -w without -s
     printf '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n' |
     runtest_resort -Z1 -w \
-	-t ../tests/transport_broken_rnd \
+	-t scripts/transport_broken_rnd \
 	-m F= -c: -n '0.5ns-nopostfail 0.5ns-nopostfail 0.5ns-nopostfail' |
     cmp 'paexec broken transport #3' \
 'success
@@ -1256,7 +1256,7 @@ success
     printf '%s' '-1 0
 0 1
 ' | runtest -z -g -E \
-	-t ../tests/broken_echo/transport_broken_echo -c ':' \
+	-t scripts/transport_broken_echo -c ':' \
 	-n '1' |
     cmp 'paexec broken transport #4' \
 "I'll output -1
@@ -1282,7 +1282,7 @@ all nodes failed
 4 5
 5 6
 ' | runtest -z -r -g -E \
-	-t ../tests/broken_echo/transport_broken_echo -c ':' \
+	-t scripts/transport_broken_echo -c ':' \
 	-n '1 2 3 4 5 6 7' |
     cmp 'paexec broken transport #5' \
 "1 I'll output -1
@@ -1343,7 +1343,7 @@ all nodes failed
 3 4
 4 5
 5 6
-' | runtest -g -z -lre -t transport_closed_stdin -c : \
+' | runtest -g -z -lre -t transp_closed_stdin/transp_closed_stdin -c : \
 	-n '0 1 2 3 4 5 6 7 8' |
     cmp 'paexec broken transport #6' \
 "0 1 I'll output 0
@@ -1396,7 +1396,7 @@ all nodes failed
         }
     }' |
     runtest -z -r -g -E \
-	-t ../tests/broken_echo/transport_broken_echo -c ':' \
+	-t scripts/transport_broken_echo -c ':' \
 	-n '4' |
     cmp 'paexec broken transport #7' \
 '4 fatal
@@ -1406,7 +1406,7 @@ all nodes failed
 
     # resistance to transport failure
     echo mama | runtest -z -r -g -i -E \
-	-t ../tests/broken_echo/transport_broken_echo -c ':' \
+	-t scripts/transport_broken_echo -c ':' \
 	-n '4' | 
     cmp 'paexec broken transport #8' \
 '4 mama
@@ -1428,7 +1428,7 @@ dat5
 dat6
 EOF
 
-    runtest -s -z -lr -t ../tests/transport_broken_rnd -c : \
+    runtest -s -z -lr -t scripts/transport_broken_rnd -c : \
 	-n '0.1 0.15 0.2 0.25 0.3 0' < $OBJDIR/_test.in |
     filter_succeded_tasks | sort -n |
     cmp 'paexec broken transport #9' \
@@ -1446,7 +1446,7 @@ EOF
 
     # resistance to transport failure
     awk 'BEGIN {for (i=1; i <= 1000; ++i) {print "dat" i}}' |
-    runtest -s -z -lr -t ../tests/transport_broken_rnd -c : \
+    runtest -s -z -lr -t scripts/transport_broken_rnd -c : \
 	-n '0.01-ns 0.03-ns 0.09-ns 0.09-ns 0.03-ns 0-ns' |
     filter_succeded_tasks | sort -n | cksum |
     cmp 'paexec broken transport #10' \
@@ -1468,7 +1468,7 @@ EOF
     rm -f "$test_file"
 
     runtest -Z1 -s -n '1 2' -c: \
-	-t "../tests/broken_echo/transport_broken_echo2 $test_file" \
+	-t "scripts/transport_broken_echo2 $test_file" \
 	< $OBJDIR/_tasks.tmp | grep output | sort |
     cmp 'paexec broken transport #11' \
 'output 1
