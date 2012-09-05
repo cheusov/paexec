@@ -1,6 +1,6 @@
 INSCRIPTS   =	cmd cmd__xxx_failed
 
-SCRIPTS     =	${INSCRIPTS}
+SCRIPTS     =	${INSCRIPTS} run run_cycle
 FILES      !=	echo tasks*
 
 FILESDIR    =	${EGDIR}/${.CURDIR:T}

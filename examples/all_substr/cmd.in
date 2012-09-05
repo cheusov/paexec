@@ -1,8 +1,10 @@
 #!@awk@ -f
 
 {
-	# here we print all not empty substrings
-	# of the input string (this is our task)
+	# Read tasks line-by-line
+
+	# Our task is to print all not empty
+	# substrings of the input string
 	len=length($0)
 
 	for (i=1; i <= len; ++i){
@@ -12,9 +14,9 @@
 		}
 	}
 
-	# print end of task marker here
+	# End of task marker, empty line by default
 	print ""
 
-	# end of task MUST BE FLUSHED!!!
+	# In the end, stdout must be flushed
 	fflush()
 }

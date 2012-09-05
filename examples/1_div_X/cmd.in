@@ -1,14 +1,29 @@
 #!@awk@ -f
 
+# This a sample command passed to paexec via option -c
+
+
 {
+	# Read tasks line-by-line
+
 	if ($1 != 0){
+		# Result which should not contain empty lines
 		print "1/" $1 "=" 1/$1
-		print "success" # an exit status line for 'paexec -s...'
+
+		# "paexec -g" requires either "success" or "failure" in the end.
+		# For non-zero input number x we are able to calculate 1/x
+		print "success"
 	}else{
+		# Oops, dependent tasks will fail as well
 		print "Cannot calculate 1/0"
-		print "failure" # an exit status line for 'paexec -s...'
+
+		# "paexec -g" requires either "success" or "failure" in the end.
+		print "failure"
 	}
 
-	print "" # end of task marker
+	# End of task marker, empty line by default
+	print ""
+
+	# In the end, stdout must be flushed
 	fflush()
 }

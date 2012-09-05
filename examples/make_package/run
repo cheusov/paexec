@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Build packages taking a dependency graph on input
+# and sort the sliced output using sort(1) -- first task
+# before the second one and so on.
+paexec -g -le -c "`pwd`/cmd" -n +3 < tasks | paexec_reorder -g -Ms

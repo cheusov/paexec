@@ -1,11 +1,16 @@
 #!/bin/sh
 
-# obtains all substrings in parallel
-# subprocesses are run on the same host where paexec is run
-../../paexec -lp -c "`pwd`/cmd" -n +3 <<EOF
-dictd  is  a  server  for  the Dictionary Server Protocol (DICT).
-The book is red.
-The table is black.
-The sun is shining.
-What a pretty girl!
+# Obtains all substrings in parallel using 3 subprocesses.
+# Subprocesses are run on the same host where paexec is run.
+# Output lines are prepanded with task number (-l)
+# and process pid (-p).
+# In the end of task, an empty line is added (-e)
+# Output is sliced.
+paexec -lpe -c "`pwd`/cmd" -n +3 <<EOF
+My English is awesome.
+Who is absent?
+My name is Aleksey.
+I was born in USSR.
+London is a capital of Great Britain.
+Who is on duty today? :-)
 EOF

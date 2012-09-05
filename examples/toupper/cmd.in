@@ -1,12 +1,16 @@
 #!@awk@ -f
 
 {
-	# we MUST not produce an empty line for generic data
+	# Prepand every line with a space in order
+	# to avoid empty lines on output
 	printf " "
 
-	# works fine for empty input too
+	# Single-line output
 	print toupper($0)
 
-	print ""          # end of task marker
-	fflush()          # end of task MUST BE FLUSHED!!!
+	# End of task marker, empty line by default
+	print ""
+
+	# In the end, stdout must be flushed
+	fflush()
 }

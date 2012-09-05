@@ -1,8 +1,17 @@
 #!@awk@ -f
 
 {
+	# Read package names one-by-one
+
+	# Suppose we built the package...
 	print $0
+
+	# ...succesfully
 	print "success"
-	print "" # end of task marker
+
+	# End of task marker, empty line by default
+	print ""
+
+	# In the end, stdout must be flushed
 	fflush()
 }

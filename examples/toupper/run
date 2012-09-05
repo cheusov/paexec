@@ -3,12 +3,16 @@
 # Converts all strings to upper case in parallel.
 # Subprocesses are run on the same host where paexec is run.
 # Input may contains empty lines.
-paexec -lp -c "`pwd`/cmd" -n +10 <<EOF
-dictd  is  a  server  for  the Dictionary Server Protocol (DICT).
 
-The book is red.
-The table is black.
-
-The sun is shining.
-What a pretty girl!
+input (){
+    cat <<'EOF'
+My English is awesome.
+Who is absent?
+My name is Aleksey.
+I was born in USSR.
+London is a capital of Great Britain.
+Who is on duty today? :-)
 EOF
+}
+
+input | paexec -c "`pwd`/cmd" -n +2 | cut -b 2-
