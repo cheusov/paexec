@@ -386,6 +386,19 @@ usage: paexec [OPTIONS] [files...]
 6 pid FFFFFF
 '
 
+    printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
+    runtest -l -p \
+	-c ../examples/toupper/cmd -n '+2' |
+    resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
+    cmp 'paexec toupper #6' \
+'1 pid A
+2 pid BB
+3 pid CCC
+4 pid DDDD
+5 pid EEEEE
+6 pid FFFFFF
+'
+
     # all_substr
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -c ../examples/all_substr/cmd \
@@ -651,6 +664,30 @@ usage: paexec [OPTIONS] [files...]
 11 success
 12 1/12=0.0833333
 12 success
+'
+
+    # paexec_reorder + failure
+    ( cd ../examples/1_div_X; ./run; ) | sed 's/^[^ ]* //' | sort |
+    cmp 'paexec 1/X #4' \
+'0 7 8 9 
+1/10=0.1
+1/11=0.0909091
+1/12=0.0833333
+1/1=1
+1/2=0.5
+1/3=0.333333
+1/4=0.25
+1/5=0.2
+Cannot calculate 1/0
+failure
+success
+success
+success
+success
+success
+success
+success
+success
 '
 
     # -s all failed
