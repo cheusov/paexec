@@ -1,0 +1,29 @@
+#!@awk@ -f
+
+# The same as "cmd" but with non-standard "success",
+# "failure" and "eot" strings.
+
+{
+	# Read tasks line-by-line
+
+	if ($1 != 0){
+		# Result which should not contain empty lines
+		print "1/" $1 "=" 1/$1
+
+		# "paexec -g" requires either "success" or "failure" in the end.
+		# For non-zero input number x we are able to calculate 1/x
+		print "Ura!"
+	}else{
+		# Oops, dependent tasks will fail as well
+		print "Cannot calculate 1/0"
+
+		# "paexec -g" requires either "success" or "failure" in the end.
+		print "Zhopa!"
+	}
+
+	# End of task marker, empty line by default
+	print "Konec!"
+
+	# In the end, stdout must be flushed
+	fflush()
+}

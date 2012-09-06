@@ -273,9 +273,11 @@ and will wait for restoring nodes.
 
 =item B<-m> F=I<fatal>
 
-Set alternative messages instead of default 'success', 'failure' and
-'fatal'. An empty 'fatal' message means it will not be output to
-stdout in case of fatal error.
+=item B<-m> t=I<eot>
+
+Set alternative string for 'success', 'failure', 'fatal'
+and '' (end of task). An empty string for 'fatal' means it will
+not be output to stdout in case of fatal error.
 
 =item B<-W> I<num>
 

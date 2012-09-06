@@ -24,7 +24,7 @@
 #env "LC_ALL=C"
 
 #use "alt_assert.awk"
-#use "power_getopt.awk"
+#use "init_getopt.awk"
 #use "tmpfile.awk"
 #use "xsystem.awk"
 
@@ -44,30 +44,54 @@
 #       m            temporary data in memory (the default)
 #       s            use sort(1) command
 #       f            use multiple temporary files
-# In -g -Mm and -g -Mf modes, portions of the results followed by "fatal" marker
-# are automatically cut off.
+#    =m s=<success>
+#    =m f=<failure>
+#    =m F=<fatal>
+#    =m t=<eot>      set alternative string for 'success', 'failure',
+#                    'fatal' and '' (end of task).
+# In -g -Mm and -g -Mf modes, portions of the result followed
+# by "fatal" marker are automatically cut off.
 #.end-str
 ############################################################
 
 BEGIN {
-	if (getarg("h")){
-		print_help()
-		exitnow(0)
+	method = "m"
+
+	msg_success = "success"
+	msg_failure = "failure"
+	msg_fatal   = "fatal"
+	msg_eot     = ""
+
+	while (getopt(short_opts)){
+		if (optopt == "h"){
+			print_help()
+			exitnow(0)
+		}else if (optopt == "g"){
+			graph_mode = 1
+		}else if (optopt == "S"){
+			remove_spc = 1
+		}else if (optopt == "l"){
+			output_task = 1
+		}else if (optopt == "M"){
+			method = optarg
+		}else if (optopt == "m"){
+			if (optarg ~ /^s=/){
+				msg_success = substr(optarg, 3)
+			}else if (optarg ~ /^f=/){
+				msg_failure = substr(optarg, 3)
+			}else if (optarg ~ /^F=/){
+				msg_fatal = substr(optarg, 3)
+			}else if (optarg ~ /^t=/){
+				msg_eot = substr(optarg, 3)
+			}else{
+				abort("bad argument for -m")
+			}
+		}else{
+			abort()
+		}
 	}
 
 	bad_input_msg = "bad input, did you run paexec -sle?"
-	method = 1
-	remove_spc  = getarg("S")
-	graph_mode  = getarg("g")
-	output_task = getarg("l")
-
-	method      = getarg("M")
-	if (method == "s")
-		method = 2
-	else if (method == "f")
-		method = 3
-	else
-		method = 1
 
 	# -Ms
 	if (output_task)
@@ -81,7 +105,7 @@ function print_results (task,        cnt,i){
 	if (graph_mode && !(task in pline))
 		return
 
-	if (!graph_mode || pline [task] == "success" || ppline [task] == "failure"){
+	if (!graph_mode || pline [task] == msg_success || ppline [task] == msg_failure){
 		cnt = count [task]
 		for (i=1; i <= cnt; ++i){
 			if (output_task)
@@ -91,7 +115,7 @@ function print_results (task,        cnt,i){
 		}
 
 		count [task] = 0
-	}else if (pline [task] == "fatal"){
+	}else if (pline [task] == msg_fatal){
 		count [task] = 0
 	}else{
 		abort(bad_input_msg)
@@ -106,8 +130,8 @@ function print_results (task,        cnt,i){
 }
 
 # -Ms
-method == 2 {
-	if (!/^[0-9]+ $/){
+method == "s" {
+	if (! (match($0, /^[0-9]+ /) && substr($0, RSTART+RLENGTH) == msg_eot)){
 		if (remove_spc){
 			num = $1
 			sub(/^[0-9]+  ?/, "", $0)
@@ -131,9 +155,9 @@ function print_results_file (task,      cmd,fn){
 	}
 }
 
-method == 3 {
-	if (/^[0-9]+ $/){
-		if (!graph_mode || pline [$1] != "fatal"){
+method == "f" {
+	if (match($0, /^[0-9]+ /) && substr($0, RSTART+RLENGTH) == msg_eot){
+		if (!graph_mode || pline [$1] != msg_fatal){
 			print_results_file(task)
 		}else{
 			fn = runawk_tmpdir "/" task
@@ -166,7 +190,7 @@ method == 3 {
 }
 
 # -Mm
-/^[0-9]+ $/ {
+match($0, /^[0-9]+ /) && substr($0, RSTART+RLENGTH) == msg_eot {
 	print_results($1)
 	next
 }
@@ -190,12 +214,12 @@ END {
 	# output of "paexec -l" (without -e) is also allowed, obviously
 	# this requires more memory for reordering results, so applying
 	# option -e is strongly recomended.
-	if (method == 1){
+	if (method == "m"){
 		# -Mm
 		for (i=1; i <= task_max; ++i){
 			print_results(i)
 		}
-	}else if (method == 3){
+	}else if (method == "f"){
 		# -Mf
 		for (i=1; i <= task_max; ++i){
 			print_results_file(i)

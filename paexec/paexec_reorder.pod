@@ -43,6 +43,17 @@ will react on "fatal" B<paexec's> keyword.
 
 Remove leading space character.
 
+=item B<-m> s=I<success>
+
+=item B<-m> f=I<failure>
+
+=item B<-m> F=I<fatal>
+
+=item B<-m> F=I<eot>
+
+Set alternative string
+for 'success', 'failure', 'fatal' and '' (end of task).
+
 =back
 
 =head1 EXAMPLES

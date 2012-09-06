@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# The same as "run" but with non-standard "success",
+# "failure" and "eot" strings.
+
+paexec -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
+    -s -l -c "`pwd`/cmd2" -n +3 <<EOF
+1 2
+2 3
+3 4
+4 5
+5 0
+0 7
+7 8
+8 9
+5 10
+10 11
+11 12
+EOF

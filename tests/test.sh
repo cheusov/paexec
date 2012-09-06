@@ -262,6 +262,14 @@ paexec_reorder_input5 (){
 EOF
 }
 
+nonstandard_msgs (){
+    sed -e 's/^\([0-9][0-9]* $\)/\1Konec!/' \
+	-e 's/^\([0-9][0-9]* \)success/\1Ura!/' \
+	-e 's/^\([0-9][0-9]* \)failure/\1Zhopa!/' \
+	-e 's/^\([0-9][0-9]* \)fatal/\1PolnayaZhopa!/' \
+	"$@"
+}
+
 tmpdir="/tmp/paexec-test.$$"
 mkdir -m 0700 "$tmpdir" || exit 60
 
@@ -636,9 +644,38 @@ usage: paexec [OPTIONS] [files...]
 6 
 '
 
+    test_tasks3 |
+    runtest -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
+	-e -s -l -c ../examples/divide/cmd2 -n +10 |
+    cmp 'paexec 1/X #1 nonstandard' \
+'1 1/1=1
+1 Ura!
+1 Konec!
+2 1/2=0.5
+2 Ura!
+2 Konec!
+3 1/3=0.333333
+3 Ura!
+3 Konec!
+4 1/4=0.25
+4 Ura!
+4 Konec!
+5 1/5=0.2
+5 Ura!
+5 Konec!
+6 Cannot calculate 1/0
+6 Zhopa!
+6 0 7 8 9 10 11 12 
+6 Konec!
+'
+
     # -s and no input
     runtest -s -l -c ../examples/divide/cmd -n +10 < /dev/null |
     cmp 'paexec 1/X #2' ''
+
+    runtest -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
+	-s -l -c ../examples/divide/cmd -n +10 < /dev/null |
+    cmp 'paexec 1/X #2 nonstandard' ''
 
     # paexec_reorder + failure
     test_tasks4 |
@@ -666,6 +703,32 @@ usage: paexec [OPTIONS] [files...]
 12 success
 '
 
+    test_tasks4 |
+    runtest -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
+	-se -l -c ../examples/divide/cmd2 -n +1 |
+    paexec_reorder -gl -ms='Ura!' -mf='Zhopa!' -mt='Konec!' |
+    cmp 'paexec 1/X #3 nonstandard' \
+'1 1/1=1
+1 Ura!
+2 1/2=0.5
+2 Ura!
+3 1/3=0.333333
+3 Ura!
+4 1/4=0.25
+4 Ura!
+5 1/5=0.2
+5 Ura!
+6 Cannot calculate 1/0
+6 Zhopa!
+6 0 7 8 9 
+10 1/10=0.1
+10 Ura!
+11 1/11=0.0909091
+11 Ura!
+12 1/12=0.0833333
+12 Ura!
+'
+
     # paexec_reorder + failure
     ( cd ../examples/divide; ./run; ) | sed 's/^[^ ]* //' | sort |
     cmp 'paexec 1/X #4' \
@@ -688,6 +751,29 @@ success
 success
 success
 success
+'
+
+    ( cd ../examples/divide; ./run2; ) | sed 's/^[^ ]* //' | sort |
+    cmp 'paexec 1/X #4 nonstandard' \
+'0 7 8 9 
+1/10=0.1
+1/11=0.0909091
+1/12=0.0833333
+1/1=1
+1/2=0.5
+1/3=0.333333
+1/4=0.25
+1/5=0.2
+Cannot calculate 1/0
+Ura!
+Ura!
+Ura!
+Ura!
+Ura!
+Ura!
+Ura!
+Ura!
+Zhopa!
 '
 
     # -s all failed
@@ -1952,8 +2038,27 @@ success
 '
 
     # tests for paexec_reorder
-    paexec_reorder_input1 | paexec_reorder |
+    paexec_reorder_input1 |
+    paexec_reorder |
     cmp 'paexec_reorder' \
+'TABLE1
+TABLE2
+TABLE3
+TABLE4
+GREEN1
+GREEN2
+GREEN3
+GREEN4
+APPLE1
+APPLE2
+APPLE3
+APPLE4
+'
+
+    paexec_reorder_input1 |
+    nonstandard_msgs |
+    paexec_reorder -m t='Konec!' |
+    cmp 'paexec_reorder nonstandard' \
 'TABLE1
 TABLE2
 TABLE3
@@ -1985,8 +2090,28 @@ APPLE4
 3 GREEN4
 '
 
+    paexec_reorder_input2 |
+    nonstandard_msgs |
+    paexec_reorder -l \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -l nonstandard' \
+'2 PolnayaZhopa! 1
+2 PolnayaZhopa! 2
+2 PolnayaZhopa! 3
+2 PolnayaZhopa! 4
+1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN4
+'
+
     # tests for paexec_reorder -g
-    paexec_reorder_input3 | paexec_reorder -gS |
+    paexec_reorder_input3 |
+    paexec_reorder -gS |
     cmp 'paexec_reorder -gS' \
 'TABLE1
 TABLE2
@@ -2003,6 +2128,29 @@ GREEN2
 GREEN3
 GREEN???
 failure
+4 5
+'
+
+    paexec_reorder_input3 |
+    nonstandard_msgs |
+    paexec_reorder -gS \
+	-mt='Konec!' -mf='Zhopa!' -mF='PolnayaZhopa!' -ms='Ura!' |
+    cmp 'paexec_reorder -gS nonstandard' \
+'TABLE1
+TABLE2
+TABLE3
+TABLE4
+Ura!
+APPLE1
+APPLE2
+APPLE3
+APPLE4
+Ura!
+GREEN1
+GREEN2
+GREEN3
+GREEN???
+Zhopa!
 4 5
 '
 
@@ -2027,8 +2175,32 @@ failure
 3 4 5
 '
 
+    paexec_reorder_input4 |
+    nonstandard_msgs |
+    paexec_reorder -glS \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -glS nonstandard' \
+'2 TABLE1
+2 TABLE2
+2 TABLE3
+2 TABLE4
+2 Ura!
+1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+1 Ura!
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN???
+3 Zhopa!
+3 4 5
+'
+
     # tests for paexec_reorder -gl
-    paexec_reorder_input5 | paexec_reorder -gl |
+    paexec_reorder_input5 |
+    paexec_reorder -gl |
     cmp 'paexec_reorder -gl' \
 '1 APPLE1
 1 APPLE2
@@ -2048,8 +2220,32 @@ failure
 3 4 5
 '
 
+    paexec_reorder_input5 |
+    nonstandard_msgs |
+    paexec_reorder -gl \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -gl nonstandard' \
+'1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+1 Ura!
+2 TABLE1
+2 TABLE2
+2 TABLE3
+2 TABLE4
+2 Ura!
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN???
+3 Zhopa!
+3 4 5
+'
+
     # tests for paexec_reorder -Ms
-    paexec_reorder_input1 | paexec_reorder -Ms |
+    paexec_reorder_input1 |
+    paexec_reorder -Ms |
     cmp 'paexec_reorder -Ms' \
 'APPLE1
 APPLE2
@@ -2065,8 +2261,28 @@ GREEN3
 GREEN4
 '
 
+    paexec_reorder_input1 |
+    nonstandard_msgs |
+    paexec_reorder -Ms \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -Ms nonstandard' \
+'APPLE1
+APPLE2
+APPLE3
+APPLE4
+TABLE1
+TABLE2
+TABLE3
+TABLE4
+GREEN1
+GREEN2
+GREEN3
+GREEN4
+'
+
     # tests for paexec_reorder -l -Ms
-    paexec_reorder_input2 | paexec_reorder -l -Ms |
+    paexec_reorder_input2 |
+    paexec_reorder -l -Ms |
     cmp 'paexec_reorder -l -Ms' \
 '1 APPLE1
 1 APPLE2
@@ -2082,8 +2298,28 @@ GREEN4
 3 GREEN4
 '
 
+    paexec_reorder_input2 |
+    nonstandard_msgs |
+    paexec_reorder -l -Ms \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -l -Ms nonstandard ' \
+'1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+2 PolnayaZhopa! 1
+2 PolnayaZhopa! 2
+2 PolnayaZhopa! 3
+2 PolnayaZhopa! 4
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN4
+'
+
     # tests for paexec_reorder -gS -Ms
-    paexec_reorder_input3 | paexec_reorder -gS -Ms |
+    paexec_reorder_input3 |
+    paexec_reorder -gS -Ms |
     cmp 'paexec_reorder -gS -Ms' \
 'APPLE1
 APPLE2
@@ -2103,8 +2339,32 @@ failure
 4 5
 '
 
+    paexec_reorder_input3 |
+    nonstandard_msgs |
+    paexec_reorder -gS -Ms \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -gS -Ms nonstandard' \
+'APPLE1
+APPLE2
+APPLE3
+APPLE4
+Ura!
+TABLE1
+TABLE2
+TABLE3
+TABLE4
+Ura!
+GREEN1
+GREEN2
+GREEN3
+GREEN???
+Zhopa!
+4 5
+'
+
     # tests for paexec_reorder -gl -Ms
-    paexec_reorder_input4 | paexec_reorder -gl -Ms |
+    paexec_reorder_input4 |
+    paexec_reorder -gl -Ms |
     cmp 'paexec_reorder -gl -Ms' \
 '1  blablabla
 1 fatal
@@ -2129,8 +2389,37 @@ failure
 3 4 5
 '
 
+    paexec_reorder_input4 |
+    nonstandard_msgs |
+    paexec_reorder -gl -Ms \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -gl -Ms nonstandard' \
+'1  blablabla
+1 PolnayaZhopa!
+1  APPLE1
+1  APPLE2
+1  APPLE3
+1  APPLE4
+1 Ura!
+2  TABLE1
+2  TABLE2
+2  TABLE3
+2  TABLE4
+2 Ura!
+3  foo
+3  bar
+3 PolnayaZhopa!
+3  GREEN1
+3  GREEN2
+3  GREEN3
+3  GREEN???
+3 Zhopa!
+3 4 5
+'
+
     # tests for paexec_reorder -gl -Ms
-    paexec_reorder_input5 | paexec_reorder -gl -Ms |
+    paexec_reorder_input5 |
+    paexec_reorder -gl -Ms |
     cmp 'paexec_reorder -gl -Ms' \
 '1 APPLE1
 1 APPLE2
@@ -2150,8 +2439,32 @@ failure
 3 4 5
 '
 
+    paexec_reorder_input5 |
+    nonstandard_msgs |
+    paexec_reorder -gl -Ms \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -gl -Ms nonstandard' \
+'1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+1 Ura!
+2 TABLE1
+2 TABLE2
+2 TABLE3
+2 TABLE4
+2 Ura!
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN???
+3 Zhopa!
+3 4 5
+'
+
     # tests for paexec_reorder -Mf
-    paexec_reorder_input1 | paexec_reorder -Mf |
+    paexec_reorder_input1 |
+    paexec_reorder -Mf |
     cmp 'paexec_reorder -Mf' \
 'TABLE1
 TABLE2
@@ -2167,8 +2480,28 @@ APPLE3
 APPLE4
 '
 
+    paexec_reorder_input1 |
+    nonstandard_msgs |
+    paexec_reorder -Mf \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -Mf nonstandard ' \
+'TABLE1
+TABLE2
+TABLE3
+TABLE4
+GREEN1
+GREEN2
+GREEN3
+GREEN4
+APPLE1
+APPLE2
+APPLE3
+APPLE4
+'
+
     # tests for paexec_reorder -l -Mf
-    paexec_reorder_input2 | paexec_reorder -l -Mf |
+    paexec_reorder_input2 |
+    paexec_reorder -l -Mf |
     cmp 'paexec_reorder -l -Mf' \
 '2 fatal 1
 2 fatal 2
@@ -2184,8 +2517,28 @@ APPLE4
 3 GREEN4
 '
 
+    paexec_reorder_input2 |
+    nonstandard_msgs |
+    paexec_reorder -l -Mf \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -l -Mf nonstandard' \
+'2 PolnayaZhopa! 1
+2 PolnayaZhopa! 2
+2 PolnayaZhopa! 3
+2 PolnayaZhopa! 4
+1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN4
+'
+
     # tests for paexec_reorder -gS -Mf
-    paexec_reorder_input3 | paexec_reorder -gS -Mf |
+    paexec_reorder_input3 |
+    paexec_reorder -gS -Mf |
     cmp 'paexec_reorder -gS -Mf' \
 'TABLE1
 TABLE2
@@ -2205,8 +2558,32 @@ failure
 4 5
 '
 
+    paexec_reorder_input3 |
+    nonstandard_msgs |
+    paexec_reorder -gS -Mf \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -gS -Mf nonstandard' \
+'TABLE1
+TABLE2
+TABLE3
+TABLE4
+Ura!
+APPLE1
+APPLE2
+APPLE3
+APPLE4
+Ura!
+GREEN1
+GREEN2
+GREEN3
+GREEN???
+Zhopa!
+4 5
+'
+
     # tests for paexec_reorder -gl -Mf
-    paexec_reorder_input4 | paexec_reorder -gl -Mf |
+    paexec_reorder_input4 |
+    paexec_reorder -gl -Mf |
     cmp 'paexec_reorder -gl -Mf' \
 '2  TABLE1
 2  TABLE2
@@ -2226,8 +2603,32 @@ failure
 3 4 5
 '
 
+    paexec_reorder_input4 |
+    nonstandard_msgs |
+    paexec_reorder -gl -Mf \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -gl -Mf nonstandard' \
+'2  TABLE1
+2  TABLE2
+2  TABLE3
+2  TABLE4
+2 Ura!
+1  APPLE1
+1  APPLE2
+1  APPLE3
+1  APPLE4
+1 Ura!
+3  GREEN1
+3  GREEN2
+3  GREEN3
+3  GREEN???
+3 Zhopa!
+3 4 5
+'
+
     # tests for paexec_reorder -gl -Mf
-    paexec_reorder_input5 | paexec_reorder -gl -Mf |
+    paexec_reorder_input5 |
+    paexec_reorder -gl -Mf |
     cmp 'paexec_reorder -gl -Mf' \
 '1 APPLE1
 1 APPLE2
@@ -2244,6 +2645,29 @@ failure
 3 GREEN3
 3 GREEN???
 3 failure
+3 4 5
+'
+
+    paexec_reorder_input5 |
+    nonstandard_msgs |
+    paexec_reorder -gl -Mf \
+	-m t='Konec!' -m f='Zhopa!' -mF='PolnayaZhopa!' -m s='Ura!' |
+    cmp 'paexec_reorder -gl -Mf nonstandard' \
+'1 APPLE1
+1 APPLE2
+1 APPLE3
+1 APPLE4
+1 Ura!
+2 TABLE1
+2 TABLE2
+2 TABLE3
+2 TABLE4
+2 Ura!
+3 GREEN1
+3 GREEN2
+3 GREEN3
+3 GREEN???
+3 Zhopa!
 3 4 5
 '
 
