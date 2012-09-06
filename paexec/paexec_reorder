@@ -41,14 +41,14 @@
 #    -l              prepand output line with the task number
 #                    given on input
 #    =M <method>     method of resorting result line, where method is
-#       m            temporary data in memory (the default)
-#       s            use sort(1) command
-#       f            use multiple temporary files
-#    =m s=<success>
-#    =m f=<failure>
-#    =m F=<fatal>
-#    =m t=<eot>      set alternative string for 'success', 'failure',
-#                    'fatal' and '' (end of task).
+#       m               temporary data in memory (the default)
+#       s               use sort(1) command
+#       f               use multiple temporary files
+#    =m s=<success>  set alternative string for 'success', 'failure',
+#       f=<failure>  'fatal' and '' (end of task).
+#       F=<fatal>
+#       t=<eot>
+#
 # In -g -Mm and -g -Mf modes, portions of the result followed
 # by "fatal" marker are automatically cut off.
 #.end-str

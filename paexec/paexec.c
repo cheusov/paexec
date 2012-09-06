@@ -99,10 +99,10 @@ OPTIONS:\n\
                    of all tasks that depend on it,\n\
                    directly or indirectly\n\
 \n\
-  -m s=<success>\n\
-  -m f=<failure>\n\
-  -m F=<fatal>\n\
-  -m t=<eot>       set alternative messages instead of default 'success',\n\
+  -m   s=<success>\n\
+       f=<failure>\n\
+       F=<fatal>\n\
+       t=<eot>     set alternative messages instead of default 'success',\n\
                    'failure', 'fatal' and '' (end-of-task marker).\n\
 -n and -c are mandatory options\n\
 \n\
