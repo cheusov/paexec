@@ -16,7 +16,7 @@
    NOTE:    !!! GNU make IS NOT GOOD !!!
 
 2)
-   We also need mk-configure >= 0.20.0.
+   We also need mk-configure >= 0.23.0.
 
    http://sourceforge.net/projects/mk-configure/
 
@@ -73,7 +73,7 @@
    env SUBPRJ_DFLT='paexec examples doc' mkcmake all install
 
 13)
-   paexec_reorder utility is written in RunAWK, so we'll need RunAWK
+   paexec_reorder utility is written in runawk, so we need runawk>=1.4.3
    at runtime.
 
    http://sourceforge.net/projects/runawk/
