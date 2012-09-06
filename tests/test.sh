@@ -613,7 +613,7 @@ usage: paexec [OPTIONS] [files...]
 
     # tests for partially ordered set of tasks (-s option)
     test_tasks3 |
-    runtest -e -s -l -c ../examples/1_div_X/cmd -n +10 |
+    runtest -e -s -l -c ../examples/divide/cmd -n +10 |
     cmp 'paexec 1/X #1' \
 '1 1/1=1
 1 success
@@ -637,12 +637,12 @@ usage: paexec [OPTIONS] [files...]
 '
 
     # -s and no input
-    runtest -s -l -c ../examples/1_div_X/cmd -n +10 < /dev/null |
+    runtest -s -l -c ../examples/divide/cmd -n +10 < /dev/null |
     cmp 'paexec 1/X #2' ''
 
     # paexec_reorder + failure
     test_tasks4 |
-    runtest -se -l -c ../examples/1_div_X/cmd -n +1 |
+    runtest -se -l -c ../examples/divide/cmd -n +1 |
     paexec_reorder -gl |
     cmp 'paexec 1/X #3' \
 '1 1/1=1
@@ -667,7 +667,7 @@ usage: paexec [OPTIONS] [files...]
 '
 
     # paexec_reorder + failure
-    ( cd ../examples/1_div_X; ./run; ) | sed 's/^[^ ]* //' | sort |
+    ( cd ../examples/divide; ./run; ) | sed 's/^[^ ]* //' | sort |
     cmp 'paexec 1/X #4' \
 '0 7 8 9 
 1/10=0.1
