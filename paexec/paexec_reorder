@@ -41,7 +41,7 @@
 #    -l              prepand output line with the task number
 #                    given on input
 #    =M <method>     method of resorting result line, where method is
-#       m               temporary data in memory (the default)
+#       m               in-memory sort (the default)
 #       s               use sort(1) command
 #       f               use multiple temporary files
 #    =m s=<success>  set alternative string for 'success', 'failure',
