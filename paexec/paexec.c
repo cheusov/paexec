@@ -22,8 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-/* if you need, add extra includes to config.h
-   Use may use config.h for getopt_long for example */
+/* if you need, add extra includes to config.h */
 #include "config.h"
 #endif
 
@@ -857,52 +856,9 @@ static void loop (void)
 static void process_args (int *argc, char ***argv)
 {
 	int c;
-#ifdef HAVE_GETOPT_LONG
-	struct option longopts [] = {
-		{ "help",      0, 0, 1000 + 'h' },
-		{ "version",   0, 0, 1000 + 'V' },
-
-		{ "nodes",     1, 0, 1000 + 'n' },
-		{ "cmd",       1, 0, 1000 + 'c' },
-		{ "transport", 1, 0, 1000 + 't' },
-
-		{ "show-node", 0, 0, 1000 + 'r' },
-		{ "show-line", 0, 0, 1000 + 'l' },
-		{ "show-pid",  0, 0, 1000 + 'p' },
-
-		{ "eot",       0, 0, 1000 + 'e' },
-		{ "eot-flush", 0, 0, 1000 + 'E' },
-
-		{ "i2o",       0, 0, 1000 + 'i' },
-		{ "i2o-flush", 0, 0, 1000 + 'I' },
-
-		{ "pos",       0, 0, 1000 + 's' },
-		{ "graph",     0, 0, 1000 + 'g' },
-
-		{ "debug",     0, 0, 1000 + 'd' },
-
-		{ "resistant", 0, 0, 1000 + 'z' },
-
-		{ NULL,        0, 0, 0 },
-	};
-#endif
-
 	static const char optstring [] = "hVdvrlpeEiIwzZ:n:c:t:sgm:W:x";
 
-	while (c =
-#ifdef HAVE_GETOPT_LONG
-		   getopt_long (*argc, *argv, optstring, longopts, NULL),
-#else
-		   getopt (*argc, *argv, optstring),
-#endif
-		   c != EOF)
-	{
-		if (c >= 1000){
-			fprintf (stderr, "Long options will be removed in "
-			                 "the future, please don't use them!\n\n\n\n");
-			c %= 1000;
-		}
-
+	while (c = getopt (*argc, *argv, optstring), c != EOF){
 		switch (c) {
 			case 'V':
 				printf ("paexec %s written by Aleksey Cheusov\n", PAEXEC_VERSION);

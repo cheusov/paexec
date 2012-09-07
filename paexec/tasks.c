@@ -22,8 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-/* if you need, add extra includes to config.h
-   Use may use config.h for getopt_long for example */
+/* if you need, add extra includes to config.h */
 #include "config.h"
 #endif
 
