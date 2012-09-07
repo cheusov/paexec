@@ -58,6 +58,10 @@
 #include "nodes.h"
 #include "signals.h"
 
+#ifndef HAVE_FUNC3_SHQUOTE
+size_t shquote(const char *arg, char *buf, size_t bufsize);
+#endif
+
 static void usage (void)
 {
 	fprintf (stderr, "\
