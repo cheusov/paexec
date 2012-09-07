@@ -77,6 +77,7 @@ OPTIONS:\n\
   -n <:filename>   filename containing a list of nodes, one node per line\n\
   -c <command>     path to a command\n\
   -t <trans>       path to a transport program\n\
+  -x               run command once per task\n\
 \n\
   -r               include a node (or a number) to the output\n\
   -l               include 0-based task number to the output\n\
@@ -105,8 +106,11 @@ OPTIONS:\n\
   -m   s=<success>\n\
        f=<failure>\n\
        F=<fatal>\n\
-       t=<eot>     set alternative messages instead of default 'success',\n\
-                   'failure', 'fatal' and '' (end-of-task marker).\n\
+       t=<eot>\n\
+       d=<delimiter>\n\
+                   set an alternative for 'success',\n\
+                   'failure', 'fatal', '' (end-of-task marker) and\n\
+                   ' ' (task delimiter character).\n\
 -n and -c are mandatory options\n\
 \n\
 ");
@@ -168,6 +172,7 @@ static const char *poset_success = "success";
 static const char *poset_failure = "failure";
 static const char *poset_fatal   = "fatal";
 static const char *poset_eot = "";
+static char poset_delim = ' ';
 
 static int resistant = 0;
 static int resistance_timeout = 0;
@@ -235,7 +240,7 @@ static void init__read_poset_tasks (void)
 		tok_cnt = 0;
 
 		for (p=buf; *p; ++p){
-			if (*p == ' '){
+			if (*p == poset_delim){
 				*p = 0;
 			}else if (p == buf || p [-1] == 0){
 				if (!tok1){
@@ -930,7 +935,12 @@ static void process_args (int *argc, char ***argv)
 					poset_fatal = xstrdup (optarg+2);
 				else if (optarg [0] == 't' && optarg [1] == '=')
 					poset_eot = xstrdup (optarg+2);
-				else{
+				else if (optarg [0] == 'd' && optarg [1] == '='){
+					if (optarg [2] == 0 || optarg [3] != 0){
+						err_fatal (NULL, "bad argument for -md=. Exactly one character is allowed\n");
+					}
+					poset_delim = optarg [2];
+				}else{
 					err_fatal (NULL, "bad argument for -m\n");
 				}
 

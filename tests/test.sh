@@ -30,6 +30,10 @@ cut_full_path_closed_stdin (){
     sed 's|^\(.*\) [^ ]*\(transport_closed_stdin.*\)$|\1 \2|'
 }
 
+spc2semicolon (){
+    tr ' ' ';'
+}
+
 resort (){
     awk '{print $1, NR, $0}' |
     sort -k1,1n -k2,2n |
@@ -327,6 +331,15 @@ cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov
 cmp 'paexec -h' 'paexec - parallel executor
          that distributes tasks over CPUs or machines in a network.
 usage: paexec [OPTIONS] [files...]
+'
+
+    # bad -md= arg
+    runtest -md= 2>&1 |
+    cmp 'paexec -md= #1' 'paexec: bad argument for -md=. Exactly one character is allowed
+'
+
+    runtest -md=aa 2>&1 |
+    cmp 'paexec -md= #2' 'paexec: bad argument for -md=. Exactly one character is allowed
 '
 
     # bad -n arg
@@ -641,6 +654,30 @@ usage: paexec [OPTIONS] [files...]
     test_tasks3 |
     runtest -e -s -l -c ../examples/divide/cmd -n +10 |
     cmp 'paexec 1/X #1' \
+'1 1/1=1
+1 success
+1 
+2 1/2=0.5
+2 success
+2 
+3 1/3=0.333333
+3 success
+3 
+4 1/4=0.25
+4 success
+4 
+5 1/5=0.2
+5 success
+5 
+6 Cannot calculate 1/0
+6 failure
+6 0 7 8 9 10 11 12 
+6 
+'
+
+    test_tasks3 | spc2semicolon |
+    runtest -eslmd=";" -c ../examples/divide/cmd -n +10 |
+    cmp 'paexec 1/X -md=";" #1.1' \
 '1 1/1=1
 1 success
 1 
@@ -1755,10 +1792,69 @@ sum_weight [libmaa]=5
 sum_weight [paexec]=4
 '
 
+    test_tasks2 | spc2semicolon |
+    runtest -edW0 -md=';' -c ../examples/make_package/cmd \
+	-n +1 2>&1 | grep '^sum_weight' |
+    cmp 'paexec -W0 -md=";" #3.1' \
+'sum_weight [pipestatus]=1
+sum_weight [pkg_status]=1
+sum_weight [pkg_summary-utils]=2
+sum_weight [dict]=15
+sum_weight [pkg_online-client]=1
+sum_weight [netcat]=1
+sum_weight [dictd]=20
+sum_weight [pkg_online-server]=1
+sum_weight [judyhash]=12
+sum_weight [runawk]=2
+sum_weight [libmaa]=5
+sum_weight [paexec]=4
+'
+
     # tests for sum_weight calculation (-W0 option)
     test_tasks2 |
     runtest -eW0 -c ../examples/make_package/cmd -n +1 2>&1 |
     cmp 'paexec -W0 #4' \
+'judyhash
+success
+
+libmaa
+success
+
+dictd
+success
+
+dict
+success
+
+paexec
+success
+
+runawk
+success
+
+pipestatus
+success
+
+pkg_summary-utils
+success
+
+pkg_status
+success
+
+netcat
+success
+
+pkg_online-client
+success
+
+pkg_online-server
+success
+
+'
+
+    test_tasks2 | spc2semicolon |
+    runtest -eW0 -md=';' -c ../examples/make_package/cmd -n +1 2>&1 |
+    cmp 'paexec -W0 -md=";" #4.1' \
 'judyhash
 success
 

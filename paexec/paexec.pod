@@ -123,6 +123,10 @@ for future extensions.
 
 Filename containing list of nodes, one per line.
 
+=item B<-x>
+
+Run command once per task.
+
 =item B<-r>
 
 Include node identifier or node number (0-based) to the
@@ -275,9 +279,11 @@ and will wait for restoring nodes.
 
 =item B<-m> t=I<eot>
 
-Set alternative string for 'success', 'failure', 'fatal'
-and '' (end of task). An empty string for 'fatal' means it will
-not be output to stdout in case of fatal error.
+=item B<-m> d=I<delimiter>
+
+Set alternative string for 'success', 'failure', 'fatal', '' (end of
+task) and ' ' (task delimiter character). An empty string for 'fatal'
+means it will not be output to stdout in case of fatal error.
 
 =item B<-W> I<num>
 
