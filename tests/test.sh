@@ -270,6 +270,23 @@ nonstandard_msgs (){
 	"$@"
 }
 
+# on exit
+on_exit (){
+    rm -rf $tmpdir
+}
+
+sig_handler (){
+    on_exit
+    trap - "$1"
+    kill -"$1" $$
+}
+
+trap "sig_handler INT"  INT
+trap "sig_handler QUIT" QUIT
+trap "sig_handler TERM" TERM
+trap "on_exit" 0
+
+#
 tmpdir="/tmp/paexec-test.$$"
 mkdir -m 0700 "$tmpdir" || exit 60
 
@@ -279,8 +296,7 @@ tmpfn3="$tmpdir/3"
 tmpfn4="$tmpdir/4"
 tmpex="$tmpdir/5"
 
-trap "rm -rf $tmpdir" 0 INT QUIT TERM HUP
-
+# 
 echo > $tmpex
 
 cmp (){
