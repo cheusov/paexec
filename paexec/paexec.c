@@ -168,11 +168,11 @@ static size_t *node2task_buf_sz = NULL;
 
 static int end_of_stdin = 0;
 
-static const char *poset_success = "success";
-static const char *poset_failure = "failure";
-static const char *poset_fatal   = "fatal";
-static const char *poset_eot = "";
-static char poset_delim = ' ';
+static const char *msg_success = "success";
+static const char *msg_failure = "failure";
+static const char *msg_fatal   = "fatal";
+static const char *msg_eot = "";
+static char msg_delim = ' ';
 
 static int resistant = 0;
 static int resistance_timeout = 0;
@@ -203,7 +203,7 @@ static void bad_input_line (const char *line)
 	exit_with_error (NULL, NULL);
 }
 
-static void init__read_poset_tasks (void)
+static void init__read_graph_tasks (void)
 {
 	char *buf = NULL;
 	size_t len = 0;
@@ -218,7 +218,7 @@ static void init__read_poset_tasks (void)
 
 	/* */
 	if (debug){
-		fprintf (stderr, "start: init__read_poset_tasks\n");
+		fprintf (stderr, "start: init__read_graph_tasks\n");
 	}
 
 	/* */
@@ -240,7 +240,7 @@ static void init__read_poset_tasks (void)
 		tok_cnt = 0;
 
 		for (p=buf; *p; ++p){
-			if (*p == poset_delim){
+			if (*p == msg_delim){
 				*p = 0;
 			}else if (p == buf || p [-1] == 0){
 				if (!tok1){
@@ -287,7 +287,7 @@ static void init__read_poset_tasks (void)
 
 	/* */
 	if (debug){
-		fprintf (stderr, "end: init__read_poset_tasks\n");
+		fprintf (stderr, "end: init__read_graph_tasks\n");
 	}
 }
 
@@ -421,7 +421,7 @@ static void init (void)
 	tasks__init ();
 
 	/**/
-	init__read_poset_tasks ();
+	init__read_graph_tasks ();
 
 	/**/
 	tasks__check_for_cycles ();
@@ -529,7 +529,7 @@ static void print_line (int num, const char *line)
 static void print_EOT (int num)
 {
 	if (print_eot){
-		print_line (num, poset_eot);
+		print_line (num, msg_eot);
 		if (flush_eot)
 			fflush (stdout);
 	}
@@ -570,8 +570,8 @@ static void send_to_node (void)
 	{
 		if (resistant){
 			mark_node_as_dead (n);
-			if (poset_fatal [0])
-				print_line (n, poset_fatal);
+			if (msg_fatal [0])
+				print_line (n, msg_fatal);
 			print_EOT (n);
 
 			if (alive_nodes_count == 0 && !wait_mode){
@@ -719,8 +719,8 @@ static void loop (void)
 					if (resistant){
 						FD_CLR (fd_out [i], &rset);
 						mark_node_as_dead (i);
-						if (poset_fatal [0])
-							print_line (i, poset_fatal);
+						if (msg_fatal [0])
+							print_line (i, msg_fatal);
 						print_EOT (i);
 
 						if (alive_nodes_count == 0 && !wait_mode){
@@ -752,7 +752,7 @@ static void loop (void)
 
 						curr_line = buf_out_i + printed;
 
-						if (!strcmp (curr_line, poset_eot)){
+						if (!strcmp (curr_line, msg_eot)){
 							/* end of task marker */
 							assert (busy [i] == 1);
 
@@ -794,9 +794,9 @@ static void loop (void)
 						}
 
 						if (graph_mode){
-							if (!strcmp (curr_line, poset_success)){
+							if (!strcmp (curr_line, msg_success)){
 								ret_codes [i] = rt_success;
-							}else if (!strcmp (curr_line, poset_failure)){
+							}else if (!strcmp (curr_line, msg_failure)){
 								ret_codes [i] = rt_failure;
 							}else{
 								ret_codes [i] = rt_undef;
@@ -928,18 +928,18 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 'm':
 				if (optarg [0] == 's' && optarg [1] == '=')
-					poset_success = xstrdup (optarg+2);
+					msg_success = xstrdup (optarg+2);
 				else if (optarg [0] == 'f' && optarg [1] == '=')
-					poset_failure = xstrdup (optarg+2);
+					msg_failure = xstrdup (optarg+2);
 				else if (optarg [0] == 'F' && optarg [1] == '=')
-					poset_fatal = xstrdup (optarg+2);
+					msg_fatal = xstrdup (optarg+2);
 				else if (optarg [0] == 't' && optarg [1] == '=')
-					poset_eot = xstrdup (optarg+2);
+					msg_eot = xstrdup (optarg+2);
 				else if (optarg [0] == 'd' && optarg [1] == '='){
 					if (optarg [2] == 0 || optarg [3] != 0){
 						err_fatal (NULL, "bad argument for -md=. Exactly one character is allowed\n");
 					}
-					poset_delim = optarg [2];
+					msg_delim = optarg [2];
 				}else{
 					err_fatal (NULL, "bad argument for -m\n");
 				}
