@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export LC_ALL=C
+
 #EXEPREFIX='valgrind -q'
 #EXEPREFIX='env EF_PROTECT_BELOW=1 ef'
 
