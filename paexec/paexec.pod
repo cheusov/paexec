@@ -125,7 +125,7 @@ Filename containing list of nodes, one per line.
 
 =item B<-x>
 
-Run command once per task.
+Run command specificed by I<-c> for each task. Its stdout is passed to B<paexec>.
 
 =item B<-r>
 

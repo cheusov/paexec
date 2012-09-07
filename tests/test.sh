@@ -348,6 +348,23 @@ usage: paexec [OPTIONS] [files...]
 'paexec: invalid argument for option -n
 '
 
+    # x
+    printf 'aaa\nbbb\nz y x\ntrtrtr'\''brbrbr\nccc\nddd\neee\nfff\n"y;x\nggg\n' |
+    runtest -x -c "awk 'BEGIN {print toupper(ARGV [1])}'" \
+	-n +3 | sort |
+    cmp 'paexec -x #1' \
+'"Y;X
+AAA
+BBB
+CCC
+DDD
+EEE
+FFF
+GGG
+TRTRTR'"'"'BRBRBR
+Z Y X
+'
+
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -t ./scripts/paexec_notransport -c ../examples/toupper/cmd \

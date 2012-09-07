@@ -116,6 +116,8 @@ OPTIONS:\n\
 ");
 }
 
+static const char rnd_string [] = "HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5";
+
 /* arguments */
 static char *arg_nodes     = NULL;
 static char *arg_cmd       = NULL;
@@ -951,6 +953,7 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 'x':
 				exec_mode = 1;
+				msg_eot = rnd_string;
 				break;
 			default:
 				usage ();
@@ -982,9 +985,10 @@ static void process_args (int *argc, char ***argv)
 
 		snprintf (cmd, sizeof (cmd),
 				  "while read f; do"
-				  "  res=`%s \"$f\"`; printf '%%s\\n' \"$res\" | awk '{print \" \" $0}';"
-				  "  echo;"
-				  "done", arg_cmd);
+				  "  res=`%s \"$f\"`; printf '%%s\\n' \"$res\";"
+				  "  echo '%s';"
+				  "done", arg_cmd, rnd_string);
+
 		if ((size_t)-1 == shquote (cmd, shq_cmd, sizeof (shq_cmd))){
 			err_fatal (NULL, "Internal error1! (buffer size)\n");
 		}
