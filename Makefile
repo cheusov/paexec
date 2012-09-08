@@ -10,7 +10,7 @@ MKC_REQD    =	0.23.0
 # new recursive target for making a distribution tarball
 TARGETS    +=	_manpages
 
-examples    =	divide all_substr cc_wrapper make_package toupper
+examples    =	divide all_substr cc_wrapper cc_wrapper2 make_package toupper
 .for d in ${examples}
 SUBPRJ     +=	examples/${d}:tests examples/${d}:examples
 .endfor
