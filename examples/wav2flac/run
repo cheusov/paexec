@@ -9,6 +9,6 @@ set -e
 test $# -eq 2
 
 dir="$1" # directory with .wav files
-num="$2" # a number flac(1) processes
+num="$2" # a number of flac(1) processes
 
 ls -1 "$dir"/*.wav | paexec -x -c 'flac --silent' -n +"$num"
