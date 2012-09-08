@@ -867,7 +867,9 @@ static void loop (void)
 static void process_args (int *argc, char ***argv)
 {
 	int c;
-	static const char optstring [] = "hVdvrlpeEiIwzZ:n:c:t:sgm:W:x";
+
+	/* leading + is for shitty GNU libc */
+	static const char optstring [] = "+hVdvrlpeEiIwzZ:n:c:t:sgm:W:x";
 
 	while (c = getopt (*argc, *argv, optstring), c != EOF){
 		switch (c) {
