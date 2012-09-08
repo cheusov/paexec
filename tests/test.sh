@@ -344,6 +344,33 @@ usage: paexec [OPTIONS] [files...]
     cmp 'paexec -md= #2' 'paexec: bad argument for -md=. Exactly one character is allowed
 '
 
+    # bad -ms=/-mf/-mF arg
+    runtest -ms='lalala"trtrtr' 2>&1 |
+    cmp 'paexec -ms= bad #1.1' 'paexec: symbols '\'' and " are not allowed in -m argument
+'
+
+    runtest -ms="lalala'trtrtr" 2>&1 |
+    cmp 'paexec -ms= bad #1.2' 'paexec: symbols '\'' and " are not allowed in -m argument
+'
+
+
+    runtest -ms='lalala"trtrtr' 2>&1 |
+    cmp 'paexec -mf= bad #1.1' 'paexec: symbols '\'' and " are not allowed in -m argument
+'
+
+    runtest -ms="lalala'trtrtr" 2>&1 |
+    cmp 'paexec -mf= bad #1.2' 'paexec: symbols '\'' and " are not allowed in -m argument
+'
+
+
+    runtest -ms='lalala"trtrtr' 2>&1 |
+    cmp 'paexec -mF= bad #1.1' 'paexec: symbols '\'' and " are not allowed in -m argument
+'
+
+    runtest -ms="lalala'trtrtr" 2>&1 |
+    cmp 'paexec -mF= bad #1.2' 'paexec: symbols '\'' and " are not allowed in -m argument
+'
+
     # bad -n arg
     runtest -l -t dummy -c dummy -n ',bad arg' < /dev/null 2>&1 |
     cmp 'paexec bad -n' \

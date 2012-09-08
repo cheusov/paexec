@@ -864,6 +864,13 @@ static void loop (void)
 	wait_for_childs ();
 }
 
+static void check_msg (const char *msg)
+{
+	if (strpbrk (msg, "'\"")){
+		err_fatal (NULL, "symbols ' and \" are not allowed in -m argument\n");
+	}
+}
+
 static void process_args (int *argc, char ***argv)
 {
 	int c;
@@ -931,15 +938,18 @@ static void process_args (int *argc, char ***argv)
 				resistance_timeout = atoi (optarg);
 				break;
 			case 'm':
-				if (optarg [0] == 's' && optarg [1] == '=')
+				if (optarg [0] == 's' && optarg [1] == '='){
 					msg_success = xstrdup (optarg+2);
-				else if (optarg [0] == 'f' && optarg [1] == '=')
+					check_msg (msg_success);
+				}else if (optarg [0] == 'f' && optarg [1] == '='){
 					msg_failure = xstrdup (optarg+2);
-				else if (optarg [0] == 'F' && optarg [1] == '=')
+					check_msg (msg_failure);
+				}else if (optarg [0] == 'F' && optarg [1] == '='){
 					msg_fatal = xstrdup (optarg+2);
-				else if (optarg [0] == 't' && optarg [1] == '=')
+					check_msg (msg_fatal);
+				}else if (optarg [0] == 't' && optarg [1] == '='){
 					msg_eot = xstrdup (optarg+2);
-				else if (optarg [0] == 'd' && optarg [1] == '='){
+				}else if (optarg [0] == 'd' && optarg [1] == '='){
 					if (optarg [2] == 0 || optarg [3] != 0){
 						err_fatal (NULL, "bad argument for -md=. Exactly one character is allowed\n");
 					}
