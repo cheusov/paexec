@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+while test $# -ne 0; do
+    case "$1" in
+	--silent)
+	    ;;
+	-o)
+	    dst_fn=$2
+	    shift;;
+	*)
+	    break;;
+    esac
+    shift
+done
+
+test $# -eq 1
+
+src_fn="$1"
+: ${dst_fn:=${src_fn%%.wav}.flac}
+
+cat "$src_fn" > "$dst_fn"
+echo "converted to flac" >> "$dst_fn"

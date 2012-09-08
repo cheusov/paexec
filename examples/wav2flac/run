@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Here we convert .wav files to .flac
+# Usage: ./run /wav/directory a_number_of_parallel_processes
+# Ex: ./run $HOME/wavs 7
+
+set -e
+
+test $# -eq 2
+
+dir="$1" # directory with .wav files
+num="$2" # a number flac(1) processes
+
+ls -1 "$dir"/*.wav | paexec -x -c 'flac --silent' -n +"$num"

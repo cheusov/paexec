@@ -5,6 +5,8 @@ export LC_ALL=C
 #EXEPREFIX='valgrind -q'
 #EXEPREFIX='env EF_PROTECT_BELOW=1 ef'
 
+export PATH=`pwd`/fakeflac:$PATH
+
 DIFF_PROG=${DIFF_PROG-diff -U10}
 
 OBJDIR=${OBJDIR-..}
@@ -364,6 +366,50 @@ GGG
 TRTRTR'"'"'BRBRBR
 Z Y X
 '
+
+    # x
+    rm -f fakeflac/*.flac
+
+    ls -1 fakeflac/*.wav |
+    runtest -x -c 'flac --silent' -n +3 -p |
+    sed 's/[0-9][0-9]*/NNN/' |
+    cmp 'paexec -x (flac) #2.1' \
+'NNN 
+NNN 
+NNN 
+NNN 
+NNN 
+';
+
+    ls -1 fakeflac/*.flac 2>/dev/null | sed 's,.*/,,' | sort |
+    cmp 'paexec -x (flac) #2.2' \
+'fake1.flac
+fake2.flac
+fake3.flac
+fake4.flac
+fake5.flac
+'
+    rm -f fakeflac/*.flac;
+
+    # x
+    ../examples/wav2flac/run ./fakeflac 3 |
+    cmp 'paexec -x (flac) #3.1' \
+'
+
+
+
+
+'
+
+    ls -1 fakeflac/*.flac 2>/dev/null | sed 's,.*/,,' | sort |
+    cmp 'paexec -x (flac) #3.2' \
+'fake1.flac
+fake2.flac
+fake3.flac
+fake4.flac
+fake5.flac
+'
+    rm -f fakeflac/*.flac;
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
