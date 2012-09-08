@@ -3,11 +3,12 @@
                              INSTALLATION
 
 0)
-   Maybe paexec has been already packaged for your platform. See PACKAGES
-   section below and your system package management tools.
+   Maybe paexec has been already packaged for your platform. See
+   PACKAGES section in README file and your system package management
+   tools.
 
 1)
-   We need bmake (portable version of NetBSD make) for building paexec.
+   You need bmake (portable version of NetBSD make) for building paexec.
    I'd recommend to use latest stable version.
 
    http://crufty.net/help/sjg/bmake.html
@@ -91,6 +92,7 @@ build and installation.
   LDADD
   ...
 
+  NOTE: Environment variable must be the same at build and installation time!
   See mk-configure(7) for details.
 
 ------------------------------

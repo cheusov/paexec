@@ -1,13 +1,14 @@
 ======================================================================
 
 paexec: Small program that processes a list of tasks in parallel
-        on different CPUs, computers in a network or whatever else.
+        on different CPUs, computers in a network or whatever.
         Full documentation is available in paexec.1 and paexec.pod
 
 author:                                  Aleksey Cheusov <vle@gmx.net>
 
 project's home page:           http://sourceforge.net/projects/paexec/
-                                 http://freshmeat.net/projects/paexec/
+                                  http://freecode.com/projects/paexec/
+source code:                         http://github.com/cheusov/paexec
 
 licence:                                                   MIT license
 
@@ -21,21 +22,12 @@ See INSTALL file
 
                            PACKAGES
 
-  1) NetBSD, DragonFlyBSD, Linux, Solaris... (pkgsrc)
+  1) pkgsrc (NetBSD, DragonFlyBSD, Linux, Solaris...)
 
-    PAEXEC is packaged in pkgsrc as wip/paexec.
+    See parallel/paexec (http://pkgsrc.se/parallel/paexec)
 
   2) FreeBSD
 
-    PAEXEC is packaged in FreeBSD ports as devel/paexec.
+    See devel/paexec (http://www.freshports.org/devel/paexec)
 
-  3) Debian/lenny/x86
-
-    Add the following lines
-
-        deb     http://mova.org/~cheusov/pub/debian       lenny    main
-        deb-src http://mova.org/~cheusov/pub/debian       lenny    main
-
-    to /etc/apt/sources.list and then using apt or aptitude commands.
-    Binary packages are available only for Debian/Lenny/i386.
-    Ubuntu users need to recompile the package for their system.
+  3) See https://freecode.com/projects/paexec for latest information
