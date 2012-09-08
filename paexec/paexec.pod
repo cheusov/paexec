@@ -326,42 +326,23 @@ for input graph of tasks with weights.
 
 =over 6
 
+=item 1
+
  paexec -t '/usr/bin/ssh -x' -n 'host1 host2 host3' \
         -le -g -c ~/bin/complex_task < tasks.txt |
  paexec_reorder -Mf -Sl
 
- ls -1 *.wav | paexec -n +4 -c ~/bin/oggenc_wrapper
+=item 2
 
- paexec -EI -lr -n 'host1 host2 host3' \
-                -c command -t /usr/bin/rsh |
- awk '
- ! ($2 in seen) {
-     seen [$2] = 0
+ ls -1 *.wav | paexec -x -n +4 -c 'oggenc -Q'
 
-     node     = $1
-     task_num = $2
+=item 2
 
-     $1 = $2 = ""
-     $0 = substr($0, 3)
-
-     printf "task #%s (\"%s\") started on host \"%s\"\n", task_num, $0, node
-     next
- }
-
- NF == 2 {
-     printf "task #%s done\n", $2
-     next
- }
-
- {
-     task_num = $2
-     $1 = $2 = ""
-     print $0 > ("result." task_num ".txt")
- }'
-
- For other examples, see examples/ directory
+ ls -1 *.wav | paexec -xg -n +4 -c 'flac -f --silent' -il
 
 =back
+
+For other examples, see examples/ subdirectory in the distribution.
 
 =head1 NOTES
 
