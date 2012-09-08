@@ -438,6 +438,30 @@ fake5.flac
 '
     rm -f fakeflac/*.flac;
 
+    # x
+    ( cd ..; examples/dirtest/run < examples/dirtest/tasks ) |
+    paexec_reorder -l -Mm |
+    cmp 'paexec -x (dirtest) #4' \
+'1 failure
+1 /nonexistant;/nonexistant/subdir;/nonexistant/subdir/subsubdir;
+4 success
+5 success
+6 success
+7 success
+8 success
+9 success
+10 success
+11 success
+12 success
+13 success
+14 success
+15 success
+16 success
+17 success
+18 failure
+18 /etc/dir with spaces;/etc/dir with spaces/subdir;
+'
+
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -t ./scripts/paexec_notransport -c ../examples/toupper/cmd \

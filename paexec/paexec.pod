@@ -126,6 +126,8 @@ Filename containing list of nodes, one per line.
 =item B<-x>
 
 Run command specificed by I<-c> for each task. Its stdout is passed to B<paexec>.
+If both C<-x> and C<-g> are specified, task is considered failed
+if command's exit status is non-zero.
 
 =item B<-r>
 

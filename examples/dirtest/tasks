@@ -1,0 +1,17 @@
+/nonexistant;/nonexistant/subdir
+/nonexistant/subdir;/nonexistant/subdir/subsubdir
+examples
+examples/divide
+examples/all_substr
+examples/cc_wrapper
+examples/make_package
+examples/toupper
+examples/cc_wrapper2
+examples/wav2flac
+paexec
+tests;tests/transp_closed_stdin
+tests;tests/fakeflac
+tests;tests/fakeflac
+tests;tests/scripts
+/etc;/etc/dir with spaces
+/etc/dir with spaces;/etc/dir with spaces/subdir

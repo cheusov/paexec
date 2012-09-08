@@ -994,12 +994,23 @@ static void process_args (int *argc, char ***argv)
 	if (exec_mode){
 		char cmd [4096];
 		char shq_cmd [4096];
+		char cond_cmd [4096] = "";
+
+		if (graph_mode){
+			snprintf (
+				cond_cmd, sizeof (cond_cmd),
+				"if test $ex = 0; then echo '%s'; else echo '%s'; fi;",
+				msg_success, msg_failure);
+		}
 
 		snprintf (cmd, sizeof (cmd),
 				  "while read f; do"
-				  "  res=`%s \"$f\"`; printf '%%s\\n' \"$res\";"
+				  "  res=`%s \"$f\"`;"
+				  "  ex=$?;"
+				  "  printf '%%s\\n' \"$res\";"
+				  "  %s"
 				  "  echo '%s';"
-				  "done", arg_cmd, rnd_string);
+				  "done", arg_cmd, cond_cmd, rnd_string);
 
 		if ((size_t)-1 == shquote (cmd, shq_cmd, sizeof (shq_cmd))){
 			err_fatal (NULL, "Internal error1! (buffer size)\n");

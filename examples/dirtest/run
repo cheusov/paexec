@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#
+# paexec -gx: exit status of command passed
+# to -c is treated as a status of task
+#
+
+paexec -gx -l -c 'test -d' -md=';' -n +3
