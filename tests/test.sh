@@ -443,7 +443,7 @@ fake5.flac
     paexec_reorder -l -Mm |
     cmp 'paexec -x (dirtest) #4' \
 '1 failure
-1 /nonexistant;/nonexistant/subdir;/nonexistant/subdir/subsubdir;
+1 /nonexistant;/nonexistant/subdir;/nonexistant/subdir/subsubdir
 4 success
 5 success
 6 success
@@ -459,7 +459,7 @@ fake5.flac
 16 success
 17 success
 18 failure
-18 /etc/dir with spaces;/etc/dir with spaces/subdir;
+18 /etc/dir with spaces;/etc/dir with spaces/subdir
 '
 
     # toupper
@@ -785,7 +785,7 @@ fake5.flac
 5 
 6 Cannot calculate 1/0
 6 failure
-6 0 7 8 9 10 11 12 
+6 0 7 8 9 10 11 12
 6 
 '
 
@@ -809,7 +809,7 @@ fake5.flac
 5 
 6 Cannot calculate 1/0
 6 failure
-6 0;7;8;9;10;11;12;
+6 0;7;8;9;10;11;12
 6 
 '
 
@@ -834,7 +834,7 @@ fake5.flac
 5 Konec!
 6 Cannot calculate 1/0
 6 Zhopa!
-6 0 7 8 9 10 11 12 
+6 0 7 8 9 10 11 12
 6 Konec!
 '
 
@@ -863,7 +863,7 @@ fake5.flac
 5 success
 6 Cannot calculate 1/0
 6 failure
-6 0 7 8 9 
+6 0 7 8 9
 10 1/10=0.1
 10 success
 11 1/11=0.0909091
@@ -889,7 +889,7 @@ fake5.flac
 5 Ura!
 6 Cannot calculate 1/0
 6 Zhopa!
-6 0 7 8 9 
+6 0 7 8 9
 10 1/10=0.1
 10 Ura!
 11 1/11=0.0909091
@@ -901,7 +901,7 @@ fake5.flac
     # paexec_reorder + failure
     ( cd ../examples/divide; ./run; ) | sed 's/^[^ ]* //' | sort |
     cmp 'paexec 1/X #4' \
-'0 7 8 9 
+'0 7 8 9
 1/10=0.1
 1/11=0.0909091
 1/12=0.0833333
@@ -924,7 +924,7 @@ success
 
     ( cd ../examples/divide; ./run2; ) | sed 's/^[^ ]* //' | sort |
     cmp 'paexec 1/X #4 nonstandard' \
-'0 7 8 9 
+'0 7 8 9
 1/10=0.1
 1/11=0.0909091
 1/12=0.0833333

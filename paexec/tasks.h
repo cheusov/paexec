@@ -19,7 +19,7 @@ void tasks__init (void);
 int  tasks__add_task (char *s, int weight);
 void tasks__add_task_arc (int task_from, int task_to);
 void tasks__check_for_cycles (void);
-void tasks__delete_task (int task, int print_task);
+void tasks__delete_task (int task, int print_task, int with_prefix);
 void tasks__delete_task_rec (int task);
 void tasks__destroy (void);
 const char *tasks__get_new_task (void);

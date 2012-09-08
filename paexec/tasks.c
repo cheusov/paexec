@@ -92,7 +92,7 @@ void tasks__destroy (void)
 		xfree (id2sum_weight);
 }
 
-void tasks__delete_task (int task, int print_task)
+void tasks__delete_task (int task, int print_task, int with_prefix)
 {
 	int to;
 	lst_Position p;
@@ -124,13 +124,17 @@ void tasks__delete_task (int task, int print_task)
 
 	if (print_task){
 		if (!deleted_tasks [task]){
-			printf ("%s%c", id2task [task], msg_delim);
+			if (with_prefix)
+				printf ("%c", msg_delim);
+
+			printf ("%s", id2task [task]);
+
 			deleted_tasks [task] = 1;
 		}
 	}
 }
 
-static void delete_task_rec2 (int task)
+static void delete_task_rec2 (int task, int with_prefix)
 {
 	int to;
 	lst_Position p;
@@ -138,11 +142,11 @@ static void delete_task_rec2 (int task)
 
 	assert (task >= 0);
 
-	tasks__delete_task (task, 1);
+	tasks__delete_task (task, 1, with_prefix);
 
 	LST_ITERATE (arcs_outg [task], p, e){
 		to = (int) (intptr_t) e;
-		delete_task_rec2 (to);
+		delete_task_rec2 (to, 1);
 	}
 }
 
@@ -150,7 +154,7 @@ void tasks__delete_task_rec (int task)
 {
 	memset (deleted_tasks, 0, tasks_count * sizeof (*deleted_tasks));
 
-	delete_task_rec2 (task);
+	delete_task_rec2 (task, 0);
 }
 
 static int get_new_task_num_from_graph (void)

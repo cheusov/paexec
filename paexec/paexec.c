@@ -775,7 +775,7 @@ static void loop (void)
 										printf ("\n");
 										break;
 									case rt_success:
-										tasks__delete_task (node2taskid [i], 0);
+										tasks__delete_task (node2taskid [i], 0, 0);
 										break;
 									case rt_undef:
 										print_line (i, "?");
@@ -788,7 +788,7 @@ static void loop (void)
 								if (end_of_stdin)
 									close_all_ins ();
 							}else{
-								tasks__delete_task (node2taskid [i], 0);
+								tasks__delete_task (node2taskid [i], 0, 0);
 							}
 
 							print_EOT (i);
