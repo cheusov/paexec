@@ -785,7 +785,7 @@ fake5.flac
 5 
 6 Cannot calculate 1/0
 6 failure
-6 0 7 8 9 10 11 12 
+6 0;7;8;9;10;11;12;
 6 
 '
 

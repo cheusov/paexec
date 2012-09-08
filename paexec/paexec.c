@@ -174,7 +174,7 @@ static const char *msg_success = "success";
 static const char *msg_failure = "failure";
 static const char *msg_fatal   = "fatal";
 static const char *msg_eot = "";
-static char msg_delim = ' ';
+char msg_delim = ' '; /* also used in tasks.c */
 
 static int resistant = 0;
 static int resistance_timeout = 0;

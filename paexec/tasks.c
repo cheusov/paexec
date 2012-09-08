@@ -42,6 +42,8 @@
 #include "tasks.h"
 #include "wrappers.h"
 
+extern char msg_delim; /* from paexec.c */
+
 static int *deleted_tasks = NULL;
 
 static lst_List *arcs_outg = NULL;
@@ -122,7 +124,7 @@ void tasks__delete_task (int task, int print_task)
 
 	if (print_task){
 		if (!deleted_tasks [task]){
-			printf ("%s ", id2task [task]);
+			printf ("%s%c", id2task [task], msg_delim);
 			deleted_tasks [task] = 1;
 		}
 	}
