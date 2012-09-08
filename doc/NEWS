@@ -1,4 +1,40 @@
 ======================================================================
+Version 0.17.0, by Aleksey Cheusov, Sun,  9 Sep 2012 02:07:34 +0300
+
+  paexec:
+    - Option -x was added. With its help paexec can run one command
+      per task.  If -g is also specified, command's exit status is
+      analysed. Appropriate task and dependants are marked as "failed"
+      if it is non-zero.
+    - First character of -n argument must be alphanumeric, `+', `_',
+      `:' or `/'.  Other symbols are reserved for future extentions.
+    - With '-n :filename' paexec reads a list of nodes from the
+      specified file.
+    - With a help of new option '-m t=<eot>' end of task string
+      may be specified, which is an empty line by default.
+    - Option -md=<delim> was added that overrides the default
+      delimiter (space character) between tasks in graph mode (-g).
+    - Output line that contains failed dependants no longer ends with
+      unnecessary space.
+    - Long options were completely removed.
+
+  paexec_reorder:
+    - Fix. "paexec_reorder -g" now handles correctly failed tasks'
+      output.  One extra line after "fatal" is expected.
+    - Options -m was added. It does the same things as paexec's -m.
+
+  More examples of use and regression tests.
+
+  Documentation update, clean-ups and improvements.
+
+  Regression tests:
+    - Signals handling was fixed in.
+    - LC_ALL is always set to C in regression tests, this fixes some
+      problems in internationalized environment.
+
+  mk-configure>=0.23.0 is required at build time
+
+======================================================================
 Version 0.16.1, by Aleksey Cheusov, Wed, 23 Mar 2011 00:14:15 +0200
 
   paexec.1 and paexec_reorder.1 are included to paexec-0.16.1.tgz.
