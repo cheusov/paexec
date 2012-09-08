@@ -329,16 +329,22 @@ for input graph of tasks with weights.
 =item 1
 
  paexec -t '/usr/bin/ssh -x' -n 'host1 host2 host3' \
-        -le -g -c ~/bin/complex_task < tasks.txt |
+        -le -g -c calculate-me < tasks.txt |
  paexec_reorder -Mf -Sl
 
 =item 2
 
  ls -1 *.wav | paexec -x -n +4 -c 'oggenc -Q'
 
-=item 2
+=item 3
 
  ls -1 *.wav | paexec -xg -n +4 -c 'flac -f --silent' -il
+
+=item 4
+
+ { uname -s; uname -r; uname -m; } |
+ paexec -x -lp -n+2 -c banner |
+ paexec_reorder -l
 
 =back
 
