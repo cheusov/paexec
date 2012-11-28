@@ -1,3 +1,7 @@
+- refresh presentation for lvee-2011 and make it a part of documentation
+
+- trim spaces in -t argument and then check it for emptyness
+
 - paargs - xargs-like tool for distributed computing
 
 -
