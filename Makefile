@@ -36,4 +36,5 @@ manpages: _manpages
 	rm ${MKC_CACHEDIR}/_mkc*
 
 #####
+.include "Makefile.inc"
 .include <mkc.subprj.mk>

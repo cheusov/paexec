@@ -1,20 +1,10 @@
-- refresh presentation for lvee-2011 and make it a part of documentation
-
-- trim spaces in -t argument and then check it for emptyness
-
-- paargs - xargs-like tool for distributed computing
-
--
-  -n:</path/to/file> for getting nodes from a file
-  -n%'node_[1-20,21-30]'
-  warning for -n<non-alphanumeric symbol>
-
-- option for specifying a separator for weight: and task on input
-
-- warning message for usage of long options
-
-non-blocking write(2) for sending task to the slave hosts/CPUs.
-
-SIGINFO for displaying current status of tasks
-
-SIGUSR1 for trying restore connection to dead client hosts
+paexec:
+ - refresh presentation for lvee-2011 and make it a part of documentation
+ - trim spaces in -t argument and then check it for emptyness
+ - Option -I like in xargs (in combination with -x)
+ - Option -n%'node_[1-20,22-30]'
+ - Remove dependency from libmaa
+ - Use getline/getdelim instead of fgetln as the former are a part of POSIX
+ - non-blocking write(2) for sending task to the slave hosts/CPUs.
+ - SIGINFO for displaying current status of tasks
+ - SIGUSR1 for trying restore connection to dead client hosts
