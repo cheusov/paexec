@@ -87,8 +87,9 @@ char * xfgetln(FILE *fp, size_t *len)
 	if (!sz){
 		if (feof (stdin)){
 			return NULL;
-		}else{
+		}else if (!buffer_size){
 			buffer = xmalloc (1);
+			buffer_size = 1;
 		}
 	}
 
