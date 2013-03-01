@@ -335,15 +335,15 @@ static void init__postproc_arg_cmd (void)
 
 		xfree (arg_cmd);
 		arg_cmd = xstrdup (cmd);
+	}
 
-		if (arg_transport){
-			/* one more shquote(3) for ssh-like transport */
-			if ((size_t)-1 == shquote (arg_cmd, shq_cmd, sizeof (shq_cmd))){
-				err_fatal (NULL, "Internal error1! (buffer size)\n");
-			}
-			xfree (arg_cmd);
-			arg_cmd = xstrdup (shq_cmd);
+	if (arg_transport){
+		/* one more shquote(3) for ssh-like transport */
+		if ((size_t)-1 == shquote (arg_cmd, shq_cmd, sizeof (shq_cmd))){
+			err_fatal (NULL, "Internal error1! (buffer size)\n");
 		}
+		xfree (arg_cmd);
+		arg_cmd = xstrdup (shq_cmd);
 	}
 }
 
@@ -380,6 +380,8 @@ static void init__child_processes (void)
 					  arg_transport, nodes [i], arg_cmd);
 		else
 			snprintf (full_cmd, sizeof (full_cmd), "%s", arg_cmd);
+
+//		fprintf (stderr, "full cmd=%s\n", full_cmd);
 
 		pids [i] = pr_open (
 			full_cmd,
