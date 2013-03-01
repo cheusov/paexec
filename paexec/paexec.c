@@ -381,8 +381,6 @@ static void init__child_processes (void)
 		else
 			snprintf (full_cmd, sizeof (full_cmd), "%s", arg_cmd);
 
-//		fprintf (stderr, "full cmd=%s\n", full_cmd);
-
 		pids [i] = pr_open (
 			full_cmd,
 			PR_CREATE_STDIN | PR_CREATE_STDOUT,
