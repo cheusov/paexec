@@ -2336,6 +2336,21 @@ success
 6 FFFFFF
 '
 
+    # -t + shquote(3)
+    printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
+    runtest -t ./scripts/paexec_notransport \
+	-n '1 2 3 4 5 6 7 8 9' \
+	-c "sh -c 'while read f; do echo \$f; echo; done'" |
+    sort |
+    cmp 'paexec -t + shquote(3) #1' \
+'a
+bb
+ccc
+dddd
+eeeee
+ffffff
+'
+
     # tests for paexec_reorder
     paexec_reorder_input1 |
     paexec_reorder |
