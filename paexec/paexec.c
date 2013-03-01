@@ -300,6 +300,53 @@ static void init__read_graph_tasks (void)
 	}
 }
 
+static void init__postproc_arg_cmd (void)
+{
+	char shq_cmd [4096];
+
+	if (exec_mode){
+		char cmd [4096];
+		char cond_cmd [4096] = "";
+
+		if (graph_mode){
+			snprintf (
+				cond_cmd, sizeof (cond_cmd),
+				"if test $ex = 0; then echo '%s'; else echo '%s'; fi;",
+				msg_success, msg_failure);
+		}
+
+		snprintf (cmd, sizeof (cmd),
+				  "while read f; do"
+				  "  res=`%s \"$f\"`;"
+				  "  ex=$?;"
+				  "  printf '%%s\\n' \"$res\";"
+				  "  %s"
+				  "  echo '%s';"
+				  "done", arg_cmd, cond_cmd, rnd_string);
+
+		if ((size_t)-1 == shquote (cmd, shq_cmd, sizeof (shq_cmd))){
+			err_fatal (NULL, "Internal error1! (buffer size)\n");
+		}
+
+		snprintf (cmd, sizeof (cmd), "/bin/sh -c %s", shq_cmd);
+		if (strlen (cmd) == sizeof (cmd)-1){
+			err_fatal (NULL, "Internal error2! (buffer size)\n");
+		}
+
+		xfree (arg_cmd);
+		arg_cmd = xstrdup (cmd);
+
+		if (arg_transport){
+			/* one more shquote(3) for ssh-like transport */
+			if ((size_t)-1 == shquote (arg_cmd, shq_cmd, sizeof (shq_cmd))){
+				err_fatal (NULL, "Internal error1! (buffer size)\n");
+			}
+			xfree (arg_cmd);
+			arg_cmd = xstrdup (shq_cmd);
+		}
+	}
+}
+
 static void init__child_processes (void)
 {
 	char full_cmd [2000];
@@ -447,6 +494,9 @@ static void init (void)
 
 	if (debug)
 		tasks__print_sum_weights ();
+
+	/* */
+	init__postproc_arg_cmd ();
 
 	/* in/out */
 	init__child_processes ();
@@ -996,40 +1046,6 @@ static void process_args (int *argc, char ***argv)
 
 	if (use_weights < 0 || use_weights > 2){
 		err_fatal (NULL, "Only -W1 and -W2 are supported!\n");
-	}
-
-	if (exec_mode){
-		char cmd [4096];
-		char shq_cmd [4096];
-		char cond_cmd [4096] = "";
-
-		if (graph_mode){
-			snprintf (
-				cond_cmd, sizeof (cond_cmd),
-				"if test $ex = 0; then echo '%s'; else echo '%s'; fi;",
-				msg_success, msg_failure);
-		}
-
-		snprintf (cmd, sizeof (cmd),
-				  "while read f; do"
-				  "  res=`%s \"$f\"`;"
-				  "  ex=$?;"
-				  "  printf '%%s\\n' \"$res\";"
-				  "  %s"
-				  "  echo '%s';"
-				  "done", arg_cmd, cond_cmd, rnd_string);
-
-		if ((size_t)-1 == shquote (cmd, shq_cmd, sizeof (shq_cmd))){
-			err_fatal (NULL, "Internal error1! (buffer size)\n");
-		}
-
-		snprintf (cmd, sizeof (cmd), "/bin/sh -c %s", shq_cmd);
-		if (strlen (cmd) == sizeof (cmd)-1){
-			err_fatal (NULL, "Internal error2! (buffer size)\n");
-		}
-
-		xfree (arg_cmd);
-		arg_cmd = xstrdup (cmd);
 	}
 }
 

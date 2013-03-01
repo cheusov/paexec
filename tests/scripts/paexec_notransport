@@ -2,4 +2,4 @@
 
 shift # skip node
 
-"$@"
+eval "$@"

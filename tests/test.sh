@@ -2321,6 +2321,21 @@ success
 5 success
 '
 
+    # -x + -t
+    printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
+    runtest -xl -t ./scripts/paexec_notransport \
+	-n '1 2 3 4 5 6 7 8 9' \
+	-c 'awk "BEGIN {print toupper(ARGV[1])}"' |
+    resort |
+    cmp 'paexec -g + -t #1' \
+'1 A
+2 BB
+3 CCC
+4 DDDD
+5 EEEEE
+6 FFFFFF
+'
+
     # tests for paexec_reorder
     paexec_reorder_input1 |
     paexec_reorder |
