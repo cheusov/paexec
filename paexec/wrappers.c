@@ -84,8 +84,12 @@ char * xfgetln(FILE *fp, size_t *len)
 		log_error ("", "getc failed: %s\n", strerror (errno));
 		exit (1);
 	}
-	if (feof (stdin) && !sz){
-		return NULL;
+	if (!sz){
+		if (feof (stdin)){
+			return NULL;
+		}else{
+			buffer = xmalloc (1);
+		}
 	}
 
 	buffer [sz] = 0;

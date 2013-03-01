@@ -2265,6 +2265,17 @@ success
 
 '
 
+    # empty line on input
+#    printf 'aaa\n\nbbb\n' |
+
+    printf '\n\n' |
+    runtest -xc echo -n +2 -l |
+    sort |
+    cmp 'paexec # empty lines on input' \
+'1 
+2 
+'
+
     # tests for paexec_reorder
     paexec_reorder_input1 |
     paexec_reorder |
