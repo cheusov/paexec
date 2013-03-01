@@ -49,7 +49,7 @@ Remove leading space character.
 
 =item B<-m> F=I<fatal>
 
-=item B<-m> F=I<eot>
+=item B<-m> t=I<eot>
 
 Set alternative string
 for 'success', 'failure', 'fatal' and '' (end of task).
