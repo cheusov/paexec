@@ -212,7 +212,7 @@ static void init__read_graph_tasks (void)
 
 	int id1, id2;
 
-	char *tok1, *tok2, *tok3;
+	char *tok1, *tok2, *tok3, *tok;
 	int tok_cnt;
 	char *p;
 
@@ -238,30 +238,37 @@ static void init__read_graph_tasks (void)
 
 		strncpy (buf_copy, buf, sizeof (buf_copy));
 
-		tok1 = tok2 = tok3 = NULL;
+		tok1 = tok2 = tok3 = tok = NULL;
 		tok_cnt = 0;
 
-		for (p=buf; *p; ++p){
-			if (*p == msg_delim){
+		for (p=buf; 1; ++p){
+			char ch = *p;
+			if (ch == msg_delim){
 				*p = 0;
-			}else if (p == buf || p [-1] == 0){
+			}
+
+			if (!tok)
+				tok = p;
+
+			if (*p == 0){
 				if (!tok1){
-					tok1 = p;
+					tok1 = tok;
 					tok_cnt = 1;
 				}else if (!tok2){
-					tok2 = p;
+					tok2 = tok;
 					tok_cnt = 2;
 				}else if (!tok3){
-					tok3 = p;
+					tok3 = tok;
 					tok_cnt = 3;
 				}else{
 					bad_input_line (buf_copy);
 				}
+				tok = NULL;
 			}
-		}
 
-		if (!tok_cnt)
-			continue;
+			if (!ch)
+				break;
+		}
 
 		if (tok_cnt == 3 && !strcmp (tok1, "weight:")){
 			/* weight: <task> <weight> */

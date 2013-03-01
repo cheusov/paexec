@@ -110,7 +110,6 @@ libmaa dict
 pipestatus pkg_summary-utils
 paexec pkg_summary-utils
 runawk pkg_summary-utils
-
 weight: judyhash 12
 weight: dictd 20
 weight: dict 15
@@ -2274,7 +2273,7 @@ success
 2 
 '
 
-    # empty task
+    # empty lines anywhere
     printf 'aaa\n\nbbb\n' |
     runtest -xc echo -n +2 -l |
     sort |
@@ -2282,6 +2281,44 @@ success
 '1 aaa
 2 
 3 bbb
+'
+
+    # -g + the first line on input is empty
+    printf '\n\n' |
+    runtest -gxc 'echo task' -n +2 -l |
+    paexec_reorder -gl |
+    cmp 'paexec # empty line1' \
+'1 task 
+1 success
+'
+
+    # -g + empty lines anywhere
+    printf 'aaa\n\nbbb\n' |
+    runtest -gxc 'echo task' -n +2 -l |
+    paexec_reorder -gl |
+    cmp 'paexec # -g + empty line2' \
+'1 task aaa
+1 success
+2 task 
+2 success
+3 task bbb
+3 success
+'
+
+    # -g + empty task
+    printf ' ccc\nbbb \naaa bbb\nccc ddd\n' |
+    runtest -gxc 'printf '"'"'task "%s"\n'"'" -n +2 -l |
+    cmp 'paexec # -g + empty task1' \
+'4 task "aaa"
+4 success
+3 task "bbb"
+3 success
+1 task ""
+1 success
+2 task "ccc"
+2 success
+5 task "ddd"
+5 success
 '
 
     # tests for paexec_reorder
