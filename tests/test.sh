@@ -2265,15 +2265,23 @@ success
 
 '
 
-    # empty line on input
-#    printf 'aaa\n\nbbb\n' |
-
+    # the first line on input is empty
     printf '\n\n' |
     runtest -xc echo -n +2 -l |
     sort |
-    cmp 'paexec # empty lines on input' \
+    cmp 'paexec # empty line1' \
 '1 
 2 
+'
+
+    # empty task
+    printf 'aaa\n\nbbb\n' |
+    runtest -xc echo -n +2 -l |
+    sort |
+    cmp 'paexec # empty line2' \
+'1 aaa
+2 
+3 bbb
 '
 
     # tests for paexec_reorder
