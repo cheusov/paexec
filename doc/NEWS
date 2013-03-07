@@ -1,4 +1,19 @@
 ======================================================================
+Version 0.18.0, by Aleksey Cheusov, Thu,  7 Mar 2013 15:17:33 +0300
+
+  paexec:
+    - fixed: NULL dereference when the first line given on input is
+      empty.  Thanks to Sergey Revyako for bug report!
+    - fixed: entire command passed tp ssh-like transport should be
+      shquoted. In particular this fixes -x that didn't work with -t.
+      Thanks to Sergey Revyako for bug report!
+    - 'paexec -g' accepts empty strings as tasks.
+    - More regression tests were added
+
+  paexec_reorder.1:
+    - Mistype fix
+
+======================================================================
 Version 0.17.0, by Aleksey Cheusov, Sun,  9 Sep 2012 02:07:34 +0300
 
   paexec:
