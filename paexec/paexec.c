@@ -961,6 +961,8 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 't':
 				arg_transport = xstrdup (optarg);
+				if (optarg [0])
+					arg_transport = xstrdup (optarg);
 				break;
 			case 'p':
 				show_pid = 1;
