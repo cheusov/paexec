@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2008 Aleksey Cheusov <vle@gmx.net>
+ * Copyright (c) 2013 Aleksey Cheusov <vle@gmx.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -21,21 +21,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _WRAPPERS_H_
-#define _WRAPPERS_H_
+#ifndef _DECLS_H_
+#define _DECLS_H_
 
-#if HAVE_HEADER_SYS_SELECT_H
-#include <sys/select.h>
+#ifndef HAVE_FUNC3_GETLINE_STDIO_H
+ssize_t getline(char** lineptr, size_t* n, FILE* stream);
 #endif
-#include <sys/time.h> /* On ancient HP-UX select(2) is declared here */
-#include <unistd.h>
-#include <signal.h>
-#include <stdio.h>
 
-void nonblock (int fd);
-char * xfgetln(FILE *fp, size_t *len);
-void xsigprocmask (int how, const sigset_t *set, sigset_t *oset);
-void xsigaddset (sigset_t *set, int signo);
-ssize_t xgetline(char** lineptr, size_t* n, FILE* stream);
-
-#endif /* _WRAPPERS_H_ */
+#endif // _DECLS_H_

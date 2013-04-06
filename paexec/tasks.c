@@ -191,12 +191,17 @@ static const char * get_new_task_from_graph (void)
 
 static const char * get_new_task_from_stdin (void)
 {
-	const char *task = NULL;
-	size_t sz = 0;
+	static char *task = NULL;
+	static size_t task_sz = 0;
 
-	task = xfgetln (stdin, &sz);
-	if (!task)
+	ssize_t sz = 0;
+
+	sz = xgetline (&task, &task_sz, stdin);
+	if (sz == -1)
 		return NULL;
+
+	if (sz > 0 && task [sz-1] == '\n')
+		task [sz-1] = 0;
 
 	current_taskid = tasks_count++;
 

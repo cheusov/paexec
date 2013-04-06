@@ -63,37 +63,14 @@ void xsigprocmask (int how, const sigset_t *set, sigset_t *oset)
 	}
 }
 
-char * xfgetln(FILE *fp, size_t *len)
+ssize_t xgetline(char** lineptr, size_t* n, FILE* stream)
 {
-	static char *buffer       = NULL;
-	static size_t buffer_size = 0;
-	int c;
-	size_t sz = 0;
+	ssize_t ret = getline (lineptr, n, stream);
 
-	while (c = getc (fp), c != EOF && c != '\n'){
-		if (sz+1 >= buffer_size){
-			// +2 is enough for `c' and terminating zero
-			buffer_size = buffer_size * 3 / 2 + 2;
-			buffer = xrealloc (buffer, buffer_size);
-		}
-
-		buffer [sz++] = (char) c;
-	}
-
-	if (ferror (stdin)){
-		log_error ("", "getc failed: %s\n", strerror (errno));
+	if (ret == (ssize_t) -1 && ferror (stdin)){
+		log_error ("", "getline(3) failed: %s\n", strerror (errno));
 		exit (1);
 	}
-	if (!sz){
-		if (feof (stdin)){
-			return NULL;
-		}else if (!buffer_size){
-			buffer = xmalloc (1);
-			buffer_size = 1;
-		}
-	}
 
-	buffer [sz] = 0;
-	*len = sz;
-	return buffer;
+	return ret;
 }

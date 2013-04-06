@@ -208,7 +208,9 @@ static void bad_input_line (const char *line)
 static void init__read_graph_tasks (void)
 {
 	char *buf = NULL;
-	size_t len = 0;
+	size_t buf_sz = 0;
+
+	ssize_t len = 0;
 
 	int id1, id2;
 
@@ -230,7 +232,7 @@ static void init__read_graph_tasks (void)
 	}
 
 	/* reading all tasks with their dependancies */
-	while (buf = xfgetln (stdin, &len), buf != NULL){
+	while (len = xgetline (&buf, &buf_sz, stdin), len != -1){
 		if (len > 0 && buf [len-1] == '\n'){
 			buf [len-1] = 0;
 			--len;
@@ -293,6 +295,9 @@ static void init__read_graph_tasks (void)
 
 		bad_input_line (buf_copy);
 	}
+
+	if (buf)
+		free (buf);
 
 	/* */
 	if (debug){

@@ -20,13 +20,13 @@ CFLAGS    +=	-DBUFSIZE=${BUFSIZE}
 MKC_REQUIRE_HEADERS  =	maa.h
 MKC_REQUIRE_FUNCLIBS =	maa_init:maa
 
-MKC_SOURCE_FUNCLIBS  =  shquote
+MKC_SOURCE_FUNCLIBS  =  shquote getline
 
 MKC_COMMON_DEFINES   =	-D_GNU_SOURCE
 MKC_COMMON_HEADERS   =	unistd.h stdlib.h
 MKC_CHECK_TYPES      =	intptr_t:stdint.h intptr_t:inttypes.h
 MKC_CHECK_HEADERS    =	sys/select.h
-MKC_CHECK_FUNCS3     =  shquote
+MKC_CHECK_FUNCS3     =  shquote getline:stdio.h
 
 CLEANFILES           =  *~ core* *.1 *.html ktrace* ChangeLog *.tmp
 
