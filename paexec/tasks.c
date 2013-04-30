@@ -38,6 +38,7 @@
 #endif /* header file intptr_t */
 
 #include <maa.h>
+#include <sys/tree.h>
 
 #include "tasks.h"
 #include "wrappers.h"
@@ -55,7 +56,20 @@ static int *tasks_graph_deg = NULL;
 int tasks_count = 1; /* 0 - special meaning, not task ID */
 int remained_tasks_count = 0;
 
-static hsh_HashTable tasks;
+typedef struct task_struct {
+	RB_ENTRY(task_struct) linkage;
+	char *task;
+	int task_id;
+} task_t;
+
+static int tasks_cmp (task_t *a, task_t *b)
+{
+	return strcmp (a->task, b->task);
+}
+
+static RB_HEAD (tasks_entries, task_struct) tasks = RB_INITIALIZER(&tasks);
+RB_PROTOTYPE (tasks_entries, task_struct, linkage, tasks_cmp);
+RB_GENERATE (tasks_entries, task_struct, linkage, tasks_cmp);
 
 int graph_mode  = 0;
 /* numeric task id to textual representation*/
@@ -74,13 +88,19 @@ int failed_taskids_count = 0;
 
 void tasks__init (void)
 {
-	tasks = hsh_create (NULL, NULL);
 }
 
 void tasks__destroy (void)
 {
-	if (tasks){
-		hsh_destroy (tasks);
+	task_t *data, *next;
+	data = (task_t *) RB_MIN (tasks_entries, &tasks);
+	while (data){
+		next = (task_t *) RB_NEXT (tasks_entries, &tasks, data);
+		RB_REMOVE (tasks_entries, &tasks, data);
+		free (data->task);
+		free (data);
+
+		data = next;
 	}
 
 	if (deleted_tasks)
@@ -243,27 +263,26 @@ const char *tasks__get_new_task (void)
 	return current_task;
 }
 
-typedef union {
-	int integer;
-	const void *ptr;
-} int_ptr_union_t;
-
 int tasks__add_task (char *s, int weight)
 {
-	int_ptr_union_t r;
+	task_t *n = malloc (sizeof (*n));
+	task_t *data;
+	int task_id;
 
-	r.integer = 0;
-	r.ptr = hsh_retrieve (tasks, s);
-	if (r.ptr){
-		if (id2weight [r.integer] < weight){
-			id2weight     [r.integer] = weight;
-			id2sum_weight [r.integer] = weight;
+	n->task = s;
+
+	data = RB_INSERT (tasks_entries, &tasks, n);
+	if (data){
+		task_id = data->task_id;
+		if (id2weight [task_id] < weight){
+			id2weight     [task_id] = weight;
+			id2sum_weight [task_id] = weight;
 		}
-		return r.integer;
+		free (s);
+		free (n);
+		return task_id;
 	}else{
-		r.ptr = NULL;
-		r.integer = tasks_count;
-		hsh_insert (tasks, s, r.ptr);
+		n->task_id = tasks_count;
 
 		++tasks_count;
 		++remained_tasks_count;
