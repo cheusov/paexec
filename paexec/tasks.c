@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2008 Aleksey Cheusov <vle@gmx.net>
+ * Copyright (c) 2007-2013 Aleksey Cheusov <vle@gmx.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -39,6 +39,7 @@
 
 #include <maa.h>
 #include <sys/tree.h>
+#include <sys/queue.h>
 
 #include "tasks.h"
 #include "wrappers.h"
@@ -47,8 +48,12 @@ extern char msg_delim; /* from paexec.c */
 
 static int *deleted_tasks = NULL;
 
-static lst_List *arcs_outg = NULL;
-static lst_List *arcs_inco = NULL;
+struct task_entry {
+	SLIST_ENTRY (task_entry) entries;      /* List. */
+	int task_id;
+};
+static SLIST_HEAD (task_head, task_entry) *arcs_outg = NULL, *arcs_inco = NULL;
+
 static int arcs_count = 0;
 
 static int *tasks_graph_deg = NULL;
@@ -114,9 +119,8 @@ void tasks__destroy (void)
 
 void tasks__delete_task (int task, int print_task, int with_prefix)
 {
+	struct task_entry *p;
 	int to;
-	lst_Position p;
-	void *e;
 
 	assert (task < tasks_count);
 	assert (task >= 0);
@@ -129,8 +133,8 @@ void tasks__delete_task (int task, int print_task, int with_prefix)
 	}
 
 	if (graph_mode){
-		LST_ITERATE (arcs_outg [task], p, e){
-			to = (int) (intptr_t) e;
+		SLIST_FOREACH (p, &arcs_outg [task], entries){
+			to = p->task_id;
 			if (tasks_graph_deg [to] > 0)
 				--tasks_graph_deg [to];
 		}
@@ -156,16 +160,15 @@ void tasks__delete_task (int task, int print_task, int with_prefix)
 
 static void delete_task_rec2 (int task, int with_prefix)
 {
+	struct task_entry *p;
 	int to;
-	lst_Position p;
-	void *e;
 
 	assert (task >= 0);
 
 	tasks__delete_task (task, 1, with_prefix);
 
-	LST_ITERATE (arcs_outg [task], p, e){
-		to = (int) (intptr_t) e;
+	SLIST_FOREACH (p, &arcs_outg [task], entries){
+		to = p->task_id;
 		delete_task_rec2 (to, 1);
 	}
 }
@@ -287,13 +290,13 @@ int tasks__add_task (char *s, int weight)
 		++tasks_count;
 		++remained_tasks_count;
 
-		arcs_outg = (lst_List *) xrealloc (
+		arcs_outg = (struct task_head *) xrealloc (
 			arcs_outg, tasks_count * sizeof (*arcs_outg));
-		arcs_outg [tasks_count-1] = lst_create ();
+		SLIST_INIT(&arcs_outg [tasks_count-1]);
 
-		arcs_inco = (lst_List *) xrealloc (
+		arcs_inco = (struct task_head *) xrealloc (
 			arcs_inco, tasks_count * sizeof (*arcs_inco));
-		arcs_inco [tasks_count-1] = lst_create ();
+		SLIST_INIT(&arcs_inco [tasks_count-1]);
 
 		id2task = (char **) xrealloc (
 			id2task, tasks_count * sizeof (*id2task));
@@ -321,9 +324,18 @@ int tasks__add_task (char *s, int weight)
 
 void tasks__add_task_arc (int task_from, int task_to)
 {
+	struct task_entry *p1,*p2;
 	++arcs_count;
-	lst_append (arcs_outg [task_from], (void *) (intptr_t) task_to);
-	lst_append (arcs_inco [task_to],   (void *) (intptr_t) task_from);
+
+	p1 = xmalloc (sizeof (*p1));
+	memset (p1, 0, sizeof (*p1));
+	p1->task_id = task_to;
+	SLIST_INSERT_HEAD (&arcs_outg [task_from], p1, entries);
+
+	p2 = xmalloc (sizeof (*p2));
+	memset (p2, 0, sizeof (*p2));
+	p2->task_id = task_from;
+	SLIST_INSERT_HEAD (&arcs_inco [task_to], p2, entries);
 
 	++tasks_graph_deg [task_to];
 }
@@ -342,21 +354,20 @@ static int *check_cycles__mark;
 
 static void check_cycles__outgoing (int stack_sz)
 {
+	struct task_entry *p;
 	int j;
 	int s, t;
 	int loop;
 	int to;
 	int from = check_cycles__stack [stack_sz-1];
-	lst_Position p;
-	void *e;
 
 	assert (stack_sz > 0);
 
 	assert (check_cycles__mark [from] == 0);
 	check_cycles__mark [from] = 2; /* currently in the path */
 
-	LST_ITERATE (arcs_outg [from], p, e){
-		to = (int) (intptr_t) e;
+	SLIST_FOREACH (p, &arcs_outg [from], entries){
+		to = p->task_id;
 		assert (stack_sz < tasks_count);
 
 		check_cycles__stack [stack_sz] = to;
@@ -424,14 +435,13 @@ static char *seen = NULL;
 
 static void tasks__make_sum_weights_rec (int *accu_w, int task)
 {
-	lst_Position p;
-	void *e;
+	struct task_entry *p;
 	int to;
 
 	*accu_w += id2weight [task];
 	seen [task] = 1;
-	LST_ITERATE (arcs_outg [task], p, e){
-		to = (int) (intptr_t) e;
+	SLIST_FOREACH (p, &arcs_outg [task], entries){
+		to = p->task_id;
 		if (!seen [to])
 			tasks__make_sum_weights_rec (accu_w, to);
 	}
@@ -439,8 +449,7 @@ static void tasks__make_sum_weights_rec (int *accu_w, int task)
 
 void tasks__make_sum_weights (void)
 {
-	lst_Position p;
-	void *e;
+	struct task_entry *p;
 	int to;
 	int i;
 
@@ -452,8 +461,8 @@ void tasks__make_sum_weights (void)
 	for (i=1; i < tasks_count; ++i){
 		memset (seen, 0, tasks_count);
 
-		LST_ITERATE (arcs_outg [i], p, e){
-			to = (int) (intptr_t) e;
+		SLIST_FOREACH (p, &arcs_outg [i], entries){
+			to = p->task_id;
 			tasks__make_sum_weights_rec (&id2sum_weight [i], to);
 		}
 	}
@@ -463,15 +472,14 @@ void tasks__make_sum_weights (void)
 
 static void tasks__make_max_weights_rec (int *accu_w, int task)
 {
-	lst_Position p;
-	void *e;
+	struct task_entry *p;
 	int to;
 
 	int curr_w = id2weight [task];
 	*accu_w = (*accu_w < curr_w ? curr_w : *accu_w);
 	seen [task] = 1;
-	LST_ITERATE (arcs_outg [task], p, e){
-		to = (int) (intptr_t) e;
+	SLIST_FOREACH (p, &arcs_outg [task], entries){
+		to = p->task_id;
 		if (!seen [to])
 			tasks__make_max_weights_rec (accu_w, to);
 	}
@@ -479,8 +487,7 @@ static void tasks__make_max_weights_rec (int *accu_w, int task)
 
 void tasks__make_max_weights (void)
 {
-	lst_Position p;
-	void *e;
+	struct task_entry *p;
 	int to;
 	int i;
 
@@ -492,8 +499,8 @@ void tasks__make_max_weights (void)
 	for (i=1; i < tasks_count; ++i){
 		memset (seen, 0, tasks_count);
 
-		LST_ITERATE (arcs_outg [i], p, e){
-			to = (int) (intptr_t) e;
+		SLIST_FOREACH (p, &arcs_outg [i], entries){
+			to = p->task_id;
 			tasks__make_max_weights_rec (&id2sum_weight [i], to);
 		}
 	}
