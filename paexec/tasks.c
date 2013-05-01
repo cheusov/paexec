@@ -438,19 +438,20 @@ static void tasks__make_sum_weights_rec (int *accu_w, int task)
 	struct task_entry *p;
 	int to;
 
-	*accu_w += id2weight [task];
 	seen [task] = 1;
 	SLIST_FOREACH (p, &arcs_outg [task], entries){
 		to = p->task_id;
-		if (!seen [to])
-			tasks__make_sum_weights_rec (accu_w, to);
+		if (seen [to])
+			continue;
+
+		tasks__make_sum_weights_rec (accu_w, to);
+		*accu_w += id2weight [to];
+		seen [to] = 1;
 	}
 }
 
 void tasks__make_sum_weights (void)
 {
-	struct task_entry *p;
-	int to;
 	int i;
 
 	if (!graph_mode)
@@ -460,11 +461,7 @@ void tasks__make_sum_weights (void)
 
 	for (i=1; i < tasks_count; ++i){
 		memset (seen, 0, tasks_count);
-
-		SLIST_FOREACH (p, &arcs_outg [i], entries){
-			to = p->task_id;
-			tasks__make_sum_weights_rec (&id2sum_weight [i], to);
-		}
+		tasks__make_sum_weights_rec (&id2sum_weight [i], i);
 	}
 
 	xfree (seen);
@@ -474,21 +471,24 @@ static void tasks__make_max_weights_rec (int *accu_w, int task)
 {
 	struct task_entry *p;
 	int to;
+	int curr_w;
 
-	int curr_w = id2weight [task];
-	*accu_w = (*accu_w < curr_w ? curr_w : *accu_w);
 	seen [task] = 1;
 	SLIST_FOREACH (p, &arcs_outg [task], entries){
 		to = p->task_id;
-		if (!seen [to])
-			tasks__make_max_weights_rec (accu_w, to);
+		if (seen [to])
+			continue;
+
+		tasks__make_max_weights_rec (accu_w, to);
+		curr_w = id2weight [to];
+		if (*accu_w < curr_w)
+			*accu_w = curr_w;
+		seen [to] = 1;
 	}
 }
 
 void tasks__make_max_weights (void)
 {
-	struct task_entry *p;
-	int to;
 	int i;
 
 	if (!graph_mode)
@@ -499,10 +499,7 @@ void tasks__make_max_weights (void)
 	for (i=1; i < tasks_count; ++i){
 		memset (seen, 0, tasks_count);
 
-		SLIST_FOREACH (p, &arcs_outg [i], entries){
-			to = p->task_id;
-			tasks__make_max_weights_rec (&id2sum_weight [i], to);
-		}
+		tasks__make_max_weights_rec (&id2sum_weight [i], i);
 	}
 
 	xfree (seen);

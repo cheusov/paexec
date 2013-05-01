@@ -108,6 +108,10 @@ libmaa paexec
 libmaa dictd
 libmaa dict
 pipestatus pkg_summary-utils
+pipestatus pkg_summary-utils
+pipestatus pkg_summary-utils
+pipestatus pkg_summary-utils
+pipestatus pkg_summary-utils
 paexec pkg_summary-utils
 runawk pkg_summary-utils
 weight: judyhash 12
@@ -130,6 +134,8 @@ test_tasks3 (){
 4 5
 5 0
 0 7
+5 0
+0 7
 7 8
 8 9
 9 10
@@ -148,6 +154,9 @@ test_tasks4 (){
 0 7
 7 8
 8 9
+5 10
+10 11
+11 12
 5 10
 10 11
 11 12
@@ -2133,6 +2142,14 @@ success
 pkg_online-server
 success
 
+'
+
+    # tests for sum_weight calculation (-W1 option)
+    printf 'task1 task2\ntask1 task2\nweight: task1 7\nweight: task2 9\n' |
+    runtest -edW1 -c ../examples/make_package/cmd -n +1 2>&1 | grep '^sum_weight' |
+    cmp 'paexec -W1 #5' \
+'sum_weight [task1]=16
+sum_weight [task2]=9
 '
 
     # tests for weighted nodes of graph (-W2 option)
