@@ -1,4 +1,4 @@
-SCRIPTS     =	run
+SCRIPTS     =	run_cc_wrapper2
 SCRIPTSDIR ?=	${FILESDIR}
 
 FILES      !=	echo *.c

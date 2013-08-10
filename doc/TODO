@@ -3,7 +3,6 @@ paexec:
  - trim spaces in -t argument and then check it for emptyness
  - Option -I like in xargs (in combination with -x)
  - Option -n%'node_[1-20,22-30]'
- - Remove dependency from libmaa
  - non-blocking write(2) for sending task to the slave hosts/CPUs.
  - SIGINFO for displaying current status of tasks
  - SIGUSR1 for trying restore connection to dead client hosts

@@ -1,4 +1,4 @@
-SCRIPTS    =	run
+SCRIPTS    =	run_dirtest
 SCRIPTSDIR =	${EGDIR}/${.CURDIR:T}
 
 FILES      =	tasks

@@ -427,7 +427,7 @@ fake5.flac
     rm -f fakeflac/*.flac;
 
     # x
-    ../examples/wav2flac/run ./fakeflac 3 |
+    run_wav2flac ./fakeflac 3 |
     cmp 'paexec -x (flac) #3.1' \
 '
 
@@ -447,7 +447,7 @@ fake5.flac
     rm -f fakeflac/*.flac;
 
     # x
-    ( cd ..; examples/dirtest/run < examples/dirtest/tasks ) |
+    ( cd ..; run_dirtest < examples/dirtest/tasks ) |
     paexec_reorder -l -Mm |
     cmp 'paexec -x (dirtest) #4' \
 '1 failure
@@ -472,7 +472,7 @@ fake5.flac
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -t ./scripts/paexec_notransport -c ../examples/toupper/cmd \
+    runtest -l -t paexec_notransport -c cmd_toupper \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec toupper #1' \
 '1 A
@@ -485,7 +485,7 @@ fake5.flac
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -t '' -c ../examples/toupper/cmd \
+    runtest -l -t '' -c cmd_toupper \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec toupper #2' \
 '1 A
@@ -497,7 +497,7 @@ fake5.flac
 '
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c ../examples/toupper/cmd \
+    runtest -l -c cmd_toupper \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec toupper #3' \
 '1 A
@@ -509,8 +509,8 @@ fake5.flac
 '
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -p -t ./scripts/paexec_notransport \
-	-c ../examples/toupper/cmd -n '+2' |
+    runtest -l -p -t paexec_notransport \
+	-c cmd_toupper -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
     cmp 'paexec toupper #4' \
 '1 pid A
@@ -523,7 +523,7 @@ fake5.flac
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p -t '' \
-	-c ../examples/toupper/cmd -n '+2' |
+	-c cmd_toupper -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
     cmp 'paexec toupper #5' \
 '1 pid A
@@ -536,7 +536,7 @@ fake5.flac
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p \
-	-c ../examples/toupper/cmd -n '+2' |
+	-c cmd_toupper -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
     cmp 'paexec toupper #6' \
 '1 pid A
@@ -549,7 +549,7 @@ fake5.flac
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p \
-	-c ../examples/toupper/cmd -n '+2' |
+	-c cmd_toupper -n '+2' |
     resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
     cmp 'paexec toupper #6' \
 '1 pid A
@@ -562,7 +562,7 @@ fake5.flac
 
     # all_substr
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c ../examples/all_substr/cmd \
+    runtest -l -c cmd_all_substr \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec all_substr #1.1' \
 '1 substr[1,1]=a
@@ -626,7 +626,7 @@ fake5.flac
     # all_substr
     printf '1\n2\n3\n4\n5\n6\n7\n8\n9\n' > "$tmpfn4"
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c ../examples/all_substr/cmd \
+    runtest -l -c cmd_all_substr \
 	-n ":$tmpfn4" | resort |
     cmp 'paexec all_substr #1.2' \
 '1 substr[1,1]=a
@@ -689,7 +689,7 @@ fake5.flac
 
     # all_substr
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c ../examples/all_substr/cmd -n '+9' |
+    runtest -l -c cmd_all_substr -n '+9' |
     resort |
     cmp 'paexec all_substr #2' \
 '1 substr[1,1]=a
@@ -751,7 +751,7 @@ fake5.flac
 '
 
     # no input
-    runtest -c ../examples/all_substr/cmd -n +3 < /dev/null |
+    runtest -c cmd_all_substr -n +3 < /dev/null |
     cmp 'paexec all_substr #3' ''
 
     # bad command + no input
@@ -764,7 +764,7 @@ fake5.flac
 	for (i=0; i < 10; ++i) {
 	    print "1234567890-=qwertyuiop[]asdfghjkl;zxcvbnm,./zaqwsxcderfvbgtyhnmjuik,.lo";
 	}
-    }' | runtest -c scripts/big_result_cmd -n '+9' |
+    }' | runtest -c big_result_cmd -n '+9' |
     uniq -c |
     head -n 100 |
     awk '{$1 = $1; print $0}' |
@@ -774,7 +774,7 @@ fake5.flac
 
     # tests for partially ordered set of tasks (-s option)
     test_tasks3 |
-    runtest -e -s -l -c ../examples/divide/cmd -n +10 |
+    runtest -e -s -l -c cmd_divide -n +10 |
     cmp 'paexec 1/X #1' \
 '1 1/1=1
 1 success
@@ -798,7 +798,7 @@ fake5.flac
 '
 
     test_tasks3 | spc2semicolon |
-    runtest -eslmd=";" -c ../examples/divide/cmd -n +10 |
+    runtest -eslmd=";" -c cmd_divide -n +10 |
     cmp 'paexec 1/X -md=";" #1.1' \
 '1 1/1=1
 1 success
@@ -823,7 +823,7 @@ fake5.flac
 
     test_tasks3 |
     runtest -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
-	-e -s -l -c ../examples/divide/cmd2 -n +10 |
+	-e -s -l -c cmd_divide2 -n +10 |
     cmp 'paexec 1/X #1 nonstandard' \
 '1 1/1=1
 1 Ura!
@@ -847,16 +847,16 @@ fake5.flac
 '
 
     # -s and no input
-    runtest -s -l -c ../examples/divide/cmd -n +10 < /dev/null |
+    runtest -s -l -c cmd_divide -n +10 < /dev/null |
     cmp 'paexec 1/X #2' ''
 
     runtest -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
-	-s -l -c ../examples/divide/cmd -n +10 < /dev/null |
+	-s -l -c cmd_divide -n +10 < /dev/null |
     cmp 'paexec 1/X #2 nonstandard' ''
 
     # paexec_reorder + failure
     test_tasks4 |
-    runtest -se -l -c ../examples/divide/cmd -n +1 |
+    runtest -se -l -c cmd_divide -n +1 |
     paexec_reorder -gl |
     cmp 'paexec 1/X #3' \
 '1 1/1=1
@@ -882,7 +882,7 @@ fake5.flac
 
     test_tasks4 |
     runtest -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
-	-se -l -c ../examples/divide/cmd2 -n +1 |
+	-se -l -c cmd_divide2 -n +1 |
     paexec_reorder -gl -ms='Ura!' -mf='Zhopa!' -mt='Konec!' |
     cmp 'paexec 1/X #3 nonstandard' \
 '1 1/1=1
@@ -907,7 +907,7 @@ fake5.flac
 '
 
     # paexec_reorder + failure
-    ( cd ../examples/divide; ./run; ) | sed 's/^[^ ]* //' | sort |
+    ( cd ../examples/divide; ./run_divide; ) | sed 's/^[^ ]* //' | sort |
     cmp 'paexec 1/X #4' \
 '0 7 8 9
 1/10=0.1
@@ -930,7 +930,7 @@ success
 success
 '
 
-    ( cd ../examples/divide; ./run2; ) | sed 's/^[^ ]* //' | sort |
+    ( cd ../examples/divide; ./run_divide2; ) | sed 's/^[^ ]* //' | sort |
     cmp 'paexec 1/X #4 nonstandard' \
 '0 7 8 9
 1/10=0.1
@@ -954,22 +954,22 @@ Zhopa!
 '
 
     # -s all failed
-    runtest -s -l -c '../examples/make_package/cmd__xxx_failed .' \
+    runtest -s -l -c 'cmd_xxx_failed_make_package .' \
 	-n +10 < /dev/null |
     cmp 'paexec all fails #1' ''
 
     # -s all failed
-    runtest -s -l -c '../examples/make_package/cmd__xxx_failed .' \
+    runtest -s -l -c 'cmd_xxx_failed_make_package .' \
 	-n +5 < /dev/null |
     cmp 'paexec all fails #2' ''
 
     # -s all failed
-    runtest -s -l -c '../examples/make_package/cmd__xxx_failed .' \
+    runtest -s -l -c 'cmd_xxx_failed_make_package .' \
 	-n +1 < /dev/null |
     cmp 'paexec all fails #3' ''
 
     # -s: all succeeded
-    runtest -l -s -c ../examples/make_package/cmd -n +2 \
+    runtest -l -s -c cmd_make_package -n +2 \
 	> $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1004,7 +1004,7 @@ ok100
 '
 
     # -s: byacc fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed byacc' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package byacc' \
 	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1038,7 +1038,7 @@ ok100
 '
 
     # -s: flex fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed flex' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package flex' \
 	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1072,7 +1072,7 @@ ok100
 '
 
     # -s: libmaa fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed libmaa' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package libmaa' \
 	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1106,7 +1106,7 @@ ok100
 '
 
     # -s: m4 fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed m4' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package m4' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1138,7 +1138,7 @@ ok100
 '
 
     # -s: libjudy fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed libjudy' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package libjudy' \
 	-n +2 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1171,7 +1171,7 @@ ok100
 '
 
     # -s: dictem fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed dictem' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package dictem' \
 	-n +3 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1204,7 +1204,7 @@ ok100
 '
 
     # -s: glib2 fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed glib2' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package glib2' \
 	-n +6 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1237,7 +1237,7 @@ ok100
 '
 
     # -s: gmake fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed gmake' -n +5 \
+    runtest -l -s -c 'cmd_xxx_failed_make_package gmake' -n +5 \
 	> $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1270,7 +1270,7 @@ ok100
 '
 
     # -s: autoconf fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed autoconf' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package autoconf' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1304,7 +1304,7 @@ ok100
 '
 
     # -s: dict-server fails
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed dict-server' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package dict-server' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1335,7 +1335,7 @@ ok100
 '
 
     # -s: flex and byacc fail
-    runtest -l -s -c '../examples/make_package/cmd__xxx_failed "flex|byacc"' \
+    runtest -l -s -c 'cmd_xxx_failed_make_package "flex|byacc"' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1377,7 +1377,7 @@ ok100
 
     # -s: gmake and autoconf fail
     runtest -l -s \
-	-c '../examples/make_package/cmd__xxx_failed "gmake|autoconf"' \
+	-c 'cmd_xxx_failed_make_package "gmake|autoconf"' \
 	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
@@ -1421,7 +1421,7 @@ ok100
 
     # diamond-like dependancy and failure
     runtest -l -s \
-	-c '../examples/make_package/cmd__xxx_failed flex' \
+	-c 'cmd_xxx_failed_make_package flex' \
 	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/tasks2
 
     {
@@ -1445,7 +1445,7 @@ ok
 
     # cycle detection1
     runtest -l -s \
-	-c ../examples/make_package/cmd \
+	-c cmd_make_package \
 	-n +5 < ../examples/make_package/tasks_cycle |
     cmp 'paexec cyclic deps #1' \
 'Cyclic dependancy detected:
@@ -1462,7 +1462,7 @@ task10 task20
 task20 task30
 task30 task10
 ' | runtest -l -s \
-	-c ../examples/make_package/cmd \
+	-c cmd_make_package \
 	-n +5 |
     cmp 'paexec cyclic deps #2' \
 'Cyclic dependancy detected:
@@ -1478,7 +1478,7 @@ task20 task30
 task50 task50
 task30 task40
 ' | runtest -l -s \
-	-c ../examples/make_package/cmd \
+	-c cmd_make_package \
 	-n +5 |
     cmp 'paexec cyclic deps #3' \
 'Cyclic dependancy detected:
@@ -1497,7 +1497,7 @@ task100 task110
 task200 task300
 task300 task0
 ' | runtest -l -s \
-	-c ../examples/make_package/cmd \
+	-c cmd_make_package \
 	-n +5 |
     cmp 'paexec cyclic deps #4' \
 'Cyclic dependancy detected:
@@ -1515,7 +1515,7 @@ task300 task0
 3 4
 4 5
 ' | runtest -s -E \
-	-t scripts/transport_broken_echo -c ':' \
+	-t transport_broken_echo -c ':' \
 	-n '1 2 3 4 5 6' |
     cmp 'paexec broken transport #1' \
 "I'll output -1
@@ -1538,7 +1538,7 @@ pear
 plum
 cherry
 ' | runtest_resort -el -z \
-	-t scripts/transport_broken_toupper \
+	-t transport_broken_toupper \
 	-c : -n '4 5 6 7' |
     cmp 'paexec broken transport #2' \
 '1 fatal
@@ -1560,7 +1560,7 @@ cherry
     # -Z + -w without -s
     printf '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n' |
     runtest_resort -Z1 -w \
-	-t scripts/transport_broken_rnd \
+	-t transport_broken_rnd \
 	-m F= -c: -n '0.5ns-nopostfail 0.5ns-nopostfail 0.5ns-nopostfail' |
     cmp 'paexec broken transport #3' \
 'success
@@ -1601,7 +1601,7 @@ success
     printf '%s' '-1 0
 0 1
 ' | runtest -z -g -E \
-	-t scripts/transport_broken_echo -c ':' \
+	-t transport_broken_echo -c ':' \
 	-n '1' |
     cmp 'paexec broken transport #4' \
 "I'll output -1
@@ -1627,7 +1627,7 @@ all nodes failed
 4 5
 5 6
 ' | runtest -z -r -g -E \
-	-t scripts/transport_broken_echo -c ':' \
+	-t transport_broken_echo -c ':' \
 	-n '1 2 3 4 5 6 7' |
     cmp 'paexec broken transport #5' \
 "1 I'll output -1
@@ -1688,7 +1688,7 @@ all nodes failed
 3 4
 4 5
 5 6
-' | runtest -g -z -lre -t transp_closed_stdin/transp_closed_stdin -c : \
+' | runtest -g -z -lre -t transp_closed_stdin -c : \
 	-n '0 1 2 3 4 5 6 7 8' |
     cmp 'paexec broken transport #6' \
 "0 1 I'll output 0
@@ -1741,7 +1741,7 @@ all nodes failed
         }
     }' |
     runtest -z -r -g -E \
-	-t scripts/transport_broken_echo -c ':' \
+	-t transport_broken_echo -c ':' \
 	-n '4' |
     cmp 'paexec broken transport #7' \
 '4 fatal
@@ -1751,7 +1751,7 @@ all nodes failed
 
     # resistance to transport failure
     echo mama | runtest -z -r -g -i -E \
-	-t scripts/transport_broken_echo -c ':' \
+	-t transport_broken_echo -c ':' \
 	-n '4' | 
     cmp 'paexec broken transport #8' \
 '4 mama
@@ -1773,7 +1773,7 @@ dat5
 dat6
 EOF
 
-    runtest -s -z -lr -t scripts/transport_broken_rnd -c : \
+    runtest -s -z -lr -t transport_broken_rnd -c : \
 	-n '0.1 0.15 0.2 0.25 0.3 0' < $OBJDIR/_test.in |
     filter_succeded_tasks | sort -n |
     cmp 'paexec broken transport #9' \
@@ -1791,7 +1791,7 @@ EOF
 
     # resistance to transport failure
     awk 'BEGIN {for (i=1; i <= 1000; ++i) {print "dat" i}}' |
-    runtest -s -z -lr -t scripts/transport_broken_rnd -c : \
+    runtest -s -z -lr -t transport_broken_rnd -c : \
 	-n '0.01-ns 0.03-ns 0.09-ns 0.09-ns 0.03-ns 0-ns' |
     filter_succeded_tasks | sort -n | cksum |
     cmp 'paexec broken transport #10' \
@@ -1813,7 +1813,7 @@ EOF
     rm -f "$test_file"
 
     runtest -Z1 -s -n '1 2' -c: \
-	-t "scripts/transport_broken_echo2 $test_file" \
+	-t "transport_broken_echo2 $test_file" \
 	< $OBJDIR/_tasks.tmp | grep output | sort |
     cmp 'paexec broken transport #11' \
 'output 1
@@ -1828,7 +1828,7 @@ output 6
     rm -f "$test_file"
 
     # tests for weighted nodes of graph (-W0 option)
-    test_tasks1 | runtest -W0 -e -c ../examples/make_package/cmd -n +1 |
+    test_tasks1 | runtest -W0 -e -c cmd_make_package -n +1 |
     cmp 'paexec -W0 #1' \
 'qt4
 success
@@ -1876,7 +1876,7 @@ success
 
     # tests for max_weight calculation (-W0 option)
     test_tasks1 |
-    runtest -W0 -e -d -c ../examples/make_package/cmd \
+    runtest -W0 -e -d -c cmd_make_package \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W0 #2' \
 'sum_weight [pcc]=4
@@ -1897,7 +1897,7 @@ sum_weight [qt4]=14
 
     # tests for max_weight calculation (-W0 option)
     test_tasks2 |
-    runtest -edW0 -c ../examples/make_package/cmd \
+    runtest -edW0 -c cmd_make_package \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W0 #3' \
 'sum_weight [pipestatus]=1
@@ -1915,7 +1915,7 @@ sum_weight [paexec]=4
 '
 
     test_tasks2 | spc2semicolon |
-    runtest -edW0 -md=';' -c ../examples/make_package/cmd \
+    runtest -edW0 -md=';' -c cmd_make_package \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W0 -md=";" #3.1' \
 'sum_weight [pipestatus]=1
@@ -1934,7 +1934,7 @@ sum_weight [paexec]=4
 
     # tests for sum_weight calculation (-W0 option)
     test_tasks2 |
-    runtest -eW0 -c ../examples/make_package/cmd -n +1 2>&1 |
+    runtest -eW0 -c cmd_make_package -n +1 2>&1 |
     cmp 'paexec -W0 #4' \
 'judyhash
 success
@@ -1975,7 +1975,7 @@ success
 '
 
     test_tasks2 | spc2semicolon |
-    runtest -eW0 -md=';' -c ../examples/make_package/cmd -n +1 2>&1 |
+    runtest -eW0 -md=';' -c cmd_make_package -n +1 2>&1 |
     cmp 'paexec -W0 -md=";" #4.1' \
 'judyhash
 success
@@ -2016,7 +2016,7 @@ success
 '
 
     # tests for weighted nodes of graph (-W1 option)
-    test_tasks1 | runtest -W1 -e -c ../examples/make_package/cmd -n +1 |
+    test_tasks1 | runtest -W1 -e -c cmd_make_package -n +1 |
     cmp 'paexec -W1 #1' \
 'qt4
 success
@@ -2064,7 +2064,7 @@ success
 
     # tests for sum_weight calculation (-W1 option)
     test_tasks1 |
-    runtest -W1 -e -d -c ../examples/make_package/cmd \
+    runtest -W1 -e -d -c cmd_make_package \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W1 #2' \
 'sum_weight [pcc]=4
@@ -2085,7 +2085,7 @@ sum_weight [qt4]=14
 
     # tests for sum_weight calculation (-W1 option)
     test_tasks2 |
-    runtest -edW1 -c ../examples/make_package/cmd \
+    runtest -edW1 -c cmd_make_package \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W1 #3' \
 'sum_weight [pipestatus]=6
@@ -2104,7 +2104,7 @@ sum_weight [paexec]=9
 
     # tests for sum_weight calculation (-W1 option)
     test_tasks2 |
-    runtest -eW1 -c ../examples/make_package/cmd -n +1 2>&1 |
+    runtest -eW1 -c cmd_make_package -n +1 2>&1 |
     cmp 'paexec -W1 #4' \
 'libmaa
 success
@@ -2146,14 +2146,14 @@ success
 
     # tests for sum_weight calculation (-W1 option)
     printf 'task1 task2\ntask1 task2\nweight: task1 7\nweight: task2 9\n' |
-    runtest -edW1 -c ../examples/make_package/cmd -n +1 2>&1 | grep '^sum_weight' |
+    runtest -edW1 -c cmd_make_package -n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W1 #5' \
 'sum_weight [task1]=16
 sum_weight [task2]=9
 '
 
     # tests for weighted nodes of graph (-W2 option)
-    test_tasks1 | runtest -W2 -e -c ../examples/make_package/cmd -n +1 |
+    test_tasks1 | runtest -W2 -e -c cmd_make_package -n +1 |
     cmp 'paexec -W2 #1' \
 'qt4
 success
@@ -2201,7 +2201,7 @@ success
 
     # tests for max_weight calculation (-W2 option)
     test_tasks1 |
-    runtest -W2 -e -d -c ../examples/make_package/cmd \
+    runtest -W2 -e -d -c cmd_make_package \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W2 #2' \
 'sum_weight [pcc]=4
@@ -2222,7 +2222,7 @@ sum_weight [qt4]=14
 
     # tests for max_weight calculation (-W2 option)
     test_tasks2 |
-    runtest -edW2 -c ../examples/make_package/cmd \
+    runtest -edW2 -c cmd_make_package \
 	-n +1 2>&1 | grep '^sum_weight' |
     cmp 'paexec -W2 #3' \
 'sum_weight [pipestatus]=2
@@ -2241,7 +2241,7 @@ sum_weight [paexec]=4
 
     # tests for sum_weight calculation (-W2 option)
     test_tasks2 |
-    runtest -eW2 -c ../examples/make_package/cmd -n +1 2>&1 |
+    runtest -eW2 -c cmd_make_package -n +1 2>&1 |
     cmp 'paexec -W2 #4' \
 'libmaa
 success
@@ -2340,7 +2340,7 @@ success
 
     # -x + -t
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -xl -t ./scripts/paexec_notransport \
+    runtest -xl -t paexec_notransport \
 	-n '1 2 3 4 5 6 7 8 9' \
 	-c 'awk "BEGIN {print toupper(ARGV[1])}"' |
     resort |
@@ -2355,7 +2355,7 @@ success
 
     # -t + shquote(3)
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -t ./scripts/paexec_notransport \
+    runtest -t paexec_notransport \
 	-n '1 2 3 4 5 6 7 8 9' \
 	-c "sh -c 'while read f; do echo \$f; echo; done'" |
     sort |

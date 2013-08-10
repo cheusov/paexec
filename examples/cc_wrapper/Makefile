@@ -1,4 +1,4 @@
-SCRIPTS     =	cmd run
+SCRIPTS     =	cmd_cc_wrapper run_cc_wrapper
 SCRIPTSDIR ?=	${FILESDIR}
 
 FILES      !=	echo *.c

@@ -5,7 +5,7 @@
 # Tasks 7, 8, 9 and 10 will be marked as failed
 # due to task 0 failure. See cmd for details.
 
-paexec -s -l -c "`pwd`/cmd" -n +3 <<EOF
+paexec -s -l -c cmd_divide -n +3 <<EOF
 1 2
 2 3
 3 4
