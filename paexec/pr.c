@@ -72,7 +72,7 @@ static int max_fd (void)
 static void _pr_init (void)
 {
 	if (!_pr_objects)
-		_pr_objects = xmalloc (max_fd () * sizeof (struct _pr_Obj));
+		_pr_objects = xcalloc (max_fd (), sizeof (struct _pr_Obj));
 }
 
 static int pr_wait( int pid )

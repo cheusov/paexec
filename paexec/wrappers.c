@@ -97,6 +97,17 @@ void *xmalloc (size_t size)
 	return ret;
 }
 
+void *xcalloc(size_t number, size_t size)
+{
+	void *ret = calloc (number, size);
+	if (!ret){
+		perror ("calloc(3) failed");
+		exit (1);
+	}
+
+	return ret;
+}
+
 void *xrealloc(void *ptr, size_t size)
 {
 	void *ret = realloc (ptr, size);

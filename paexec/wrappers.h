@@ -38,6 +38,7 @@ void xsigaddset (sigset_t *set, int signo);
 ssize_t xgetline(char** lineptr, size_t* n, FILE* stream);
 char *xstrdup (const char *s);
 void *xmalloc (size_t size);
+void *xcalloc(size_t number, size_t size);
 void *xrealloc(void *ptr, size_t size);
 void xfree (void *p);
 void err_fatal (const char *m);
