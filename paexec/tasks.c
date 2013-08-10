@@ -37,8 +37,17 @@
 #include <inttypes.h>
 #endif /* header file intptr_t */
 
+#if HAVE_HEADER_SYS_TREE_H
 #include <sys/tree.h>
+#else
+#include "netbsd_sys_tree.h"
+#endif
+
+#if HAVE_HEADER_SYS_QUEUE_H
 #include <sys/queue.h>
+#else
+#include "netbsd_sys_queue.h"
+#endif
 
 #include "tasks.h"
 #include "wrappers.h"
