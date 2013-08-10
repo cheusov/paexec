@@ -755,7 +755,7 @@ fake5.flac
     cmp 'paexec all_substr #3' ''
 
     # bad command + no input
-    runtest -l -c /path/to/bad/prog -n +3 < /dev/null |
+    runtest -l -c /path/to/bad/prog -n +3 < /dev/null 2>/dev/null 1>&2|
     cmp 'paexec bad_command' ''
 
     # bi-i-i-i-i-i-ig result

@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2007-2008 Aleksey Cheusov <vle@gmx.net>
+ * Copyright (c) 1996, 2002 Rickard E. Faith (faith@dict.org)
+ * Copyright (c) 2013 Aleksey Cheusov <vle@gmx.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -21,30 +22,14 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _WRAPPERS_H_
-#define _WRAPPERS_H_
+#define PR_USE_STDIN        0x00000001
+#define PR_USE_STDOUT       0x00000002
+#define PR_USE_STDERR       0x00000004
+#define PR_CREATE_STDIN     0x00000010
+#define PR_CREATE_STDOUT    0x00000020
+#define PR_CREATE_STDERR    0x00000040
+#define PR_STDERR_TO_STDOUT 0x00000100
 
-#if HAVE_HEADER_SYS_SELECT_H
-#include <sys/select.h>
-#endif
-#include <sys/time.h> /* On ancient HP-UX select(2) is declared here */
-#include <unistd.h>
-#include <signal.h>
-#include <stdio.h>
-
-void nonblock (int fd);
-void xsigprocmask (int how, const sigset_t *set, sigset_t *oset);
-void xsigaddset (sigset_t *set, int signo);
-ssize_t xgetline(char** lineptr, size_t* n, FILE* stream);
-char *xstrdup (const char *s);
-void *xmalloc (size_t size);
-void *xrealloc(void *ptr, size_t size);
-void xfree (void *p);
-void err_fatal (const char *m);
-void err_fatal_errno (const char *m);
-void err_internal (const char *routine, const char *m);
-
-void kill_childs (void); /* paexec.c */
-void wait_for_childs (void); /* paexec.c */
-
-#endif /* _WRAPPERS_H_ */
+int pr_open (const char *command, int flags,
+		     int *infd, int *outfd, int *errfd);
+int pr_close (int fd);

@@ -22,14 +22,13 @@
  */
 
 #include "nodes.h"
+#include "wrappers.h"
 
 #include <stdlib.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-
-#include <maa.h>
 
 char **nodes    = NULL;
 int nodes_count = 0;
@@ -40,7 +39,7 @@ static void nodes_create__count (const char *nodes_str)
 
 	nodes_count = (int) strtol (nodes_str, NULL, 10);
 	if (nodes_count == (int) LONG_MAX)
-		err_fatal_errno (NULL, "invalid option -n:");
+		err_fatal_errno ("paexec: invalid option -n:");
 
 	nodes = xmalloc (nodes_count * sizeof (nodes [0]));
 
@@ -102,7 +101,7 @@ static void nodes_create__file (const char *nodes_str)
 	size_t len = 0;
 
 	if (!fd)
-		err_fatal_errno (NULL, "Cannot obtain a list of nodes");
+		err_fatal_errno ("paexec: Cannot obtain a list of nodes");
 
 	while (fgets (node, sizeof (node), fd)){
 		len = strlen (node);
@@ -138,12 +137,12 @@ void nodes_create (const char *nodes_str)
 		nodes_create__list (nodes_copy);
 		xfree (nodes_copy);
 	}else{
-		err_fatal (NULL, "invalid argument for option -n\n");
+		err_fatal ("paexec: invalid argument for option -n");
 	}
 
 	/* final check */
 	if (nodes_count == 0)
-		err_fatal (NULL, "invalid argument for option -n\n");
+		err_fatal ("paexec: invalid argument for option -n");
 }
 
 void nodes_destroy (void)

@@ -29,8 +29,6 @@
 #include <string.h>
 #include <signal.h>
 
-#include <maa.h>
-
 #include "wrappers.h"
 #include "common.h"
 
@@ -38,13 +36,13 @@ void nonblock (int fd)
 {
 	int ret = fcntl (fd, F_GETFL, 0);
 	if (ret == -1){
-		log_error ("", "fcntl failed: %s\n", strerror (errno));
+		perror ("fcntl failed(2)");
 		exit (1);
 	}
 
 	ret = fcntl (fd, F_SETFL, ret | O_NONBLOCK);
 	if (ret == -1){
-		log_error ("", "fcntl failed: %s\n", strerror (errno));
+		perror ("fcntl failed(2)");
 		exit (1);
 	}
 }
@@ -52,14 +50,16 @@ void nonblock (int fd)
 void xsigaddset (sigset_t *set, int signo)
 {
 	if (sigaddset (set, signo)){
-		log_error ("", "sigaddset(2) failed: %s\n", strerror (errno));
+		perror ("sigaddset(2) failed");
+		exit (1);
 	}
 }
 
 void xsigprocmask (int how, const sigset_t *set, sigset_t *oset)
 {
 	if (sigprocmask (how, set, oset)){
-		log_error ("", "sigaddset(2) failed: %s\n", strerror (errno));
+		perror ("sigprocmask(2) failed");
+		exit (1);
 	}
 }
 
@@ -68,9 +68,85 @@ ssize_t xgetline(char** lineptr, size_t* n, FILE* stream)
 	ssize_t ret = getline (lineptr, n, stream);
 
 	if (ret == (ssize_t) -1 && ferror (stdin)){
-		log_error ("", "getline(3) failed: %s\n", strerror (errno));
+		perror ("getline(3) failed");
 		exit (1);
 	}
 
 	return ret;
+}
+
+char *xstrdup (const char *s)
+{
+	char *ret = strdup (s);
+	if (!ret){
+		perror ("strdup(3) failed");
+		exit (1);
+	}
+
+	return ret;
+}
+
+void *xmalloc (size_t size)
+{
+	void *ret = malloc (size);
+	if (!ret){
+		perror ("malloc(3) failed");
+		exit (1);
+	}
+
+	return ret;
+}
+
+void *xrealloc(void *ptr, size_t size)
+{
+	void *ret = realloc (ptr, size);
+	if (!ret){
+		perror ("realloc(3) failed");
+		exit (1);
+	}
+
+	return ret;
+}
+
+void xfree (void *p)
+{
+	if (p)
+		free (p);
+}
+
+void err_fatal (const char *m)
+{
+	kill_childs ();
+	wait_for_childs ();
+
+	fflush (stdout);
+
+	fprintf (stderr, "%s\n", m);
+	exit (1);
+}
+
+void err_fatal_errno (const char *m)
+{
+	kill_childs ();
+	wait_for_childs ();
+
+	fflush (stdout);
+
+	fprintf (stderr, "%s: %s\n", m, strerror (errno));
+	exit (1);
+}
+
+void err_internal (const char *routine, const char *m)
+{
+	kill_childs ();
+	wait_for_childs ();
+
+	fflush (stdout);
+
+	if (routine)
+		fprintf (stderr, "%s (%s)\n", m, routine);
+	else
+		fprintf (stderr, "%s\n", m);
+
+	exit (1);
 }

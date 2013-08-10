@@ -50,13 +50,12 @@
 #define PAEXEC_VERSION "x.y.z"
 #endif
 
-#include <maa.h>
-
 #include "wrappers.h"
 #include "common.h"
 #include "tasks.h"
 #include "nodes.h"
 #include "signals.h"
+#include "pr.h"
 
 #ifndef HAVE_FUNC3_SHQUOTE
 size_t shquote(const char *arg, char *buf, size_t bufsize);
@@ -186,8 +185,6 @@ static int exec_mode = 0;
 
 static int use_weights = 0;
 
-static void exit_with_error (const char * routine attr_unused, const char *msg);
-
 static void close_all_ins (void)
 {
 	int i;
@@ -201,8 +198,10 @@ static void close_all_ins (void)
 
 static void bad_input_line (const char *line)
 {
-	fprintf (stderr, "Bad input line: %s\n", line);
-	exit_with_error (NULL, NULL);
+	char buf [4000];
+	snprintf (buf, sizeof (buf), "Bad input line: %s\n", line);
+
+	err_fatal (buf);
 }
 
 static void init__read_graph_tasks (void)
@@ -330,12 +329,12 @@ static void init__postproc_arg_cmd (void)
 				  "done", arg_cmd, cond_cmd, rnd_string);
 
 		if ((size_t)-1 == shquote (cmd, shq_cmd, sizeof (shq_cmd))){
-			err_fatal (NULL, "Internal error1! (buffer size)\n");
+			err_fatal ("paexec: Internal error1! (buffer size)");
 		}
 
 		snprintf (cmd, sizeof (cmd), "/bin/sh -c %s", shq_cmd);
 		if (strlen (cmd) == sizeof (cmd)-1){
-			err_fatal (NULL, "Internal error2! (buffer size)\n");
+			err_fatal ("paexec: Internal error2! (buffer size)");
 		}
 
 		xfree (arg_cmd);
@@ -345,7 +344,7 @@ static void init__postproc_arg_cmd (void)
 	if (arg_transport){
 		/* one more shquote(3) for ssh-like transport */
 		if ((size_t)-1 == shquote (arg_cmd, shq_cmd, sizeof (shq_cmd))){
-			err_fatal (NULL, "Internal error1! (buffer size)\n");
+			err_fatal ("paexec: Internal error1! (buffer size)");
 		}
 		xfree (arg_cmd);
 		arg_cmd = xstrdup (shq_cmd);
@@ -518,7 +517,7 @@ static void init (void)
 	ignore_sigpipe ();
 }
 
-static void kill_childs (void)
+void kill_childs (void)
 {
 	int i;
 	for (i=0; i < nodes_count; ++i){
@@ -528,7 +527,7 @@ static void kill_childs (void)
 	}
 }
 
-static void wait_for_childs (void)
+void wait_for_childs (void)
 {
 	int i;
 
@@ -543,19 +542,6 @@ static void wait_for_childs (void)
 	}
 }
 
-static void exit_with_error (const char * routine attr_unused, const char *msg)
-{
-	kill_childs ();
-	wait_for_childs ();
-
-	fflush (stdout);
-	/*	err_fatal (routine, msg);*/
-	if (msg)
-		fprintf (stderr, "%s\n", msg);
-
-	exit (1);
-}
-
 static int find_free_node (void)
 {
 	int i;
@@ -564,7 +550,7 @@ static int find_free_node (void)
 			return i;
 	}
 
-	exit_with_error (NULL, "internal error: there is no free node\n");
+	err_internal (__func__, "there is no free node");
 	return -1;
 }
 
@@ -639,11 +625,11 @@ static void send_to_node (void)
 			print_EOT (n);
 
 			if (alive_nodes_count == 0 && !wait_mode){
-				exit_with_error (NULL, "all nodes failed");
+				err_fatal ("all nodes failed");
 			}
 			return;
 		}else{
-			err_fatal_errno (NULL, "Sending task to the node failed:");
+			err_fatal_errno ("paexec: Sending task to the node failed:");
 		}
 	}
 }
@@ -664,7 +650,7 @@ static int unblock_select_block (
 
 	if (ret == -1){
 		snprintf (msg, sizeof (msg), "select(2) failed: %s", strerror (errno));
-		exit_with_error (NULL, msg);
+		err_fatal (msg);
 	}
 
 	block_signals ();
@@ -788,7 +774,7 @@ static void loop (void)
 						print_EOT (i);
 
 						if (alive_nodes_count == 0 && !wait_mode){
-							exit_with_error ("loop", "all nodes failed");
+							err_fatal ("all nodes failed");
 						}
 						continue;
 					}else{
@@ -804,7 +790,7 @@ static void loop (void)
 								nodes [i], strerror (errno));
 						}
 
-						exit_with_error ("loop", msg);
+						err_fatal (msg);
 					}
 				}
 
@@ -929,7 +915,7 @@ static void loop (void)
 static void check_msg (const char *msg)
 {
 	if (strpbrk (msg, "'\"")){
-		err_fatal (NULL, "symbols ' and \" are not allowed in -m argument\n");
+		err_fatal ("paexec: symbols ' and \" are not allowed in -m argument");
 	}
 }
 
@@ -1015,11 +1001,11 @@ static void process_args (int *argc, char ***argv)
 					msg_eot = xstrdup (optarg+2);
 				}else if (optarg [0] == 'd' && optarg [1] == '='){
 					if (optarg [2] == 0 || optarg [3] != 0){
-						err_fatal (NULL, "bad argument for -md=. Exactly one character is allowed\n");
+						err_fatal ("paexec: bad argument for -md=. Exactly one character is allowed");
 					}
 					msg_delim = optarg [2];
 				}else{
-					err_fatal (NULL, "bad argument for -m\n");
+					err_fatal ("paexec: bad argument for -m");
 				}
 
 				break;
@@ -1038,21 +1024,21 @@ static void process_args (int *argc, char ***argv)
 	}
 
 	if (!resistance_timeout && wait_mode){
-		err_fatal (NULL, "-w is useless without -Z\n");
+		err_fatal ("paexec: -w is useless without -Z");
 	}
 
 	if (arg_nodes){
 		nodes_create (arg_nodes);
 	}else{
-		err_fatal (NULL, "-n option is mandatory!\n");
+		err_fatal ("paexec: -n option is mandatory!");
 	}
 
 	if (!arg_cmd){
-		err_fatal (NULL, "-c option is mandatory!\n");
+		err_fatal ("paexec: -c option is mandatory!");
 	}
 
 	if (use_weights < 0 || use_weights > 2){
-		err_fatal (NULL, "Only -W1 and -W2 are supported!\n");
+		err_fatal ("paexec: Only -W1 and -W2 are supported!");
 	}
 }
 
@@ -1121,9 +1107,6 @@ int main (int argc, char **argv)
 
 	block_signals ();
 
-	maa_init ("paexec");
-	/* log_stream ("paexec", stderr); */
-
 	process_args (&argc, &argv);
 
 	if (debug){
@@ -1139,9 +1122,6 @@ int main (int argc, char **argv)
 	loop ();
 
 	free_memory ();
-
-	log_close ();
-	maa_shutdown ();
 
 	unblock_signals ();
 

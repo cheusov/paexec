@@ -37,7 +37,6 @@
 #include <inttypes.h>
 #endif /* header file intptr_t */
 
-#include <maa.h>
 #include <sys/tree.h>
 #include <sys/queue.h>
 

@@ -8,7 +8,7 @@ WARNS     ?=	4
 WARNERR   ?=	no
 
 PROG       =	paexec
-SRCS       =	paexec.c wrappers.c tasks.c nodes.c signals.c
+SRCS       =	paexec.c wrappers.c tasks.c nodes.c signals.c pr.c
 
 SCRIPTS    =	paexec_reorder
 
@@ -16,9 +16,6 @@ MAN        =	paexec.1 paexec_reorder.1
 
 CFLAGS    +=	-DPAEXEC_VERSION='"${VERSION}"'
 CFLAGS    +=	-DBUFSIZE=${BUFSIZE}
-
-MKC_REQUIRE_HEADERS  =	maa.h
-MKC_REQUIRE_FUNCLIBS =	maa_init:maa
 
 MKC_SOURCE_FUNCLIBS  =  shquote getline
 
