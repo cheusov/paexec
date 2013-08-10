@@ -2368,6 +2368,17 @@ eeeee
 ffffff
 '
 
+    # -t + shquote(3)
+    printf 'a\nbb\n' |
+    runtest -x -t /bad/transport \
+	-n +1 \
+	-c echo |
+    sort |
+    cmp 'paexec -n +1 -t /bad/transport' \
+'a
+bb
+'
+
     # tests for paexec_reorder
     paexec_reorder_input1 |
     paexec_reorder |

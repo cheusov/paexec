@@ -1028,6 +1028,9 @@ static void process_args (int *argc, char ***argv)
 	}
 
 	if (arg_nodes){
+		if (arg_nodes [0] == '+')
+			arg_transport = NULL;
+
 		nodes_create (arg_nodes);
 	}else{
 		err_fatal ("paexec: -n option is mandatory!");
