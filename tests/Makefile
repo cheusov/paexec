@@ -7,6 +7,7 @@ all:
 	export OBJDIR=${.OBJDIR}; \
 	export PATH=${.CURDIR}/broken_echo:$$PATH; \
 	export PATH=${.CURDIR}/scripts:$$PATH; \
+	export PATH=${.CURDIR}/../paexec:$$PATH; \
 	export PATH=${.CURDIR}/../examples/all_substr:$$PATH; \
 	export PATH=${.CURDIR}/../examples/cc_wrapper:$$PATH; \
 	export PATH=${.CURDIR}/../examples/cc_wrapper2:$$PATH; \
