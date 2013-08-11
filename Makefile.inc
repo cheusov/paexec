@@ -10,4 +10,4 @@ AWK ?=			/usr/bin/awk
 INTEXTS_REPLS +=	awk ${AWK}
 
 #
-VERSION=	0.18.0
+VERSION=	0.19.0

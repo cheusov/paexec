@@ -1,4 +1,20 @@
 ======================================================================
+Version 0.19.0, by Aleksey Cheusov, Sun, 11 Aug 2013 16:34:40 +0300
+
+  paexec is now selfcontained, libmaa is not needed anymore.
+
+  paexec:
+    - POSIX-2008 getline(3) is used for reading lines
+      instead of home-made function.
+    - t '' is equivalent to "no transport"
+    - "paexec -n +NNN" works correctly even if transport is specified,
+      i.e. transport is ignored.
+
+  "mkcmake test" runs less tests with different PAEXEC_BUFSIZE.
+
+  A number of fixes and improvements in regression tests.
+
+======================================================================
 Version 0.18.0, by Aleksey Cheusov, Thu,  7 Mar 2013 15:17:33 +0300
 
   paexec:
