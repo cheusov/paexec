@@ -1,0 +1,499 @@
+%%%begin-myprojects
+\documentclass[hyperref={colorlinks=true}]{beamer}
+
+\usepackage{fancyvrb,relsize}
+\usepackage{graphicx}
+
+\setbeamertemplate{navigation symbols}{}
+
+%\usetheme{Boadilla}
+%\usetheme{CambridgeUS}
+%\usetheme{Malmoe}
+%\usetheme{Singapore}
+%\usetheme{boxes}
+
+%\usecolortheme{crane}
+%\usecolortheme{dove}
+\usecolortheme{seagull} % very cool with \usetheme{default}
+%\usefonttheme{professionalfonts}
+%\useinnertheme{rectangles}
+
+\mode<presentation>
+\title{paexec -- distributes tasks over network or CPUs}
+\author{Aleksey Cheusov \\ \texttt{vle@gmx.net}}
+\date{Minsk, Belarus, 2011}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newenvironment{CodeSmall}[1]%
+               {\Verbatim[label=\bf{#1},frame=single,%
+                   fontsize=\footnotesize,%
+                   commandchars=\\\{\}]}%
+               {\endVerbatim}
+\newenvironment{CodeSmallNoLabel}%
+               {\Verbatim[frame=single,%
+                   fontsize=\footnotesize,%
+                   commandchars=\\\{\}]}%
+               {\endVerbatim}
+
+\newenvironment{Code}[1]%
+              {\Verbatim[label=\bf{#1},frame=single,%
+                  fontsize=\small,%
+                  commandchars=\\\{\}]}%
+              {\endVerbatim}
+\newenvironment{CodeNoLabel}%
+               {\Verbatim[frame=single,%
+                   fontsize=\small,%
+                   commandchars=\\\{\}]}%
+               {\endVerbatim}
+
+\newenvironment{CodeLarge}[1]%
+               {\Verbatim[label=\bf{#1},frame=single,%
+                   fontsize=\large,%
+                   commandchars=\\\{\}]}%
+               {\endVerbatim}
+\newenvironment{CodeLargeNoLabel}%
+               {\Verbatim[frame=single,%
+                   fontsize=\large,%
+                   commandchars=\\\{\}]}%
+               {\endVerbatim}
+
+%\newcommand{\prompt}[1]{\textcolor{blue}{#1}}
+%\newcommand{\prompt}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\prompt}[1]{{\bf{#1}}}
+%\newcommand{\h}[1]{\textbf{#1}}
+%\newcommand{\h}[1]{\bf{#1}\textnormal{}}
+\newcommand{\h}[1]{{\bf{#1}}}
+\newcommand{\URL}[1]{\textbf{#1}}
+\newcommand{\AutohellFile}[1]{\textcolor{red}{#1}}
+\newcommand{\MKCfile}[1]{\textcolor{green}{#1}}
+\newcommand{\ModuleName}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\ProgName}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\ProjectName}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\PackageName}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\MKC}[1]{\large\textsf{#1}\textnormal{}\normalsize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \begin{frame}
+%%   \frametitle{qqq}
+%%   \begin{code}{files in the directory}
+%%     bla bla bla
+%%   \end{code}
+%% \end{frame}
+
+%%%end-myprojects
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{}
+  \frametitle{Problem}
+  \begin{block}{}
+    \begin{itemize}
+    \item Huge amount of data to process
+    \item Typical desktop machines have more than one CPU/Core
+    \item Unlimited resources are available through Internet
+    \item Heterogeneous environment (*BSD, Linux, Windows...)
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Solution}
+
+  \begin{block}{}
+      \begin{CodeLarge}{Usage}
+paexec [OPTIONS] \textbackslash
+  -n 'machines of CPUs' \textbackslash
+  -t 'transport program' \textbackslash
+  -c 'calculator' < tasks
+      \end{CodeLarge}
+      \begin{CodeLarge}{example}
+ls *.wav | paexec \textbackslash
+  -n +4 \textbackslash
+  -c ~/bin/wav2flac
+      \end{CodeLarge}
+      \begin{CodeLarge}{example}
+paexec \textbackslash
+  -n 'host1 host2 host3' \textbackslash
+  -t /usr/bin/ssh \textbackslash
+  -c ~/bin/toupper < tasks
+      \end{CodeLarge}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 1: toupper}
+  Our task is to convert strings to upper case
+  \begin{block}{}
+      \begin{CodeLarge}{\~{}/bin/toupper}
+#!/usr/bin/awk -f
+
+\{
+   print " ", toupper(\$0)
+   print ""  # end-of-task marker!
+   \h{fflush()}  # We must flush stdout!
+\}
+      \end{CodeLarge}
+  \end{block}
+  \begin{block}{}
+      \begin{CodeLarge}{\~{}/tmp/tasks}
+apple
+bananas
+orange
+      \end{CodeLarge}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 1: toupper}
+
+  \begin{block}{}
+      \begin{CodeLarge}{paexec invocation}
+\prompt{\$} paexec \h{-t} ssh \h{-c} ~/bin/toupper \textbackslash
+   \h{-n} 'syn-proc7 syn-proc5' \textbackslash
+   < ~/tmp/tasks > results
+\prompt{\$} cat results
+ BANANAS
+ ORANGE
+ APPLE
+\prompt{\$}
+      \end{CodeLarge}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 1: toupper}
+
+  \begin{block}{}
+      \begin{CodeLarge}{paexec -lr invocation}
+\prompt{\$} paexec \h{-lr} -t ssh -c ~/bin/toupper \textbackslash
+   -n 'syn-proc7 syn-proc5' \textbackslash
+   < ~/tmp/tasks > results
+\prompt{\$} cat results
+\h{syn-proc5 2}  BANANAS
+\h{syn-proc5 3}  ORANGE
+\h{syn-proc7 1}  APPLE
+\prompt{\$}
+      \end{CodeLarge}
+  \end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\linespread{0.5}
+\begin{frame}[fragile]
+  \frametitle{Example 2: parallel banner(1)}
+
+  \begin{block}{}
+      \begin{CodeLarge}{what is banner(1)?}
+\prompt{\$} banner -f @ NetBSD
+
+@     @                 @@@@@@   @@@@@  @@@@@@
+@@    @  @@@@@@   @@@@@ @     @ @     @ @     @
+@ @   @  @          @   @     @ @       @     @
+@  @  @  @@@@@      @   @@@@@@   @@@@@  @     @
+@   @ @  @          @   @     @       @ @     @
+@    @@  @          @   @     @ @     @ @     @
+@     @  @@@@@@     @   @@@@@@   @@@@@  @@@@@@
+
+
+\prompt{\$}
+      \end{CodeLarge}
+  \end{block}
+\end{frame}
+\linespread{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 2: parallel banner(1)}
+
+  \begin{block}{}
+      \begin{CodeLarge}{\~{}/bin/pbanner}
+#!/bin/sh
+
+while \h{read task}; do
+   banner -f M "\$task" | \h{sed 's/^/ /'}
+   \h{echo} '' # \h{end-of-task-marker}
+done
+      \end{CodeLarge}
+      \begin{CodeLarge}{\~{}/bin/tasks2}
+pae
+xec
+      \end{CodeLarge}
+
+      \begin{CodeLarge}{paexec invocation}
+\prompt{\$} paexec -l -c ~/bin/pbanner \textbackslash
+   -n \h{+2} \textbackslash
+   < ~/tmp/tasks2 > results
+\prompt{\$}
+      \end{CodeLarge}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\linespread{0.5}
+\begin{frame}[fragile]
+  \frametitle{Example 2: parallel banner(1)}
+
+  \begin{block}{}
+      \begin{CodeSmall}{Sliced result}
+\prompt{\$} cat results
+2  
+2  
+2   M    M  MMMMMM   MMMM
+2    M  M   M       M    M
+1  
+1  
+1   MMMMM     MM    MMMMMM
+1   M    M   M  M   M
+1   M    M  M    M  MMMMM
+1   MMMMM   MMMMMM  M
+2     MM    MMMMM   M
+2     MM    M       M
+2    M  M   M       M    M
+2   M    M  MMMMMM   MMMM
+2  
+1   M       M    M  M
+1   M       M    M  MMMMMM
+1  
+\prompt{\$}
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+\linespread{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\linespread{0.5}
+\begin{frame}[fragile]
+  \frametitle{Example 2: parallel banner(1)}
+
+  \begin{block}{}
+      \begin{CodeSmall}{Ordered result}
+\prompt{\$} paexec_reorder \h{-S} results
+
+
+ MMMMM     MM    MMMMMM
+ M    M   M  M   M
+ M    M  M    M  MMMMM
+ MMMMM   MMMMMM  M
+ M       M    M  M
+ M       M    M  MMMMMM
+
+
+
+ M    M  MMMMMM   MMMM
+  M  M   M       M    M
+   MM    MMMMM   M
+   MM    M       M
+  M  M   M       M    M
+ M    M  MMMMMM   MMMM
+
+
+\prompt{\$}
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+\linespread{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 3: dependency graph of tasks}
+  paexec(1) is able to build tasks taking into account their ``dependencies''
+  \begin{block}{}
+    \begin{figure}
+      \includegraphics[width=\textwidth, height=\textheight, keepaspectratio=true]{dep-graph.eps}
+    \end{figure}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 3: dependency graph of tasks}
+
+  \begin{block}{}
+      \begin{CodeSmall}{\~{}/tmp/packages\_to\_build}
+audio/cd-discid audio/abcde
+textproc/gsed audio/abcde
+audio/cdparanoia audio/abcde
+audio/id3v2 audio/abcde
+audio/id3 audio/abcde
+misc/mkcue audio/abcde
+shells/bash audio/abcde
+devel/libtool-base audio/cdparanoia
+devel/gmake audio/cdparanoia
+devel/libtool-base audio/id3lib
+devel/gmake audio/id3v2
+audio/id3lib audio/id3v2
+devel/m4 devel/bison
+lang/f2c devel/libtool-base
+devel/gmake misc/mkcue
+devel/bison shells/bash
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 3: dependency graph of tasks}
+
+  \begin{block}{}
+      \begin{CodeSmall}{\~{}/bin/pkg\_builder}
+#!/usr/bin/awk -f
+
+\{
+   print "build " \$0
+   \h{print "success"} # build succeeded!
+   print ""        # end-of-task marker
+   fflush()        # we must flush stdout
+\}
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 3: dependency graph of tasks}
+
+  \begin{block}{}
+      \begin{CodeSmall}{paexec -g invocation (no failures)}
+\prompt{\$} paexec \h{-g} -l -c ~/bin/pkg_builder -n 'syn-proc5 syn-proc7' \textbackslash
+    -t ssh < ~/tmp/packages_to_build | paexec_reorder > result
+\prompt{\$} cat result
+build textproc/gsed
+\h{success}
+build devel/gmake
+success
+build misc/mkcue
+success
+build devel/m4
+success
+build devel/bison
+success
+...
+build audio/id3v2
+success
+build audio/abcde
+success
+\prompt{\$}
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 3: dependency graph of tasks}
+
+  \begin{block}{}
+      \begin{CodeSmall}{\~{}/bin/pkg\_builder}
+#!/usr/bin/awk -f
+
+\{
+   print "build " \$0
+   if (\$0 == "devel/gmake")
+      \h{print "failure"} # Oh no...
+   else
+      print "success" # build succeeded!
+
+   print ""        # end-of-task marker
+   fflush()        # we must flush stdout
+\}
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 3: dependency graph of tasks}
+
+  \begin{block}{}
+      \begin{CodeSmall}{paexec -g invocation (with failures)}
+\prompt{\$} paexec -gl -c ~/bin/pkg_builder -n 'syn-proc5 syn-proc7' \textbackslash
+    -t ssh < ~/tmp/packages_to_build | paexec_reorder > result
+\prompt{\$} cat result
+build audio/cd-discid
+success
+build audio/id3
+success
+build devel/gmake
+\h{failure}
+\h{devel/gmake audio/cdparanoia audio/abcde audio/id3v2 misc/mkcue}
+build devel/m4
+success
+build textproc/gsed
+success
+...
+\prompt{\$}
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 4: Resistance to network failures}
+
+  \begin{block}{}
+      \begin{CodeSmall}{\~{}/bin/pkg\_builder}
+#!/usr/bin/awk -f
+
+\{
+   "hostname -s" | getline hostname
+   print "build " \$0 " on " hostname
+
+   if (hostname == "syn-proc7" && \$0 == "textproc/gsed")
+      \h{exit 0} # Damn it, I'm dying...
+   else
+      print "success" # Yes! :-)
+
+   print ""        # end-of-task marker
+   fflush()        # we must flush stdout
+\}
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 4: Resistance to network failures}
+
+  \begin{block}{}
+      \begin{CodeSmall}{paexec -Z300 invocation (with failure)}
+\prompt{\$} paexec -gl -Z300 -t ssh -c ~/bin/pkg_builder \textbackslash
+      -n 'syn-proc5 syn-proc7' < ~/tmp/packages_to_build \textbackslash
+      | paexec_reorder > result
+\prompt{\$} cat result
+build audio/cd-discid on syn-proc5
+success
+\h{build textproc/gsed on syn-proc7}
+\h{fatal}
+\h{build textproc/gsed on syn-proc5}
+\h{success}
+build audio/id3 on syn-proc5
+success
+...
+\prompt{\$}
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{}
+  \begin{center}
+    \huge
+    The End
+  \end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

@@ -2,8 +2,8 @@ BIRTHDATE   =	2008-01-25
 PROJECTNAME =	paexec
 
 #####
-SUBPRJ      =	paexec:tests doc
-SUBPRJ_DFLT?=	paexec
+SUBPRJ      =	paexec:tests presentation doc
+SUBPRJ_DFLT?=	paexec presentation
 
 examples    =	divide all_substr cc_wrapper cc_wrapper2 \
 		make_package toupper dirtest
@@ -27,13 +27,14 @@ clean: clean-tests
 cleandir: cleandir-tests
 
 # new recursive target for making a distribution tarball
-TARGETS    +=	_manpages
+TARGETS    +=	_prepdist
 
-DIST_TARGETS=	manpages
+DIST_TARGETS=	prepdist
 
-.PHONY: manpages
-manpages: _manpages
+.PHONY: prepdist
+manpages: _prepdist
 	rm ${MKC_CACHEDIR}/_mkc*
+	${MAKE} ${MAKEFILES} _clean_garbage
 
 #####
 .include "Makefile.inc"

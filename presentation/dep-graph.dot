@@ -1,0 +1,35 @@
+digraph FSA {
+node [ shape=box fontsize=14 fontface="Arial"];
+
+        "audio/cd-discid" -> "audio/abcde" [ fontsize = 14];
+        "textproc/gsed" -> "audio/abcde" [ fontsize = 14];
+        "audio/cdparanoia" -> "audio/abcde" [ fontsize = 14];
+        "audio/id3v2" -> "audio/abcde" [ fontsize = 14];
+        "audio/id3" -> "audio/abcde" [ fontsize = 14];
+        "misc/mkcue" -> "audio/abcde" [ fontsize = 14];
+        "shells/bash" -> "audio/abcde" [ fontsize = 14];
+        "devel/libtool-base" -> "audio/cdparanoia" [ fontsize = 14];
+        "devel/gmake" -> "audio/cdparanoia" [ fontsize = 14];
+        "devel/libtool-base" -> "audio/id3lib" [ fontsize = 14];
+        "devel/gmake" -> "audio/id3v2" [ fontsize = 14];
+        "audio/id3lib" -> "audio/id3v2" [ fontsize = 14];
+        "devel/m4" -> "devel/bison" [ fontsize = 14];
+        "lang/f2c" -> "devel/libtool-base" [ fontsize = 14];
+        "devel/gmake" -> "misc/mkcue" [ fontsize = 14];
+        "devel/bison" -> "shells/bash" [ fontsize = 14];
+        node [ shape = box ];
+        "devel/m4" [ ];
+        "shells/bash" [ ];
+        "audio/id3lib" [ ];
+        "misc/mkcue" [ ];
+        "audio/id3" [ ];
+        "lang/f2c" [ ];
+        "devel/gmake" [ ];
+        "textproc/gsed" [ ];
+        "audio/id3v2" [ ];
+        "audio/abcde" [ ];
+        "devel/bison" [ ];
+        "audio/cdparanoia" [ ];
+        "devel/libtool-base" [ ];
+        "audio/cd-discid" [ ];
+}

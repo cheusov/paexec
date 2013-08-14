@@ -27,8 +27,8 @@ MKC_CHECK_FUNCS3     =  shquote getline:stdio.h
 
 CLEANFILES           =  *~ core* *.1 *.html ktrace* ChangeLog *.tmp
 
-.PHONY: _manpages
-_manpages: ${MAN}
+.PHONY: _prepdist
+_prepdist: ${MAN}
 
 ############################################################
 .include <mkc.prog.mk>
