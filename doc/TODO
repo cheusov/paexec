@@ -1,4 +1,11 @@
 paexec:
+ - rename paexec_reorder to pareorder
+ - -y -mt='magic string'
+ - -n 'server1 server2 +5' two remote servers and five local
+ - paexec -C [OPTIONS] cmd arg1 arg2..
+ - -X -- suppress calculator's output
+ - paexec_reorder -x
+ - mt= together with -x is useless => error message
  - refresh presentation for lvee-2011 and make it a part of documentation
  - trim spaces in -t argument and then check it for emptyness
  - Option -I like in xargs (in combination with -x)
