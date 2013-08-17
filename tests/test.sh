@@ -340,7 +340,7 @@ cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov
     runtest -h 2>&1 | cut_help |
 cmp 'paexec -h' 'paexec - parallel executor
          that distributes tasks over CPUs or machines in a network.
-usage: paexec [OPTIONS] [files...]
+usage: paexec    [OPTIONS]
 '
 
     # bad -md= arg
