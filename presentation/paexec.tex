@@ -288,7 +288,7 @@ Magic line is used instead empty line as an end-of-task marker.
 
 while read task; do
    banner -f M "\$task" |
-   echo \h{'SE@X-L0S0!&'} # end-of-task marker
+   echo \h{"\$PAEXEC\_EOT"} # end-of-task marker
 done
       \end{Code}
       \begin{Code}{tasks}
@@ -345,6 +345,39 @@ paexec\_reorder(1) normalizes paexec(1)'s output.
   \begin{block}{}
       \begin{CodeSmall}{Ordered result}
 \prompt{\$} paexec_reorder \h{-mt='SE@X-L0S0!&'} results
+
+
+MMMMM     MM    MMMMMM
+M    M   M  M   M
+M    M  M    M  MMMMM
+MMMMM   MMMMMM  M
+M       M    M  M
+M       M    M  MMMMMM
+
+
+
+M    M  MMMMMM   MMMM
+ M  M   M       M    M
+  MM    MMMMM   M
+  MM    M       M
+ M  M   M       M    M
+M    M  MMMMMM   MMMM
+
+
+\prompt{\$}
+      \end{CodeSmall}
+  \end{block}
+\end{frame}
+\linespread{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\linespread{0.5}
+\begin{frame}[fragile]
+  \frametitle{Example 2: parallel banner(1)}
+The same as above but using magic end-of-task marker provided by paexec(1).
+  \begin{block}{}
+      \begin{CodeSmall}{Ordered result}
+\prompt{\$} paexec \h{-y} -lc ~/bin/pbanner -n+2 < tasks | paexec_reorder \h{-y}
 
 
 MMMMM     MM    MMMMMM

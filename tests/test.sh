@@ -884,6 +884,50 @@ fake5.flac
 6 Konec!
 '
 
+    test_tasks3 |
+    ( export PAEXEC_EOT='Konec!'; runtest -ms='Ura!' -mf='Zhopa!' \
+	-esly -c cmd_divide2 -n +10; ) |
+    cmp 'paexec 1/X nonstandard -y #1.1' \
+'1 1/1=1
+1 Ura!
+1 HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5
+2 1/2=0.5
+2 Ura!
+2 HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5
+3 1/3=0.333333
+3 Ura!
+3 HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5
+4 1/4=0.25
+4 Ura!
+4 HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5
+5 1/5=0.2
+5 Ura!
+5 HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5
+6 Cannot calculate 1/0
+6 Zhopa!
+6 0 7 8 9 10 11 12
+6 HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5
+'
+
+    test_tasks3 |
+    ( export PAEXEC_EOT='Konec!'; runtest -ms='Ura!' -mf='Zhopa!' \
+	-esly -c cmd_divide2 -n +10; ) | paexec_reorder -y |
+    cmp 'paexec 1/X nonstandard -y #1.2' \
+'1/1=1
+Ura!
+1/2=0.5
+Ura!
+1/3=0.333333
+Ura!
+1/4=0.25
+Ura!
+1/5=0.2
+Ura!
+Cannot calculate 1/0
+Zhopa!
+0 7 8 9 10 11 12
+'
+
     # -s and no input
     runtest -s -l -c cmd_divide -n +10 < /dev/null |
     cmp 'paexec 1/X #2' ''

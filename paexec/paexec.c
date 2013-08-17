@@ -77,6 +77,7 @@ OPTIONS:\n\
   -c <command>     path to a command\n\
   -t <trans>       path to a transport program\n\
   -x               run command once per task\n\
+  -y               magic line is used as an end-of-task marker\n\
 \n\
   -r               include a node (or a number) to the output\n\
   -l               include 0-based task number to the output\n\
@@ -115,7 +116,7 @@ OPTIONS:\n\
 ");
 }
 
-static const char rnd_string [] = "HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5";
+static const char magic_eot [] = "HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5";
 
 /* arguments */
 static char *arg_nodes     = NULL;
@@ -327,7 +328,7 @@ static void init__postproc_arg_cmd (void)
 				  "  printf '%%s\\n' \"$res\";"
 				  "  %s"
 				  "  echo '%s';"
-				  "done", arg_cmd, cond_cmd, rnd_string);
+				  "done", arg_cmd, cond_cmd, magic_eot);
 
 		xfree (arg_cmd);
 		arg_cmd = xstrdup (cmd);
@@ -443,15 +444,6 @@ static void mark_node_as_dead (int node)
 
 static void init (void)
 {
-	char *env_msg_eot = getenv ("PAEXEC_EOT");
-	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
-
-	/* environment */
-	if (env_bufsize)
-		initial_bufsize = atoi (env_bufsize);
-	if (env_msg_eot)
-		msg_eot = env_msg_eot;
-
 	/* arrays */
 	pids  = xmalloc (nodes_count * sizeof (*pids));
 	memset (pids,-1, nodes_count * sizeof (*pids));
@@ -934,7 +926,7 @@ static void process_args (int *argc, char ***argv)
 	int c;
 
 	/* leading + is for shitty GNU libc */
-	static const char optstring [] = "+hVdvrlpeEiIwzZ:n:c:t:sgm:W:x";
+	static const char optstring [] = "+hVdvrlpeEiIwzZ:n:c:t:sgm:W:xy";
 
 	while (c = getopt (*argc, *argv, optstring), c != EOF){
 		switch (c) {
@@ -1025,7 +1017,10 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 'x':
 				exec_mode = 1;
-				msg_eot = rnd_string;
+				msg_eot = magic_eot;
+				break;
+			case 'y':
+				msg_eot = magic_eot;
 				break;
 			default:
 				usage ();
@@ -1117,11 +1112,25 @@ static void free_memory (void)
 	tasks__destroy ();
 }
 
+static void init_env (void)
+{
+	char *env_msg_eot = getenv ("PAEXEC_EOT");
+	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
+
+	/* environment */
+	if (env_bufsize)
+		initial_bufsize = atoi (env_bufsize);
+	if (env_msg_eot)
+		msg_eot = env_msg_eot;
+}
+
 int main (int argc, char **argv)
 {
 	int i;
 
 	block_signals ();
+
+	init_env ();
 
 	process_args (&argc, &argv);
 

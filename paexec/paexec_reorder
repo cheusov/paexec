@@ -1,6 +1,6 @@
 #!/usr/bin/env runawk
 
-# Copyright (c) 2009 Aleksey Cheusov <vle@gmx.net>
+# Copyright (c) 2009-2013 Aleksey Cheusov <vle@gmx.net>
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -40,6 +40,7 @@
 #    -S              remove leading space
 #    -l              prepand output line with the task number
 #                    given on input
+#    -y              magic line is used as an end-of-task marker
 #    =M <method>     method of resorting result line, where method is
 #       m               in-memory sort (the default)
 #       s               use sort(1) command
@@ -86,6 +87,8 @@ BEGIN {
 			}else{
 				abort("bad argument for -m")
 			}
+		}else if (optopt == "y"){
+			msg_eot = "HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5"
 		}else{
 			abort()
 		}

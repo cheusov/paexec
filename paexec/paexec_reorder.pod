@@ -12,7 +12,7 @@ B<paexec> with -l option produces a sliced output where results of
 different tasks are intermixed. The intent of B<paexec_reorder> is to
 produce ordered output where results for all tasks follow each other
 without intermixing. It is strongly recomended to send output of
-"paexec -le" or paexec -gle" to the input of B<paexec_reorder>. Otherwise
+"B<paexec> I<-le>" or "B<paexec> I<-gle>" to the input of B<paexec_reorder>. Otherwise
 more memory or disk space for temporary files will be required.
 
 =head1 OPTIONS
@@ -35,9 +35,14 @@ Prepand output line with the task number.
 
 =item B<-g>
 
-By default output of "paexec -le" is expected on input. With I<-g>
-option, output of "paexec -gle" is expected. In this case B<paexec_reorder>
+By default output of "B<paexec> I<-le>" is expected on input. With I<-g>
+option, output of "B<paexec> I<-gle>" is expected. In this case B<paexec_reorder>
 will react on "fatal" B<paexec's> keyword.
+
+=item B<-y>
+
+If applied, output of "B<paexec> -le [-g] I<-y>" is expected on input.
+This option has higher priority than PAEXEC_EOT environment variable.
 
 =item B<-S>
 
@@ -78,6 +83,10 @@ for 'success', 'failure', 'fatal' and '' (end of task).
 
 I<tempnam(3)> is used for creating temporary directory.
 See the appropriate man page.
+
+=item I<PAEXEC_EOT>
+
+The same as in B<paexec>.
 
 =back
 
