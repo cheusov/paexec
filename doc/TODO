@@ -1,7 +1,6 @@
 paexec:
  - rename paexec_reorder to pareorder
  - -n 'server1 server2 +5' two remote servers and five local
- - paexec -C [OPTIONS] cmd arg1 arg2..
  - -X -- suppress calculator's output
  - Option -I like in xargs (in combination with -x)
  - Option -n%'node_[1-20,22-30]'

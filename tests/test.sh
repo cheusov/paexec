@@ -381,24 +381,44 @@ usage: paexec [OPTIONS] [files...]
 
     # bad use
     runtest -l -t dummy -c dummy -n ',bad arg' < /dev/null 2>&1 |
-    cmp 'paexec bad -n' \
+    cmp 'paexec bad -n #1' \
 'paexec: invalid argument for option -n
 '
 
     runtest -t ssh -n +32 < /dev/null 2>&1 |
-    cmp 'paexec bad -n' \
+    cmp 'paexec bad -c' \
 'paexec: -c option is mandatory!
 '
 
     runtest -t ssh -n localhost -x -c echo file1 file2 < /dev/null 2>&1 |
-    cmp 'paexec bad -n' \
+    cmp 'paexec bad files' \
 'paexec: extra arguments. Run paexec -h for details
+'
+
+    runtest -t ssh -n localhost -Cx  < /dev/null 2>&1 |
+    cmp 'paexec bad -C' \
+'paexec: missing arguments. Run paexec -h for details
 '
 
     # x
     printf 'aaa\nbbb\nz y x\ntrtrtr'\''brbrbr\nccc\nddd\neee\nfff\n"y;x\nggg\n' |
     runtest -x -c "awk 'BEGIN {print toupper(ARGV [1])}'" -n +3 | sort |
-    cmp 'paexec -x #1' \
+    cmp 'paexec -x #1.1' \
+'"Y;X
+AAA
+BBB
+CCC
+DDD
+EEE
+FFF
+GGG
+TRTRTR'"'"'BRBRBR
+Z Y X
+'
+
+    printf 'aaa\nbbb\nz y x\ntrtrtr'\''brbrbr\nccc\nddd\neee\nfff\n"y;x\nggg\n' |
+    runtest -xCn+3 -- awk 'BEGIN {print toupper(ARGV [1])}' | sort |
+    cmp 'paexec -x #1.2' \
 '"Y;X
 AAA
 BBB
@@ -1091,18 +1111,18 @@ Zhopa!
 '
 
     # -s all failed
-    runtest -s -l -c 'cmd_xxx_failed_make_package .' \
-	-n +10 < /dev/null |
-    cmp 'paexec all fails #1' ''
+    runtest -s -l -c 'cmd_xxx_failed_make_package .' -n +10 < /dev/null |
+    cmp 'paexec all fails #1.1' ''
+
+    runtest -n +10 -sCl cmd_xxx_failed_make_package . < /dev/null |
+    cmp 'paexec all fails #1.2' ''
 
     # -s all failed
-    runtest -s -l -c 'cmd_xxx_failed_make_package .' \
-	-n +5 < /dev/null |
+    runtest -s -l -c 'cmd_xxx_failed_make_package .' -n +5 < /dev/null |
     cmp 'paexec all fails #2' ''
 
     # -s all failed
-    runtest -s -l -c 'cmd_xxx_failed_make_package .' \
-	-n +1 < /dev/null |
+    runtest -s -l -c 'cmd_xxx_failed_make_package .' -n +1 < /dev/null |
     cmp 'paexec all fails #3' ''
 
     # -s: all succeeded
@@ -1472,8 +1492,8 @@ ok100
 '
 
     # -s: flex and byacc fail
-    runtest -l -s -c 'cmd_xxx_failed_make_package "flex|byacc"' \
-	-n +4 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
+    runtest -n +4 -Cls cmd_xxx_failed_make_package 'flex|byacc' \
+	 > $OBJDIR/_test.tmp < ../examples/make_package/tasks
 
     {
 	test "`gln devel/glib2`" -gt 0 && echo ok1
@@ -1557,9 +1577,8 @@ ok100
 '
 
     # diamond-like dependancy and failure
-    runtest -l -s \
-	-c 'cmd_xxx_failed_make_package flex' \
-	-n +5 > $OBJDIR/_test.tmp < ../examples/make_package/tasks2
+    runtest -l -s -C -n +5 cmd_xxx_failed_make_package flex \
+	> $OBJDIR/_test.tmp < ../examples/make_package/tasks2
 
     {
 	test "`gln devel/flex`" = f && echo ok1
@@ -2477,9 +2496,8 @@ success
 
     # -x + -t
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -xl -t paexec_notransport \
-	-n '1 2 3 4 5 6 7 8 9' \
-	-c 'awk "BEGIN {print toupper(ARGV[1])}"' |
+    runtest -xlC -t paexec_notransport \
+	-n '1 2 3 4 5 6 7 8 9' awk "BEGIN {print toupper(ARGV[1])}" |
     resort |
     cmp 'paexec -g + -t #1' \
 '1 A
@@ -2494,7 +2512,7 @@ success
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -t paexec_notransport \
 	-n '1 2 3 4 5 6 7 8 9' \
-	-c "sh -c 'while read f; do echo \$f; echo; done'" |
+	-C sh -c 'while read f; do echo $f; echo; done' |
     sort |
     cmp 'paexec -t + shquote(3) #1' \
 'a
@@ -2507,9 +2525,7 @@ ffffff
 
     # -t + shquote(3)
     printf 'a\nbb\n' |
-    runtest -x -t /bad/transport \
-	-n +1 \
-	-c echo |
+    runtest -x -t /bad/transport -n +1 -c echo |
     sort |
     cmp 'paexec -n +1 -t /bad/transport' \
 'a

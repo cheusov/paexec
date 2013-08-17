@@ -1,10 +1,12 @@
 =head1 NAME
 
-paexec - parallel executor
+paexec - parallel executor, distribute tasks over network or CPUs
 
 =head1 SYNOPSIS
 
 B<paexec> I<[options]>
+
+B<paexec> -C I<[options]> I<command> I<[args...]>
 
 =head1 DESCRIPTION
 
@@ -103,7 +105,11 @@ Display version information.
 
 =item B<-c> I<command>
 
-Command with its arguments
+Command with its arguments.
+
+=item B<-C>
+
+Command with its arguments are specified following the options.
 
 =item B<-t> I<transport>
 
@@ -345,7 +351,7 @@ variable.
 
 =item 3
 
- ls -1 *.wav | paexec -xg -n +4 -c 'flac -f --silent' -il
+ ls -1 *.wav | paexec -xCil -n+4 flac -f --silent
 
 =item 4
 
@@ -367,6 +373,10 @@ I<node>. This may slow down an entire processing if I<tasks> are
 too big. So, it is recommended to use shorter I<tasks>, for example,
 filename or URI (several tens of bytes in size) instead of
 multi-megabyte content. Though this may be fixed in the future.
+
+Original paexec tarball contains a number of sample of use in
+presentation/paexec.pdf file. After installation you can find this
+file under share/doc/paexec/paexec.pdf or nearby.
 
 =head1 ENVIRONMENT
 

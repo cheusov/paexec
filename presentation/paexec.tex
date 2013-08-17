@@ -231,8 +231,28 @@ APPLE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
   \frametitle{Example 1: toupper}
-With options \h{-z} or \h{-Z} you can easily run your tasks on
-unreliable hosts. If you cannot connect or lost connection to the
+If we want to "shquate" less one can use option \h{-C} instead of \h{-c}
+and specify command after options.
+  \begin{block}{}
+      \begin{CodeLarge}{paexec invocation}
+\prompt{\$} paexec -x \h{-C} -t ssh -n 'server1 server2' \textbackslash
+awk 'BEGIN \{print toupper(ARGV[1])\}' \textbackslash
+    < tasks > results
+\prompt{\$} cat results
+ORANGE
+BANANAS
+APPLE
+\prompt{\$}
+      \end{CodeLarge}
+  \end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 1: toupper}
+With options \h{-z} or \h{-Z} we can easily run our tasks on
+unreliable hosts. If we cannot connect or lost connection to the
 server, paexec will redistribute failed tasks to another server.
   \begin{block}{}
       \begin{CodeLarge}{paexec invocation}

@@ -66,7 +66,8 @@ static void usage (void)
 	fprintf (stderr, "\
 paexec - parallel executor\n\
          that distributes tasks over CPUs or machines in a network.\n\
-usage: paexec [OPTIONS] [files...]\n\
+usage: paexec    [OPTIONS]\n\
+       paexec -C [OPTIONS] cmd [args...]\n\
 OPTIONS:\n\
   -h               give this help\n\
   -V               show version\n\
@@ -927,12 +928,40 @@ static void check_msg (const char *msg)
 	}
 }
 
+static char *gen_cmd (int *argc, char ***argv)
+{
+	char cmd [4096];
+	size_t len;
+	size_t curr_len;
+	int i;
+
+	len = 0;
+	for (i=0; i < *argc; ++i){
+		curr_len = shquote ((*argv) [i], cmd+len, sizeof (cmd)-len-1);
+		if (curr_len == (size_t)-1){
+			err_fatal ("paexec: Internal error4! (buffer size)");
+		}
+		len += curr_len;
+		cmd [len++] = ' ';
+
+		if (len >= sizeof (cmd)-1){
+			err_fatal ("paexec: Internal error5! (buffer size)");
+		}
+	}
+
+	cmd [len++] = 0;
+
+	assert (!arg_cmd);
+	return xstrdup (cmd);
+}
+
 static void process_args (int *argc, char ***argv)
 {
 	int c;
+	int mode_C = 0;
 
 	/* leading + is for shitty GNU libc */
-	static const char optstring [] = "+hVdvrlpeEiIwzZ:n:c:t:sgm:W:xy";
+	static const char optstring [] = "+c:CdeEghiIlm:n:prst:VvwW:xyzZ:";
 
 	while (c = getopt (*argc, *argv, optstring), c != EOF){
 		switch (c) {
@@ -952,6 +981,9 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 'c':
 				arg_cmd = xstrdup (optarg);
+				break;
+			case 'C':
+				mode_C = 1;
 				break;
 			case 't':
 				optarg += strspn (optarg, " \t");
@@ -1036,8 +1068,17 @@ static void process_args (int *argc, char ***argv)
 
 	*argv += optind;
 	*argc -= optind;
-	if (*argc){
-		err_fatal ("paexec: extra arguments. Run paexec -h for details");
+
+	if (mode_C){
+		if (!*argc){
+			err_fatal ("paexec: missing arguments. Run paexec -h for details");
+		}
+
+		arg_cmd = gen_cmd (argc, argv);
+	}else{
+		if (*argc){
+			err_fatal ("paexec: extra arguments. Run paexec -h for details");
+		}
 	}
 
 	if (!resistance_timeout && wait_mode){
