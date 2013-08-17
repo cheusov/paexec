@@ -66,6 +66,7 @@
 %\newcommand{\h}[1]{\textbf{#1}}
 %\newcommand{\h}[1]{\bf{#1}\textnormal{}}
 \newcommand{\h}[1]{{\bf{#1}}}
+\newcommand{\name}[1]{{\tt{#1}}}
 \newcommand{\URL}[1]{\textbf{#1}}
 \newcommand{\AutohellFile}[1]{\textcolor{red}{#1}}
 \newcommand{\MKCfile}[1]{\textcolor{green}{#1}}
@@ -96,8 +97,8 @@
   \begin{block}{}
     \begin{itemize}
     \item Huge amount of data to process
-    \item Typical desktop machines have more than one CPUs
-    \item Unlimited resources are available through Internet
+    \item Typical desktop machines have more than one CPU
+    \item Unlimited resources are available on the Internet
     \item Heterogeneous environment (*BSD, Linux, Windows...)
     \end{itemize}
   \end{block}
@@ -153,9 +154,9 @@ orange
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
   \frametitle{Example 1: toupper}
-\~{}/bin/toupper script will be ran only once on remote servers
+\name{\~{}/bin/toupper} script will be run only once on remote servers
 ``server1'' and ``server2''.  It takes tasks from stdin (one task per
-line). Transport program is ssh(1).
+line). Transport program is \name{ssh(1)}.
   \begin{block}{}
       \begin{CodeLarge}{paexec invocation}
 \prompt{\$} paexec \h{-t} ssh \h{-c} ~/bin/toupper \textbackslash
@@ -191,7 +192,7 @@ task is processed to stdout.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
   \frametitle{Example 1: toupper}
-The same as above but four instances of \~{}/bin/toupper are ran locally.
+The same as above but four instances of \name{\~{}/bin/toupper} are ran locally.
   \begin{block}{}
       \begin{CodeLarge}{paexec invocation}
 \prompt{\$} paexec \h{-n} +4 -c ~/bin/toupper
@@ -209,7 +210,7 @@ APPLE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
   \frametitle{Example 1: toupper}
-The same as above but without \~{}/bin/toupper.  In this example we
+The same as above but without \name{\~{}/bin/toupper}.  In this example we
 run AWK program for each individual task.  At the same time we still
 make only one ssh connection to each server regardless of a number of
 tasks given on input.
@@ -300,7 +301,7 @@ APPLE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
   \frametitle{Example 2: parallel banner(1)}
-pbanner is wrapper for banner(1) for reading tasks line by line.
+\name{\~{}/bin/pbanner} is wrapper for \name{banner(1)} for reading tasks line by line.
 Magic line is used instead empty line as an end-of-task marker.
   \begin{block}{}
       \begin{Code}{\~{}/bin/pbanner}
@@ -328,7 +329,7 @@ xec
 \linespread{0.5}
 \begin{frame}[fragile]
   \frametitle{Example 2: parallel banner(1)}
-paexec(1) reads calculator's output asynchronously.
+\name{paexec(1)} reads calculator's output asynchronously.
 So, its output is sliced.
   \begin{block}{}
       \begin{CodeSmall}{Sliced result}
@@ -361,7 +362,7 @@ So, its output is sliced.
 \linespread{0.5}
 \begin{frame}[fragile]
   \frametitle{Example 2: parallel banner(1)}
-paexec\_reorder(1) normalizes paexec(1)'s output.
+\name{paexec\_reorder(1)} normalizes \name{paexec(1)}'s output.
   \begin{block}{}
       \begin{CodeSmall}{Ordered result}
 \prompt{\$} paexec_reorder \h{-mt='SE@X-L0S0!&'} results
@@ -394,7 +395,7 @@ M    M  MMMMMM   MMMM
 \linespread{0.5}
 \begin{frame}[fragile]
   \frametitle{Example 2: parallel banner(1)}
-The same as above but using magic end-of-task marker provided by paexec(1).
+The same as above but using magic end-of-task marker provided by \name{paexec(1)}.
   \begin{block}{}
       \begin{CodeSmall}{Ordered result}
 \prompt{\$} paexec \h{-y} -lc ~/bin/pbanner -n+2 < tasks | paexec_reorder \h{-y}
@@ -427,8 +428,8 @@ M    M  MMMMMM   MMMM
 \linespread{0.5}
 \begin{frame}[fragile]
   \frametitle{Example 2: parallel banner(1)}
-For this trivial task wrapper ``pbanner'' is not needed.
-We can easily run banner(1) directly.
+For this trivial task wrapper like \name{\~{}/bin/pbanner} is not needed.
+We can easily run \name{banner(1)} directly.
   \begin{block}{}
       \begin{CodeSmall}{Sliced result}
 \prompt{\$} paexec -l \h{-x} -c banner -n+2 < tasks
@@ -459,7 +460,7 @@ We can easily run banner(1) directly.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
   \frametitle{Example 3: dependency graph of tasks}
-  paexec(1) is able to build tasks taking into account their ``dependencies''.
+\name{paexec(1)} is able to build tasks taking into account their ``dependencies''.
 Here ``devel/gmake'' and others are pkgsrc packages. Our goal in this example
 is to build pkgsrc package audio/abcde and all its build-time and compile-time
 dependencies.
@@ -473,8 +474,8 @@ dependencies.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
   \frametitle{Example 3: dependency graph of tasks}
-``paexec \h{-g}'' takes a dependency graph on input (in tsort(1) format).
-Tasks are separated by space (paexec -md=).
+\name{``paexec \h{-g}''} takes a dependency graph on input (in \name{tsort(1)} format).
+Tasks are separated by space (\name{paexec -md=}).
   \begin{block}{}
       \begin{CodeSmall}{\~{}/tmp/packages\_to\_build}
 audio/cd-discid audio/abcde
@@ -573,7 +574,7 @@ Let's suppose that ``devel/gmake'' fails to build.
 \begin{frame}[fragile]
   \frametitle{Example 3: dependency graph of tasks}
 Package ``devel/gmake'' and all dependants are marked as failed.
-Even failures happen the build continues.
+Even if failures happen, the build continues.
   \begin{block}{}
       \begin{CodeSmall}{paexec -g invocation (with failures)}
 \prompt{\$} paexec -gl -c ~/bin/pkg_builder -n 'server2 server1' \textbackslash
@@ -665,7 +666,7 @@ If \h{-x} is applied, task is passed to calculator as an argument.
 \end{block}
 \begin{block}{}
   \begin{CodeSmall}{paexec -x invocation}
-\prompt{\$} ls -1 *.wav | paexec -ixc 'oggenc -Q' -n+3 | grep .
+\prompt{\$} ls -1 *.wav | paexec -ixC -n+3 oggenc -Q | grep .
 01-Crying_Wolf.wav
 02-Autumn.wav
 03-Time_Heals.wav

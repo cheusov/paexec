@@ -1,5 +1,8 @@
 ##################################################
 
+FILES    = paexec.pdf
+FILESDIR = ${DOCDIR}
+
 .PHONE : all
 all : paexec.pdf
 
@@ -24,8 +27,8 @@ paexec.ps paexec.dvi: dep-graph.eps
 .tex.dvi:
 	latex "${.IMPSRC}" && latex "${.IMPSRC}"
 
-GARBAGE=	*.dvi *.aux *.vrb *.toc *.snm *.log *.nav *.out *.eps *.ps
-CLEANFILES+=	${GARBAGE} *.pdf
+GARBAGE     =	*.dvi *.aux *.vrb *.toc *.snm *.log *.nav *.out *.eps *.ps
+CLEANFILES +=	${GARBAGE} *.pdf
 
 .PHONY: _clean_garbage
 _clean_garbage:
