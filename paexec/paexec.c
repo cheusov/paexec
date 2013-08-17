@@ -1034,6 +1034,12 @@ static void process_args (int *argc, char ***argv)
 		}
 	}
 
+	*argv += optind;
+	*argc -= optind;
+	if (*argc){
+		err_fatal ("paexec: extra arguments. Run paexec -h for details");
+	}
+
 	if (!resistance_timeout && wait_mode){
 		err_fatal ("paexec: -w is useless without -Z");
 	}

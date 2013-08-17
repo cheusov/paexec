@@ -379,16 +379,20 @@ usage: paexec [OPTIONS] [files...]
     cmp 'paexec -mF= bad #1.2' 'paexec: symbols '\'' and " are not allowed in -m argument
 '
 
-    # bad -n arg
+    # bad use
     runtest -l -t dummy -c dummy -n ',bad arg' < /dev/null 2>&1 |
     cmp 'paexec bad -n' \
 'paexec: invalid argument for option -n
 '
 
-    # bad -n arg
     runtest -t ssh -n +32 < /dev/null 2>&1 |
     cmp 'paexec bad -n' \
 'paexec: -c option is mandatory!
+'
+
+    runtest -t ssh -n localhost -x -c echo file1 file2 < /dev/null 2>&1 |
+    cmp 'paexec bad -n' \
+'paexec: extra arguments. Run paexec -h for details
 '
 
     # x
