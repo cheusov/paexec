@@ -3,6 +3,10 @@
 # The same as "cmd" but with non-standard "success",
 # "failure" and "eot" strings.
 
+BEGIN {
+	EOT = ENVIRON ["PAEXEC_EOT"]
+}
+
 {
 	# Read tasks line-by-line
 
@@ -22,7 +26,7 @@
 	}
 
 	# End of task marker, empty line by default
-	print "Konec!"
+	print EOT
 
 	# In the end, stdout must be flushed
 	fflush()
