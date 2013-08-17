@@ -1,14 +1,25 @@
 ======================================================================
-Version 0.19.0, by Aleksey Cheusov, Sun, 11 Aug 2013 16:34:40 +0300
+Version 0.19.0, by Aleksey Cheusov, Sat, 17 Aug 2013 21:07:53 +0300
+
+  Presentation paexec.pdf was added to presentation/. I hope it will
+  help to easier understand how "paexec" works. It is installed to
+  ${DOCDIR}.
 
   paexec is now selfcontained, libmaa is not needed anymore.
 
   paexec:
     - POSIX-2008 getline(3) is used for reading lines
       instead of home-made function.
-    - t '' is equivalent to "no transport"
-    - "paexec -n +NNN" works correctly even if transport is specified,
-      i.e. transport is ignored.
+    - t '' is equivalent to "no transport", spaces are trimmed.
+    - "-n +NNN" has higher priority than -t, i.e. if they both are
+      specified, transport is ignored.
+    - Fix for -W1.
+    - Environment variable PAEXEC_EOT was introduced.
+    - Option -y was added to paexec(1) and paexec_reorder(1).
+    - Option -C was added to paexec(1).
+
+  paexec_reorder:
+    - Option -x was added to paexec_reorder(1).
 
   "mkcmake test" runs less tests with different PAEXEC_BUFSIZE.
 
