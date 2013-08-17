@@ -2,7 +2,9 @@
 
 paexec: Small program that processes a list of tasks in parallel
         on different CPUs, computers in a network or whatever.
-        Full documentation is available in paexec.1 and paexec.pod
+        Full documentation is available in paexec.1 and paexec.pod.
+        paexec.pdf presentation is also available in presentation/
+        subdirectory.
 
 author:                                  Aleksey Cheusov <vle@gmx.net>
 

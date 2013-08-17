@@ -361,7 +361,7 @@ variable.
 
 =back
 
-For other examples, see examples/ subdirectory in the distribution.
+For more examples see paexec.pdf and examples/ subdirectory in the distribution.
 
 =head1 NOTES
 
