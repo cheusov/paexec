@@ -4,9 +4,6 @@ paexec:
  - paexec -C [OPTIONS] cmd arg1 arg2..
  - -X -- suppress calculator's output
  - paexec_reorder -x
- - mt= together with -x is useless => error message
- - refresh presentation for lvee-2011 and make it a part of documentation
- - trim spaces in -t argument and then check it for emptyness
  - Option -I like in xargs (in combination with -x)
  - Option -n%'node_[1-20,22-30]'
  - non-blocking write(2) for sending task to the slave hosts/CPUs.

@@ -498,7 +498,7 @@ fake5.flac
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -t '' -c cmd_toupper \
+    runtest -l -t '		    ' -c cmd_toupper \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec toupper #2' \
 '1 A

@@ -948,7 +948,7 @@ static void process_args (int *argc, char ***argv)
 				arg_cmd = xstrdup (optarg);
 				break;
 			case 't':
-				arg_transport = xstrdup (optarg);
+				optarg += strspn (optarg, " \t");
 				if (optarg [0])
 					arg_transport = xstrdup (optarg);
 				break;
