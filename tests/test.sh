@@ -485,6 +485,19 @@ fake5.flac
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
+    ( export PAEXEC_EOT=foobarbaz; runtest -l -t paexec_notransport -c cmd_toupper \
+	-n '1 2 3 4 5 6 7 8 9' | resort; ) |
+    cmp 'paexec toupper #1.1 (PAEXEC_EOT)' \
+'1 A
+2 BB
+3 CCC
+4 DDDD
+5 EEEEE
+6 FFFFFF
+'
+
+    # toupper
+    printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -t '' -c cmd_toupper \
 	-n '1 2 3 4 5 6 7 8 9' | resort |
     cmp 'paexec toupper #2' \
@@ -824,7 +837,32 @@ fake5.flac
     test_tasks3 |
     runtest -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
 	-e -s -l -c cmd_divide2 -n +10 |
-    cmp 'paexec 1/X #1 nonstandard' \
+    cmp 'paexec 1/X nonstandard #1' \
+'1 1/1=1
+1 Ura!
+1 Konec!
+2 1/2=0.5
+2 Ura!
+2 Konec!
+3 1/3=0.333333
+3 Ura!
+3 Konec!
+4 1/4=0.25
+4 Ura!
+4 Konec!
+5 1/5=0.2
+5 Ura!
+5 Konec!
+6 Cannot calculate 1/0
+6 Zhopa!
+6 0 7 8 9 10 11 12
+6 Konec!
+'
+
+    test_tasks3 |
+    ( export PAEXEC_EOT='Konec!'; runtest -ms='Ura!' -mf='Zhopa!' \
+	-e -s -l -c cmd_divide2 -n +10; ) |
+    cmp 'paexec 1/X nonstandard #1.1' \
 '1 1/1=1
 1 Ura!
 1 Konec!
@@ -852,7 +890,11 @@ fake5.flac
 
     runtest -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
 	-s -l -c cmd_divide -n +10 < /dev/null |
-    cmp 'paexec 1/X #2 nonstandard' ''
+    cmp 'paexec 1/X nonstandard #2' ''
+
+    ( export PAEXEC_EOT='Konec!'; runtest -ms='Ura!' -mf='Zhopa!' \
+	-s -l -c cmd_divide -n +10 < /dev/null; ) |
+    cmp 'paexec 1/X nonstandard #2.1' ''
 
     # paexec_reorder + failure
     test_tasks4 |
@@ -884,7 +926,33 @@ fake5.flac
     runtest -ms='Ura!' -mf='Zhopa!' -mt='Konec!' \
 	-se -l -c cmd_divide2 -n +1 |
     paexec_reorder -gl -ms='Ura!' -mf='Zhopa!' -mt='Konec!' |
-    cmp 'paexec 1/X #3 nonstandard' \
+    cmp 'paexec 1/X nonstandard #3' \
+'1 1/1=1
+1 Ura!
+2 1/2=0.5
+2 Ura!
+3 1/3=0.333333
+3 Ura!
+4 1/4=0.25
+4 Ura!
+5 1/5=0.2
+5 Ura!
+6 Cannot calculate 1/0
+6 Zhopa!
+6 0 7 8 9
+10 1/10=0.1
+10 Ura!
+11 1/11=0.0909091
+11 Ura!
+12 1/12=0.0833333
+12 Ura!
+'
+
+    test_tasks4 |
+    ( export PAEXEC_EOT='Konec!'; runtest -ms='Ura!' -mf='Zhopa!' \
+	-se -l -c cmd_divide2 -n +1 |
+    paexec_reorder -gl -ms='Ura!' -mf='Zhopa!'; ) |
+    cmp 'paexec 1/X nonstandard #3.1' \
 '1 1/1=1
 1 Ura!
 2 1/2=0.5

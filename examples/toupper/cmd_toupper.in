@@ -1,5 +1,9 @@
 #!@awk@ -f
 
+BEGIN {
+	EOT = ENVIRON ["PAEXEC_EOT"]
+}
+
 {
 	# Prepand every line with a space in order
 	# to avoid empty lines on output
@@ -9,7 +13,7 @@
 	print toupper($0)
 
 	# End of task marker, empty line by default
-	print ""
+	print EOT
 
 	# In the end, stdout must be flushed
 	fflush()

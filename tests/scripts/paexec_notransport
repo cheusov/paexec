@@ -2,4 +2,6 @@
 
 shift # skip node
 
+unset PAEXEC_EOT
+
 eval "$@"

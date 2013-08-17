@@ -60,7 +60,7 @@ BEGIN {
 	msg_success = "success"
 	msg_failure = "failure"
 	msg_fatal   = "fatal"
-	msg_eot     = ""
+	msg_eot     = ENVIRON ["PAEXEC_EOT"]
 
 	while (getopt(short_opts)){
 		if (optopt == "h"){

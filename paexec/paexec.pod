@@ -374,6 +374,10 @@ Now internal buffers are resized automatically.
 If unsure, do not set PAEXEC_BUFSIZE variable.
 See the default value in Makefile.
 
+=item I<PAEXEC_EOT>
+
+This variable sets the end-of-task marker which is an empty line by default.
+
 =back
 
 =head1 BUGS/FEEDBACK

@@ -307,9 +307,10 @@ static void init__read_graph_tasks (void)
 static void init__postproc_arg_cmd (void)
 {
 	char shq_cmd [4096];
+	char shq_eot [4096];
+	char cmd [4096];
 
 	if (exec_mode){
-		char cmd [4096];
 		char cond_cmd [4096] = "";
 
 		if (graph_mode){
@@ -328,23 +329,26 @@ static void init__postproc_arg_cmd (void)
 				  "  echo '%s';"
 				  "done", arg_cmd, cond_cmd, rnd_string);
 
-		if ((size_t)-1 == shquote (cmd, shq_cmd, sizeof (shq_cmd))){
-			err_fatal ("paexec: Internal error1! (buffer size)");
-		}
-
-		snprintf (cmd, sizeof (cmd), "/bin/sh -c %s", shq_cmd);
-		if (strlen (cmd) == sizeof (cmd)-1){
-			err_fatal ("paexec: Internal error2! (buffer size)");
-		}
-
 		xfree (arg_cmd);
 		arg_cmd = xstrdup (cmd);
 	}
 
+	if ((size_t)-1 == shquote (arg_cmd, shq_cmd, sizeof (shq_cmd)) ||
+		(size_t)-1 == shquote (msg_eot, shq_eot, sizeof (shq_eot)))
+	{
+		err_fatal ("paexec: Internal error1! (buffer size)");
+	}
+	snprintf (cmd, sizeof (cmd), "env PAEXEC_EOT=%s /bin/sh -c %s", shq_eot, shq_cmd);
+	if (strlen (cmd) == sizeof (cmd)-1){
+		err_fatal ("paexec: Internal error2! (buffer size)");
+	}
+	xfree (arg_cmd);
+	arg_cmd = xstrdup (cmd);
+
 	if (arg_transport){
 		/* one more shquote(3) for ssh-like transport */
 		if ((size_t)-1 == shquote (arg_cmd, shq_cmd, sizeof (shq_cmd))){
-			err_fatal ("paexec: Internal error1! (buffer size)");
+			err_fatal ("paexec: Internal error3! (buffer size)");
 		}
 		xfree (arg_cmd);
 		arg_cmd = xstrdup (shq_cmd);
@@ -379,11 +383,15 @@ static void init__child_processes (void)
 
 		ret_codes [i] = rt_undef;
 
-		if (arg_transport && arg_transport [0])
+		if (arg_transport)
 			snprintf (full_cmd, sizeof (full_cmd), "%s %s %s",
 					  arg_transport, nodes [i], arg_cmd);
 		else
 			snprintf (full_cmd, sizeof (full_cmd), "%s", arg_cmd);
+
+		if (debug){
+			fprintf (stderr, "running cmd: %s\n", full_cmd);
+		}
 
 		pids [i] = pr_open (
 			full_cmd,
@@ -435,12 +443,14 @@ static void mark_node_as_dead (int node)
 
 static void init (void)
 {
+	char *env_msg_eot = getenv ("PAEXEC_EOT");
 	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
 
-	/* BUFSIZE */
-	if (env_bufsize){
+	/* environment */
+	if (env_bufsize)
 		initial_bufsize = atoi (env_bufsize);
-	}
+	if (env_msg_eot)
+		msg_eot = env_msg_eot;
 
 	/* arrays */
 	pids  = xmalloc (nodes_count * sizeof (*pids));
@@ -1043,6 +1053,9 @@ static void process_args (int *argc, char ***argv)
 	if (use_weights < 0 || use_weights > 2){
 		err_fatal ("paexec: Only -W1 and -W2 are supported!");
 	}
+
+	if (arg_transport && !arg_transport [0])
+		arg_transport = NULL;
 }
 
 static void free_memory (void)
