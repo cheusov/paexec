@@ -387,8 +387,7 @@ usage: paexec [OPTIONS] [files...]
 
     # x
     printf 'aaa\nbbb\nz y x\ntrtrtr'\''brbrbr\nccc\nddd\neee\nfff\n"y;x\nggg\n' |
-    runtest -x -c "awk 'BEGIN {print toupper(ARGV [1])}'" \
-	-n +3 | sort |
+    runtest -x -c "awk 'BEGIN {print toupper(ARGV [1])}'" -n +3 | sort |
     cmp 'paexec -x #1' \
 '"Y;X
 AAA
@@ -400,6 +399,22 @@ FFF
 GGG
 TRTRTR'"'"'BRBRBR
 Z Y X
+'
+
+    printf 'aaa\nbbb\nz y x\ntrtrtr'\''brbrbr\nccc\nddd\neee\nfff\n"y;x\nggg\n' |
+    runtest -el -x -c 'awk "BEGIN {print toupper(ARGV[1])}"' -n +4 |
+    paexec_reorder -x -Ms |
+    cmp 'paexec -x #2' \
+'AAA
+BBB
+Z Y X
+TRTRTR'"'"'BRBRBR
+CCC
+DDD
+EEE
+FFF
+"Y;X
+GGG
 '
 
     # x

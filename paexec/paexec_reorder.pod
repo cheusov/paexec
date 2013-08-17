@@ -31,13 +31,19 @@ command is used.
 
 =item B<-l>
 
-Prepand output line with the task number.
+Prepand output lines with the task number.
 
 =item B<-g>
 
 By default output of "B<paexec> I<-le>" is expected on input. With I<-g>
 option, output of "B<paexec> I<-gle>" is expected. In this case B<paexec_reorder>
 will react on "fatal" B<paexec's> keyword.
+
+=item B<-x>
+
+If applied, output of "B<paexec> -le [-g] I<-x>" is expected on input.
+This option has higher priority than PAEXEC_EOT environment variable.
+Actually B<-x> and B<-y> are synonyms.
 
 =item B<-y>
 

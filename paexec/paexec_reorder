@@ -40,7 +40,8 @@
 #    -S              remove leading space
 #    -l              prepand output line with the task number
 #                    given on input
-#    -y              magic line is used as an end-of-task marker
+#    -x              synonym for -y
+#    -y              output of "paexec -le [g] -y" is expected on input
 #    =M <method>     method of resorting result line, where method is
 #       m               in-memory sort (the default)
 #       s               use sort(1) command
@@ -87,7 +88,7 @@ BEGIN {
 			}else{
 				abort("bad argument for -m")
 			}
-		}else if (optopt == "y"){
+		}else if (optopt == "y" || optopt == "x"){
 			msg_eot = "HG>&OSO@#;L8N;!&.U4ZC_9X:0AF,2Y>SRXAD_7U&QZ5S>N^?Y,I=W?@5"
 		}else{
 			abort()
