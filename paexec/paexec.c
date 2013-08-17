@@ -522,6 +522,10 @@ static void init (void)
 void kill_childs (void)
 {
 	int i;
+
+	if (!pids)
+		return;
+
 	for (i=0; i < nodes_count; ++i){
 		if (pids [i] != (pid_t) -1){
 			kill (pids [i], SIGTERM);
@@ -533,9 +537,11 @@ void wait_for_childs (void)
 {
 	int i;
 
-	if (debug){
+	if (!pids)
+		return;
+
+	if (debug)
 		printf ("wait for childs\n");
-	}
 
 	for (i=0; i < nodes_count; ++i){
 		if (pids [i] != (pid_t) -1){

@@ -385,6 +385,12 @@ usage: paexec [OPTIONS] [files...]
 'paexec: invalid argument for option -n
 '
 
+    # bad -n arg
+    runtest -t ssh -n +32 < /dev/null 2>&1 |
+    cmp 'paexec bad -n' \
+'paexec: -c option is mandatory!
+'
+
     # x
     printf 'aaa\nbbb\nz y x\ntrtrtr'\''brbrbr\nccc\nddd\neee\nfff\n"y;x\nggg\n' |
     runtest -x -c "awk 'BEGIN {print toupper(ARGV [1])}'" -n +3 | sort |
