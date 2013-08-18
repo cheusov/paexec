@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # Obtains all substrings in parallel using 3 subprocesses.
 # Subprocesses are run on the same host where paexec is run.

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # here we compile .c sources in parallel using 4 parallel processes
 

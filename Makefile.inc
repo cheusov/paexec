@@ -8,10 +8,10 @@ DOCDIR ?=	${DATADIR}/doc/paexec
 # Those poor souls who run Solaris can set AWK to gawk
 AWK ?=			/usr/bin/awk
 
-MKC_REQUIRE_PROGS =		${AWK} runawk
+MKC_REQUIRE_PROGS +=		${AWK} runawk
 
 .export AWK
-MKC_CHECK_CUSTOM =		awk_fflush
+MKC_CHECK_CUSTOM +=		awk_fflush
 MKC_CUSTOM_FN.awk_fflush =	checks/awk_fflush
 
 .include "mkc.configure.mk"

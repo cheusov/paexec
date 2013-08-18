@@ -1,3 +1,6 @@
+MKC_CHECK_CUSTOM +=		sleep_fract
+MKC_CUSTOM_FN.sleep_fract =	../checks/sleep_fract
+
 CLEANFILES +=	_test.in _tasks.tmp _test.tmp
 
 all:
@@ -27,6 +30,7 @@ all:
 	export PATH=${OBJDIR_make_package}:$$PATH; \
 	export PATH=${OBJDIR_toupper}:$$PATH; \
 	export PATH=${OBJDIR_wav2flac}:$$PATH; \
+	export SLEEP_FRACT=${CUSTOM.sleep_fract:S/0//}; \
 	if ./test.sh; \
 	then echo 'SUCCEEDED'; \
 	else echo 'FAILED'; false; \

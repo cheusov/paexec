@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # The same as "run" but with non-standard "success",
 # "failure" and "eot" strings.

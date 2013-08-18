@@ -29,6 +29,7 @@
 #include <string.h>
 #include <signal.h>
 
+#include "decls.h"
 #include "wrappers.h"
 #include "common.h"
 

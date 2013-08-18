@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 if echo | "$AWK" '{fflush()}' 2>/dev/null 1>&2; then
 	echo 1

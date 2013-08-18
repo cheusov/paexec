@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 export LC_ALL=C
 
@@ -279,7 +279,7 @@ EOF
 }
 
 nonstandard_msgs (){
-    sed -e 's/^\([0-9][0-9]* $\)/\1Konec!/' \
+    sed -e 's/^\([0-9][0-9]* \)$/\1Konec!/' \
 	-e 's/^\([0-9][0-9]* \)success/\1Ura!/' \
 	-e 's/^\([0-9][0-9]* \)failure/\1Zhopa!/' \
 	-e 's/^\([0-9][0-9]* \)fatal/\1PolnayaZhopa!/' \
@@ -1929,6 +1929,7 @@ dat5
 dat6
 EOF
 
+    if test "$SLEEP_FRACT"; then
     runtest -s -z -lr -t transport_broken_rnd -c : \
 	-n '0.1 0.15 0.2 0.25 0.3 0' < $OBJDIR/_test.in |
     filter_succeded_tasks | sort -n |
@@ -1944,12 +1945,13 @@ EOF
 9 dat5
 10 dat6
 '
+    fi
 
     # resistance to transport failure
     awk 'BEGIN {for (i=1; i <= 1000; ++i) {print "dat" i}}' |
     runtest -s -z -lr -t transport_broken_rnd -c : \
 	-n '0.01-ns 0.03-ns 0.09-ns 0.09-ns 0.03-ns 0-ns' |
-    filter_succeded_tasks | sort -n | cksum |
+    filter_succeded_tasks | sort -n | cksum | awk '{$1=$1; print $0}' |
     cmp 'paexec broken transport #10' \
 '3878868009 10786
 '

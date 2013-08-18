@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # Build packages taking a dependency graph on input
 # and sort the sliced output using sort(1) -- first task

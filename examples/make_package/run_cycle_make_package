@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # Attempt to build packages with cyclic dependencies
 paexec -g -le -c "`pwd`/cmd" -n +3 < tasks_cycle

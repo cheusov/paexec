@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # Here we convert .wav files to .flac
 # Usage: ./run /wav/directory a_number_of_parallel_processes

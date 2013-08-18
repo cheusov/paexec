@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # Calculate 1/$1 values in 3 parallel subprocesses.
 # Dependency graph of tasks comes from stdin.

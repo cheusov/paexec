@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # here we compile .c sources in parallel on two hosts: localhost and chen
 # a la distcc
