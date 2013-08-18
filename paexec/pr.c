@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/wait.h>
 
 #include "wrappers.h"
@@ -40,11 +41,11 @@
    1992); page 43.  The implementation here, however, is different from
    that provided by Stevens for his open_max routine. */
 
-typedef struct _pr_Obj {
+struct _pr_Obj {
    int pid;
-} *_pr_Obj;
+};
 
-static _pr_Obj _pr_objects = NULL;
+static struct _pr_Obj *_pr_objects = NULL;
 
 static int max_fd (void)
 {
@@ -53,20 +54,12 @@ static int max_fd (void)
 	if (maxFd)
 		return maxFd;
 
-#if HAVE_SYSCONF
+#if HAVE_FUNC1_SYSCONF && defined(_SC_OPEN_MAX)
 	if ((maxFd = sysconf (_SC_OPEN_MAX)) > 0)
 		return maxFd;
 #endif
 
-#ifdef NOFILE
-	return maxFd = NOFILE;	/* Usually in sys/params.h */
-#else
-# ifdef _NFILE
-	return maxFd = _NFILE;
-# else
-	return maxFd = 256;		/* best guess */
-# endif
-#endif
+	return maxFd = 1024; /* big enough number */
 }
 
 static void _pr_init (void)

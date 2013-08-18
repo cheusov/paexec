@@ -24,6 +24,7 @@ MKC_COMMON_HEADERS   =	unistd.h stdlib.h
 MKC_CHECK_TYPES      =	intptr_t:stdint.h intptr_t:inttypes.h
 MKC_CHECK_HEADERS    =	sys/select.h sys/tree.h sys/queue.h
 MKC_CHECK_FUNCS3     =  shquote getline:stdio.h
+MKC_CHECK_FUNCS1     =	sysconf
 
 CLEANFILES           =  *~ core* *.1 *.html ktrace* ChangeLog *.tmp
 
