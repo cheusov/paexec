@@ -20,7 +20,7 @@ MKC_CUSTOM_FN.awk_fflush =	checks/awk_fflush
 MKC_ERR_MSG += "ERROR: ${AWK} doesnt not support fflush() function"
 .endif
 
-INTEXTS_REPLS +=	awk ${PROG.${AWK}:U0}
+INTEXTS_REPLS +=	awk ${PROG.${AWK}:U${AWK}}
 
 #
 VERSION=	0.19.0
