@@ -26,10 +26,6 @@
 #include "config.h"
 #endif
 
-#ifndef NO_PORTABHACKS_H
-#include "portabhacks.h"
-#endif
-
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>

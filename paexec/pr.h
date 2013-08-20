@@ -32,4 +32,3 @@
 
 int pr_open (const char *command, int flags,
 		     int *infd, int *outfd, int *errfd);
-int pr_close (int fd);

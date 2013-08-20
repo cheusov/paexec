@@ -68,49 +68,6 @@ static void _pr_init (void)
 		_pr_objects = xcalloc (max_fd (), sizeof (struct _pr_Obj));
 }
 
-static int pr_wait( int pid )
-{
-	int exitStatus = 0;
-	int status;
-
-	while (waitpid (pid, &status, 0) < 0) {
-		if (errno != EINTR) {
-			if (errno == ECHILD)
-				return 0;	/* We've already waited */
-
-			/* This is really bad... */
-			perror( __func__ );
-			return -1;
-		}
-	}
-
-	if (WIFEXITED (status))
-		exitStatus |= WEXITSTATUS (status);
-
-	/* SIGPIPE is ok here, since tar may
-	   shutdown early.  Anything else is a
-	   problem.  */
-	if (WIFSIGNALED (status) && WTERMSIG (status) != SIGPIPE)
-		exitStatus |= 128 + WTERMSIG (status); /* like sh :-) */
-
-	return exitStatus;
-}
-
-static int pr_close_nowait (int fd)
-{
-	int pid;
-
-	if (!_pr_objects)
-		err_internal (__func__, "paexec: No previous call to pr_open ()");
-	if (!(pid = _pr_objects [fd].pid))
-		err_internal (__func__, "paexec: File not created by pr_open ()");
-
-	_pr_objects [fd].pid = 0;
-
-	close (fd);
-	return pid;
-}
-
 int pr_open (const char *command, int flags, int *infd, int *outfd, int *errfd)
 {
 	int pid;
@@ -205,11 +162,4 @@ int pr_open (const char *command, int flags, int *infd, int *outfd, int *errfd)
 
 #undef PARENT
 	return pid;
-}
-
-int pr_close (int fd)
-{
-	int pid = pr_close_nowait (fd);
-
-	return pr_wait (pid);
 }
