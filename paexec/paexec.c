@@ -39,6 +39,7 @@
 #include <limits.h>
 #include <ctype.h>
 #include <errno.h>
+#include <sys/wait.h>
 
 /***********************************************************/
 
@@ -424,8 +425,6 @@ static void mark_node_as_dead (int node)
 		fprintf (stderr, "mark_node_as_dead (%d)\n", node);
 	}
 
-	pids [node] = (pid_t) -1;
-
 	if (busy [node]){
 		busy [node] = 0;
 		--busy_count;
@@ -441,6 +440,12 @@ static void mark_node_as_dead (int node)
 
 	tasks__mark_task_as_failed (node2taskid [node]);
 	--alive_nodes_count;
+
+	unblock_signals ();
+	waitpid (pids [node], NULL, WNOHANG);
+	block_signals ();
+
+	pids [node] = (pid_t) -1;
 }
 
 static void init (void)
@@ -918,7 +923,6 @@ static void loop (void)
 	}
 
 	close_all_ins ();
-	wait_for_childs ();
 }
 
 static void check_msg (const char *msg)
@@ -1202,6 +1206,8 @@ int main (int argc, char **argv)
 	free_memory ();
 
 	unblock_signals ();
+
+	wait_for_childs ();
 
 	return 0;
 }
