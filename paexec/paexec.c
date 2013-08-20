@@ -766,6 +766,8 @@ static void loop (void)
 			if (fd_out [i] >= 0 && FD_ISSET (fd_out [i], &rset)){
 				buf_out_i = buf_out [i];
 
+				assert (bufsize_out [i] > size_out [i]);
+
 				cnt = read (fd_out [i],
 							buf_out_i + size_out [i],
 							bufsize_out [i] - size_out [i]);
