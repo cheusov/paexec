@@ -17,7 +17,7 @@ SUBPRJ     +=	tests/${d}:tests
 .endfor
 
 #####
-MKC_REQD    =	0.23.0
+MKC_REQD    =	0.24.0
 
 #####
 test: all-tests
