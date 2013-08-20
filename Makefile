@@ -32,7 +32,7 @@ TARGETS    +=	_prepdist
 DIST_TARGETS=	prepdist
 
 .PHONY: prepdist
-manpages: _prepdist
+prepdist: _prepdist
 	rm ${MKC_CACHEDIR}/_mkc*
 	${MAKE} ${MAKEFILES} _clean_garbage
 
