@@ -137,7 +137,8 @@ int pr_open (const char *command, int flags, int *infd, int *outfd, int *errfd)
 			if (_pr_objects [i].pid > 0)
 				close (i);
 
-		execl ("/bin/sh", "/bin/sh", "-c", command, NULL);
+		/* (void ) NULL is for Solaris where NULL is 0L */
+		execl ("/bin/sh", "/bin/sh", "-c", command, (void *)NULL);
 		_exit (127);
 	}
 	/* parent */
