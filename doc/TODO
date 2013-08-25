@@ -1,4 +1,6 @@
 paexec:
+ - regression test and fix for bug with biiiiiig data
+ - WARNERR = no
  - rename paexec_reorder to pareorder
  - -n 'server1 server2 +5' two remote servers and five local
  - -X -- suppress calculator's output
