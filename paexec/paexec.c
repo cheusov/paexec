@@ -424,6 +424,8 @@ static void mark_node_as_dead (int node)
 	if (busy [node]){
 		busy [node] = 0;
 		--busy_count;
+		tasks__mark_task_as_failed (node2taskid [node]);
+		--alive_nodes_count;
 	}
 
 	if (fd_in [node] >= 0)
@@ -433,9 +435,6 @@ static void mark_node_as_dead (int node)
 
 	fd_in  [node] = -1;
 	fd_out [node] = -1;
-
-	tasks__mark_task_as_failed (node2taskid [node]);
-	--alive_nodes_count;
 
 	unblock_signals ();
 	waitpid (pids [node], NULL, WNOHANG);
