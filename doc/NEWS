@@ -21,8 +21,6 @@ Version 0.19.0, by Aleksey Cheusov, Sat, 17 Aug 2013 21:07:53 +0300
   paexec_reorder:
     - Option -x was added to paexec_reorder(1).
 
-  "mkcmake test" runs less tests with different PAEXEC_BUFSIZE.
-
   A number of fixes and improvements in regression tests.
 
 ======================================================================
