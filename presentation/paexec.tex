@@ -680,7 +680,75 @@ If \h{-x} is applied, task is passed to calculator as an argument.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
+  \frametitle{Example 5: paexec -W}
+If different tasks take different amount of time to process, than it
+makes sense to process ``heavier'' ones earlier in order to minimize
+total calculation time. For this to work one can weigh each tasks.
+Note that this mode enables ``graph'' mode automatically.
+\begin{block}{}
+  \begin{CodeSmall}{\~{}/bin/calc}
+#!/bin/sh
+# \$1 -- task given on input
+if test \$1 = huge; then
+    sleep 6
+else
+    sleep 1
+fi
+
+echo "task \$1 done"
+  \end{CodeSmall}
+\end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 5: paexec -W}
+This is how we run unweighted tasks. The whole process takes 8 seconds.
+\begin{block}{}
+  \begin{CodeSmall}{paexec invocation}
+\prompt{\$} printf 'small1\textbackslash{nsmall2}\textbackslash{nsmall3}\textbackslash{nsmall4}\textbackslash{nsmall5}\textbackslash{nhuge}\textbackslash{n}' |
+time -p paexec -c \~{}/bin/calc -n +2 -xg | grep -v success
+task small2 done
+task small1 done
+task small3 done
+task small4 done
+task small5 done
+task huge done
+real         8.04
+user         0.03
+sys          0.03
+\prompt{\$}
+  \end{CodeSmall}
+\end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Example 5: paexec -W}
+If we say paexec that the task ``huge'' is performed 6 times longer than others,
+it starts``huge'' first and then others. In total we spend 6 seconds for all tasks.
+\begin{block}{}
+  \begin{CodeSmall}{paexec -W1 invocation}
+\prompt{\$} printf 'small1\textbackslash{nsmall2}\textbackslash{nsmall3}\textbackslash{nsmall4}\textbackslash{nweight: huge 6}\textbackslash{n}' |
+time -p paexec -c \~{}/bin/calc -n +2 -x \h{-W1} | grep -v success
+task small1 done
+task small2 done
+task small3 done
+task small4 done
+task small5 done
+task huge done
+real         6.02
+user         0.03
+sys          0.02
+\prompt{\$}
+  \end{CodeSmall}
+\end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
   \frametitle{}
+  For details see the manual page.
   \begin{center}
     \huge
     The End
