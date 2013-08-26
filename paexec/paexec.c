@@ -1181,6 +1181,8 @@ static void init_env (void)
 int main (int argc, char **argv)
 {
 	int i;
+	pid_t pid;
+	int status;
 
 	block_signals ();
 
@@ -1204,7 +1206,8 @@ int main (int argc, char **argv)
 
 	unblock_signals ();
 
-	wait_for_childs ();
+	while (pid = waitpid(-1, &status, WNOHANG), pid > 0){
+	}
 
 	return 0;
 }
