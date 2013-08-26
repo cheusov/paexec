@@ -1,4 +1,9 @@
 ======================================================================
+Version 0.19.1, by Aleksey Cheusov, Mon, 26 Aug 2013 19:05:53 +0300
+
+  paexec: Fix for segfault seen on Linux
+
+======================================================================
 Version 0.19.0, by Aleksey Cheusov, Sat, 17 Aug 2013 21:07:53 +0300
 
   Presentation paexec.pdf was added to presentation/. I hope it will
