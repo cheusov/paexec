@@ -27,7 +27,7 @@ paexec.ps paexec.dvi: dep-graph.eps
 .tex.dvi:
 	latex "${.IMPSRC}" && latex "${.IMPSRC}"
 
-GARBAGE     =	*.dvi *.aux *.vrb *.toc *.snm *.log *.nav *.out *.eps *.ps
+GARBAGE     =	*.dvi *.aux *.vrb *.toc *.snm *.log *.nav *.out *.eps *.ps _mkc_*
 CLEANFILES +=	${GARBAGE} *.pdf
 
 .PHONY: _clean_garbage

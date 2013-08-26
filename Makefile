@@ -3,7 +3,7 @@ PROJECTNAME =	paexec
 
 #####
 SUBPRJ      =	paexec:tests presentation doc
-SUBPRJ_DFLT?=	paexec presentation
+SUBPRJ_DFLT?=	paexec
 
 examples    =	divide all_substr cc_wrapper cc_wrapper2 \
 		make_package toupper dirtest
@@ -32,9 +32,9 @@ TARGETS    +=	_prepdist
 DIST_TARGETS=	prepdist
 
 .PHONY: prepdist
-prepdist: _prepdist
+prepdist: all-presentation _prepdist
 	rm ${MKC_CACHEDIR}/_mkc*
-	${MAKE} ${MAKEFILES} _clean_garbage
+	${MAKE} -Cpresentation ${MAKEFILES} _clean_garbage
 
 #####
 .include "Makefile.inc"

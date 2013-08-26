@@ -3,14 +3,17 @@ Version 0.19.1, by Aleksey Cheusov, Mon, 26 Aug 2013 19:05:53 +0300
 
   paexec: Fix for segfault seen on Linux
 
-======================================================================
-Version 0.19.0, by Aleksey Cheusov, Sat, 17 Aug 2013 21:07:53 +0300
+Version 0.19.0, by Aleksey Cheusov, Sun, 25 Aug 2013 17:21:03 +0300
 
-  Presentation paexec.pdf was added to presentation/. I hope it will
-  help to easier understand how "paexec" works. It is installed to
-  ${DOCDIR}.
+  This release of paexec was successfully tested on the following
+  platforms: NetBSD-6.1/amd64, OpenBSD-5.3/i386, FreeBSD-8.3/i386,
+  Solaris-10/sparc, Solaris-11/amd64 and diverse Linux/{i386,amd64}.
 
   paexec is now selfcontained, libmaa is not needed anymore.
+
+  Presentation paexec.pdf was added to presentation/. I hope it will
+  help easier understand how "paexec" works. It is installed to
+  ${DOCDIR}.
 
   paexec:
     - POSIX-2008 getline(3) is used for reading lines
