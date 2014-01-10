@@ -1,4 +1,11 @@
 paexec:
+ - PAEXEC_TRANSPORT as a default for -t
+ - PAEXEC_NODES as a default for -n
+ - PAEXEC_COMMAND as a default for -c
+ - PAEXEC_ENV - list of variables/values passed to remote hosts
+ - paexec_reorder -> pareorder
+ - pass PAEXEC_NODEID to appropriate nodes
+ - documentation for -v
  - regression test and fix for bug with biiiiiig data
  - WARNERR = no
  - rename paexec_reorder to pareorder
