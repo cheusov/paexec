@@ -1,1 +1,35 @@
-See doc/README
+======================================================================
+
+paexec: Small program that processes a list of tasks in parallel
+        on different CPUs, computers in a network or whatever.
+        Full documentation is available in paexec.1 and paexec.pod.
+        paexec.pdf presentation is also available in presentation/
+        subdirectory.
+
+author:                                  Aleksey Cheusov <vle@gmx.net>
+
+project's home page:           http://sourceforge.net/projects/paexec/
+                                  http://freecode.com/projects/paexec/
+source code:                         http://github.com/cheusov/paexec
+
+licence:                                                   MIT license
+
+======================================================================
+
+                             INSTALLATION
+
+See INSTALL file
+
+======================================================================
+
+                           PACKAGES
+
+  1) pkgsrc (NetBSD, DragonFlyBSD, Linux, Solaris...)
+
+    See parallel/paexec (http://pkgsrc.se/parallel/paexec)
+
+  2) FreeBSD
+
+    See devel/paexec (http://www.freshports.org/devel/paexec)
+
+  3) See https://freecode.com/projects/paexec for latest information
