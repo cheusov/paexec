@@ -1,4 +1,5 @@
 paexec:
+ - minic dsh and pdsh
  - PAEXEC_TRANSPORT as a default for -t
  - PAEXEC_NODES as a default for -n
  - PAEXEC_COMMAND as a default for -c
