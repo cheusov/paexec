@@ -24,7 +24,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "decls.h"
+ssize_t
+getline(char** lineptr, size_t* n, FILE* stream);
 
 ssize_t
 getline(char** lineptr, size_t* n, FILE* stream)
@@ -46,11 +47,11 @@ getline(char** lineptr, size_t* n, FILE* stream)
 			break;
 	}
 
-	if (ferror (stdin))
+	if (ferror (stream))
 		return (ssize_t) -1;
 
 	if (!sz){
-		if (feof (stdin)){
+		if (feof (stream)){
 			return (ssize_t) -1;
 		}else if (!*n){
 			*lineptr = malloc (1);
