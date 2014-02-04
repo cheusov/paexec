@@ -24,8 +24,6 @@
 #ifndef _DECLS_H_
 #define _DECLS_H_
 
-#ifndef HAVE_FUNC3_GETLINE_STDIO_H
-ssize_t getline(char** lineptr, size_t* n, FILE* stream);
-#endif
+#include <mkc_getline.h>
 
 #endif // _DECLS_H_
