@@ -5,7 +5,7 @@ BUFSIZE   ?=	4096
 BIRTHDATE  =	2008-01-25
 
 WARNS     ?=	4
-WARNERR   ?=	yes
+WARNERR   ?=	no # open64/gcc may fail due to FD_{ZERO,CLR}
 
 PROG       =	paexec
 SRCS       =	paexec.c wrappers.c tasks.c nodes.c signals.c pr.c
