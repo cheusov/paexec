@@ -1,6 +1,5 @@
 paexec:
  - mimic dsh and pdsh
- - PAEXEC_NODES as a default for -n
  - PAEXEC_COMMAND as a default for -c
  - PAEXEC_ENV - list of variables/values passed to remote hosts
  - paexec_reorder -> pareorder

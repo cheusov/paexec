@@ -400,6 +400,10 @@ Also, through this variable an end-of-task marker is passed to all calculators.
 
 Unless option B<-t> was applied, this variables specifies the transport.
 
+=item I<PAEXEC_NODES>
+
+Unless option B<-n> was applied, this variables specifies the nodes.
+
 =back
 
 =head1 BUGS/FEEDBACK

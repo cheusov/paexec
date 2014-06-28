@@ -416,6 +416,24 @@ TRTRTR'"'"'BRBRBR
 Z Y X
 '
 
+    # x
+    export PAEXEC_NODES=+3
+    printf 'aaa\nbbb\nz y x\ntrtrtr'\''brbrbr\nccc\nddd\neee\nfff\n"y;x\nggg\n' |
+    runtest -x -c "awk 'BEGIN {print toupper(ARGV [1])}'" | sort |
+    cmp 'paexec -x #1.1.1 (PAEXEC_NODES)' \
+'"Y;X
+AAA
+BBB
+CCC
+DDD
+EEE
+FFF
+GGG
+TRTRTR'"'"'BRBRBR
+Z Y X
+'
+    export PAEXEC_NODES
+
     printf 'aaa\nbbb\nz y x\ntrtrtr'\''brbrbr\nccc\nddd\neee\nfff\n"y;x\nggg\n' |
     runtest -xCn+3 -- awk 'BEGIN {print toupper(ARGV [1])}' | sort |
     cmp 'paexec -x #1.2' \
@@ -592,6 +610,21 @@ fake5.flac
 5 pid EEEEE
 6 pid FFFFFF
 '
+
+    export PAEXEC_NODES=+2
+    printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
+    runtest -l -p -t paexec_notransport \
+	-c cmd_toupper |
+    resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
+    cmp 'paexec toupper #4.0.1 (PAEXEC_NODES)' \
+'1 pid A
+2 pid BB
+3 pid CCC
+4 pid DDDD
+5 pid EEEEE
+6 pid FFFFFF
+'
+    unset PAEXEC_NODES
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -p -t '' \

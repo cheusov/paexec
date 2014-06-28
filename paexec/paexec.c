@@ -55,7 +55,7 @@
 #include "pr.h"
 
 #ifndef HAVE_FUNC3_SHQUOTE
-size_t shquote(const char *arg, char *buf, size_t bufsize);
+size_t shquote (const char *arg, char *buf, size_t bufsize);
 #endif
 
 static void usage (void)
@@ -184,7 +184,7 @@ static int exec_mode = 0;
 
 static int use_weights = 0;
 
-static void assign_str(char **ptr, const char *str)
+static void assign_str (char **ptr, const char *str)
 {
 	size_t len = strlen (str);
 
@@ -986,7 +986,7 @@ static void process_args (int *argc, char ***argv)
 				debug = 1;
 				break;
 			case 'n':
-				arg_nodes = xstrdup (optarg);
+				assign_str (&arg_nodes, optarg);
 				break;
 			case 'c':
 				arg_cmd = xstrdup (optarg);
@@ -997,7 +997,7 @@ static void process_args (int *argc, char ***argv)
 			case 't':
 				optarg += strspn (optarg, " \t");
 				if (optarg [0])
-					assign_str(&arg_transport, optarg);
+					assign_str (&arg_transport, optarg);
 				break;
 			case 'p':
 				show_pid = 1;
@@ -1190,7 +1190,11 @@ static void init_env (void)
 
 	char *env_transport = getenv ("PAEXEC_TRANSPORT");
 	if (env_transport)
-		assign_str(&arg_transport, env_transport);
+		assign_str (&arg_transport, env_transport);
+
+	char *env_nodes = getenv ("PAEXEC_NODES");
+	if (env_nodes)
+		assign_str (&arg_nodes, env_nodes);
 }
 
 int main (int argc, char **argv)
@@ -1221,7 +1225,7 @@ int main (int argc, char **argv)
 
 	unblock_signals ();
 
-	while (pid = waitpid(-1, &status, WNOHANG), pid > 0){
+	while (pid = waitpid (-1, &status, WNOHANG), pid > 0){
 	}
 
 	return 0;
