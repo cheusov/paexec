@@ -14,6 +14,9 @@ SCRIPTS    =	paexec_reorder
 
 MAN        =	paexec.1 paexec_reorder.1
 
+LINKS      =	${BINDIR}/paexec_reorder        ${BINDIR}/pareorder
+MLINKS     =	paexec_reorder.1 pareorder.1
+
 CFLAGS    +=	-DPAEXEC_VERSION='"${VERSION}"'
 CFLAGS    +=	-DBUFSIZE=${BUFSIZE}
 
