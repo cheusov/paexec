@@ -39,7 +39,7 @@ spc2semicolon (){
 resort (){
     awk '{print $1, NR, $0}' |
     sort -k1,1n -k2,2n |
-    awk '{$1 = $2 = ""; print substr($0, 3)}'
+    awk '{sub(/^[^ ]+ [^ ]+ /, ""); print $0}'
 }
 
 gln (){
@@ -535,73 +535,74 @@ fake5.flac
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -t paexec_notransport -c cmd_toupper \
-	-n '1 2 3 4 5 6 7 8 9' | resort |
+    runtest_resort -l -t paexec_notransport -c cmd_toupper \
+	-n '1 2 3 4 5 6 7 8 9' |
     cmp 'paexec toupper #1' \
-'1 A
-2 BB
-3 CCC
-4 DDDD
-5 EEEEE
-6 FFFFFF
+'1  A
+2  BB
+3  CCC
+4  DDDD
+5  EEEEE
+6  FFFFFF
 '
 
     export PAEXEC_TRANSPORT=paexec_notransport
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c cmd_toupper \
-	-n '1 2 3 4 5 6 7 8 9' | resort |
+    runtest_resort -l -c cmd_toupper \
+	-n '1 2 3 4 5 6 7 8 9' |
     cmp 'paexec toupper #1.0.1 (PAEXEC_TRANSPORT)' \
-'1 A
-2 BB
-3 CCC
-4 DDDD
-5 EEEEE
-6 FFFFFF
+'1  A
+2  BB
+3  CCC
+4  DDDD
+5  EEEEE
+6  FFFFFF
 '
     unset PAEXEC_TRANSPORT
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    ( export PAEXEC_EOT=foobarbaz; runtest -l -t paexec_notransport -c cmd_toupper \
-	-n '1 2 3 4 5 6 7 8 9' | resort; ) |
+    ( export PAEXEC_EOT=foobarbaz;
+	runtest_resort -l -t paexec_notransport -c cmd_toupper \
+	   -n '1 2 3 4 5 6 7 8 9'; ) |
     cmp 'paexec toupper #1.1 (PAEXEC_EOT)' \
-'1 A
-2 BB
-3 CCC
-4 DDDD
-5 EEEEE
-6 FFFFFF
+'1  A
+2  BB
+3  CCC
+4  DDDD
+5  EEEEE
+6  FFFFFF
 '
 
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -t '		    ' -c cmd_toupper \
-	-n '1 2 3 4 5 6 7 8 9' | resort |
+    runtest_resort -l -t '		    ' -c cmd_toupper \
+	-n '1 2 3 4 5 6 7 8 9' |
     cmp 'paexec toupper #2' \
-'1 A
-2 BB
-3 CCC
-4 DDDD
-5 EEEEE
-6 FFFFFF
+'1  A
+2  BB
+3  CCC
+4  DDDD
+5  EEEEE
+6  FFFFFF
 '
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -c cmd_toupper \
-	-n '1 2 3 4 5 6 7 8 9' | resort |
+    runtest_resort -l -c cmd_toupper \
+	-n '1 2 3 4 5 6 7 8 9' |
     cmp 'paexec toupper #3' \
-'1 A
-2 BB
-3 CCC
-4 DDDD
-5 EEEEE
-6 FFFFFF
+'1  A
+2  BB
+3  CCC
+4  DDDD
+5  EEEEE
+6  FFFFFF
 '
 
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
-    runtest -l -p -t paexec_notransport \
+    runtest_resort -l -p -t paexec_notransport \
 	-c cmd_toupper -n '+2' |
-    resort | awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
+    awk '$1 ~ /^[0-9]/ {$2 = "pid"; print; next} {print}' |
     cmp 'paexec toupper #4' \
 '1 pid A
 2 pid BB
@@ -1765,19 +1766,19 @@ cherry
 	-c : -n '4 5 6 7' |
     cmp 'paexec broken transport #2' \
 '1 fatal
-1
+1 
 1 BILBERRY
-1
+1 
 2 GOOSEBERRY
-2
+2 
 3 APPLE
-3
+3 
 4 PEAR
-4
+4 
 5 PLUM
-5
+5 
 6 CHERRY
-6
+6 
 '
 
     # -Z + -w without -s
@@ -1802,22 +1803,22 @@ success
 success
 success
 success
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
 '
 
     # resistance to transport failure
@@ -2587,15 +2588,15 @@ success
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -xlC -t paexec_notransport \
 	-n '1 2 3 4 5 6 7 8 9' \
-	awk 'BEGIN {print " " ENVIRON["ZZZZ"], ENVIRON["YYYY"], ENVIRON["CCCC"], ENVIRON["LALALA"], toupper(ARGV[1])}' |
+	awk 'BEGIN {print ENVIRON["ZZZZ"], ENVIRON["YYYY"], ENVIRON["CCCC"], ENVIRON["LALALA"], toupper(ARGV[1])}' |
     resort |
     cmp 'paexec -g + -t #1 (PAEXEC_ENV)' \
-'1 zz1234zz yy1234yy cc1234cc A
-2 zz1234zz yy1234yy cc1234cc BB
-3 zz1234zz yy1234yy cc1234cc CCC
-4 zz1234zz yy1234yy cc1234cc DDDD
-5 zz1234zz yy1234yy cc1234cc EEEEE
-6 zz1234zz yy1234yy cc1234cc FFFFFF
+'1 zz1234zz yy1234yy cc1234cc  A
+2 zz1234zz yy1234yy cc1234cc  BB
+3 zz1234zz yy1234yy cc1234cc  CCC
+4 zz1234zz yy1234yy cc1234cc  DDDD
+5 zz1234zz yy1234yy cc1234cc  EEEEE
+6 zz1234zz yy1234yy cc1234cc  FFFFFF
 '
     unset ZZZZ YYYY CCCC PAEXEC_ENV
 
