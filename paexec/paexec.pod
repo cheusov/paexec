@@ -396,6 +396,10 @@ See the default value in Makefile.
 This variable sets the end-of-task marker which is an empty line by default.
 Also, through this variable an end-of-task marker is passed to all calculators.
 
+=item I<PAEXEC_TRANSPORT>
+
+Unless option B<-t> was applied, this variables specifies the transport.
+
 =back
 
 =head1 BUGS/FEEDBACK

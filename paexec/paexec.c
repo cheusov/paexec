@@ -184,6 +184,14 @@ static int exec_mode = 0;
 
 static int use_weights = 0;
 
+static void assign_str(char **ptr, const char *str)
+{
+	size_t len = strlen (str);
+
+	*ptr = xrealloc (*ptr, len+1);
+	memcpy (*ptr, str, len+1);
+}
+
 static void close_all_ins (void)
 {
 	int i;
@@ -989,7 +997,7 @@ static void process_args (int *argc, char ***argv)
 			case 't':
 				optarg += strspn (optarg, " \t");
 				if (optarg [0])
-					arg_transport = xstrdup (optarg);
+					assign_str(&arg_transport, optarg);
 				break;
 			case 'p':
 				show_pid = 1;
@@ -1087,8 +1095,10 @@ static void process_args (int *argc, char ***argv)
 	}
 
 	if (arg_nodes){
-		if (arg_nodes [0] == '+')
+		if (arg_nodes [0] == '+'){
+			free (arg_transport);
 			arg_transport = NULL;
+		}
 
 		nodes_create (arg_nodes);
 	}else{
@@ -1103,8 +1113,10 @@ static void process_args (int *argc, char ***argv)
 		err_fatal ("paexec: Only -W1 and -W2 are supported!");
 	}
 
-	if (arg_transport && !arg_transport [0])
+	if (arg_transport && !arg_transport [0]){
+		free (arg_transport);
 		arg_transport = NULL;
+	}
 }
 
 static void free_memory (void)
@@ -1168,14 +1180,17 @@ static void free_memory (void)
 
 static void init_env (void)
 {
-	char *env_msg_eot = getenv ("PAEXEC_EOT");
-	char *env_bufsize = getenv ("PAEXEC_BUFSIZE");
-
-	/* environment */
-	if (env_bufsize)
-		initial_bufsize = atoi (env_bufsize);
+	char *env_msg_eot   = getenv ("PAEXEC_EOT");
 	if (env_msg_eot)
 		msg_eot = env_msg_eot;
+
+	char *env_bufsize   = getenv ("PAEXEC_BUFSIZE");
+	if (env_bufsize)
+		initial_bufsize = atoi (env_bufsize);
+
+	char *env_transport = getenv ("PAEXEC_TRANSPORT");
+	if (env_transport)
+		assign_str(&arg_transport, env_transport);
 }
 
 int main (int argc, char **argv)

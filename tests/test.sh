@@ -528,6 +528,20 @@ fake5.flac
 6 FFFFFF
 '
 
+    export PAEXEC_TRANSPORT=paexec_notransport
+    printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
+    runtest -l -c cmd_toupper \
+	-n '1 2 3 4 5 6 7 8 9' | resort |
+    cmp 'paexec toupper #1.0.1 (PAEXEC_TRANSPORT)' \
+'1 A
+2 BB
+3 CCC
+4 DDDD
+5 EEEEE
+6 FFFFFF
+'
+    unset PAEXEC_TRANSPORT
+
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     ( export PAEXEC_EOT=foobarbaz; runtest -l -t paexec_notransport -c cmd_toupper \
@@ -958,6 +972,26 @@ fake5.flac
     ( export PAEXEC_EOT='Konec!'; runtest -ms='Ura!' -mf='Zhopa!' \
 	-esly -c cmd_divide2 -n +10; ) | paexec_reorder -y |
     cmp 'paexec 1/X nonstandard -y #1.2' \
+'1/1=1
+Ura!
+1/2=0.5
+Ura!
+1/3=0.333333
+Ura!
+1/4=0.25
+Ura!
+1/5=0.2
+Ura!
+Cannot calculate 1/0
+Zhopa!
+0 7 8 9 10 11 12
+'
+
+    test_tasks3 |
+    ( export PAEXEC_EOT='Konec!'; export PAEXEC_TRANSPORT=lalala;
+	runtest -ms='Ura!' -mf='Zhopa!' \
+	-esly -c cmd_divide2 -n +10; ) | paexec_reorder -y |
+    cmp 'paexec 1/X nonstandard -y #1.2.1 (PAEXEC_TRANSPORT)' \
 '1/1=1
 Ura!
 1/2=0.5
@@ -1904,6 +1938,22 @@ all nodes failed
 4 
 all nodes failed
 '
+
+    # resistance to transport failure
+    export PAEXEC_TRANSPORT=transport_broken_echo
+    awk '
+    BEGIN {
+        for (i=1; i < 300; ++i){
+            print i
+        }
+    }' |
+    runtest -z -r -g -E -c ':' -n '4' |
+    cmp 'paexec broken transport #7.0.1 (PAEXEC_TRANSPORT)' \
+'4 fatal
+4 
+all nodes failed
+'
+    unset PAEXEC_TRANSPORT
 
     # resistance to transport failure
     echo mama | runtest -z -r -g -i -E \
