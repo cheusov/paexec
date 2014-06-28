@@ -2580,18 +2580,24 @@ success
 '
 
     # -x + -t
+    export PAEXEC_ENV='   ZZZZ, , ,YYYY,CCCC LALALA    '
+    export ZZZZ=zz1234zz
+    export YYYY=yy1234yy
+    export CCCC=cc1234cc
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -xlC -t paexec_notransport \
-	-n '1 2 3 4 5 6 7 8 9' awk "BEGIN {print toupper(ARGV[1])}" |
+	-n '1 2 3 4 5 6 7 8 9' \
+	awk 'BEGIN {print " " ENVIRON["ZZZZ"], ENVIRON["YYYY"], ENVIRON["CCCC"], ENVIRON["LALALA"], toupper(ARGV[1])}' |
     resort |
-    cmp 'paexec -g + -t #1' \
-'1 A
-2 BB
-3 CCC
-4 DDDD
-5 EEEEE
-6 FFFFFF
+    cmp 'paexec -g + -t #1 (PAEXEC_ENV)' \
+'1 zz1234zz yy1234yy cc1234cc A
+2 zz1234zz yy1234yy cc1234cc BB
+3 zz1234zz yy1234yy cc1234cc CCC
+4 zz1234zz yy1234yy cc1234cc DDDD
+5 zz1234zz yy1234yy cc1234cc EEEEE
+6 zz1234zz yy1234yy cc1234cc FFFFFF
 '
+    unset ZZZZ YYYY CCCC PAEXEC_ENV
 
     # -t + shquote(3)
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |

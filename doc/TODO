@@ -1,10 +1,7 @@
 paexec:
  - mimic dsh and pdsh
  - PAEXEC_COMMAND as a default for -c
- - PAEXEC_ENV - list of variables/values passed to remote hosts
  - pass PAEXEC_NODEID to appropriate nodes
- - documentation for -v
- - regression test and fix for bug with biiiiiig data
  - -n 'server1 server2 +5' two remote servers and five local
  - -X -- suppress calculator's output
  - Option -I like in xargs (in combination with -x)

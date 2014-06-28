@@ -39,13 +39,7 @@
 
 /***********************************************************/
 
-#ifndef BUFSIZE
-#define BUFSIZE 2048
-#endif
-
-#ifndef PAEXEC_VERSION
-#define PAEXEC_VERSION "x.y.z"
-#endif
+#include "decls.h"
 
 #include "wrappers.h"
 #include "common.h"
@@ -54,8 +48,12 @@
 #include "signals.h"
 #include "pr.h"
 
-#ifndef HAVE_FUNC3_SHQUOTE
-size_t shquote (const char *arg, char *buf, size_t bufsize);
+#ifndef BUFSIZE
+#define BUFSIZE 2048
+#endif
+
+#ifndef PAEXEC_VERSION
+#define PAEXEC_VERSION "x.y.z"
 #endif
 
 static void usage (void)
@@ -183,6 +181,21 @@ static int wait_mode = 0;
 static int exec_mode = 0;
 
 static int use_weights = 0;
+
+struct envvar_entry {
+	SLIST_ENTRY(envvar_entry) entries;      /* List. */
+	char* name;
+	char* value;
+};
+static SLIST_HEAD(envvar_head, envvar_entry) envvars = SLIST_HEAD_INITIALIZER(envvars);
+
+static void add_envvar (const char *name, const char *value)
+{
+	struct envvar_entry *val = calloc(1, sizeof (struct envvar_entry));
+	val->name  = strdup (name);
+	val->value = (value ? strdup (value) : NULL);
+	SLIST_INSERT_HEAD(&envvars, val, entries);
+}
 
 static void assign_str (char **ptr, const char *str)
 {
@@ -314,8 +327,11 @@ static void init__read_graph_tasks (void)
 static void init__postproc_arg_cmd (void)
 {
 	char shq_cmd [4096];
-	char shq_eot [4096];
 	char cmd [4096];
+	char tmp [4096];
+	char env_str [4096]="";
+	char tmp2 [4096]="";
+	struct envvar_entry *p;
 
 	if (exec_mode){
 		char cond_cmd [4096] = "";
@@ -340,25 +356,32 @@ static void init__postproc_arg_cmd (void)
 		arg_cmd = xstrdup (cmd);
 	}
 
-	if ((size_t)-1 == shquote (arg_cmd, shq_cmd, sizeof (shq_cmd)) ||
-		(size_t)-1 == shquote (msg_eot, shq_eot, sizeof (shq_eot)))
-	{
-		err_fatal ("paexec: Internal error1! (buffer size)");
+	xshquote (arg_cmd, shq_cmd, sizeof (shq_cmd));
+
+	/* env(1) arg for environment variables */
+	add_envvar("PAEXEC_EOT", msg_eot);
+
+	SLIST_FOREACH (p, &envvars, entries){
+		xshquote ((p->value ? p->value : ""), tmp, sizeof (tmp));
+		snprintf (tmp2, sizeof (tmp2), "%s=%s ", p->name, tmp);
+		strlcat (env_str, tmp2, sizeof (env_str));
 	}
-	snprintf (cmd, sizeof (cmd), "env PAEXEC_EOT=%s /bin/sh -c %s", shq_eot, shq_cmd);
-	if (strlen (cmd) == sizeof (cmd)-1){
-		err_fatal ("paexec: Internal error2! (buffer size)");
-	}
+
+	/**/
+	snprintf (cmd, sizeof (cmd), "env %s /bin/sh -c %s", env_str, shq_cmd);
 	xfree (arg_cmd);
 	arg_cmd = xstrdup (cmd);
 
+	/**/
 	if (arg_transport){
 		/* one more shquote(3) for ssh-like transport */
-		if ((size_t)-1 == shquote (arg_cmd, shq_cmd, sizeof (shq_cmd))){
-			err_fatal ("paexec: Internal error3! (buffer size)");
-		}
+		xshquote (arg_cmd, shq_cmd, sizeof (shq_cmd));
 		xfree (arg_cmd);
 		arg_cmd = xstrdup (shq_cmd);
+	}
+
+	if (strlen (cmd) + 20 >= sizeof (shq_cmd)){
+		err_fatal ("paexec: internal error, buffer size limit");
 	}
 }
 
@@ -970,7 +993,7 @@ static void process_args (int *argc, char ***argv)
 	int mode_C = 0;
 
 	/* leading + is for shitty GNU libc */
-	static const char optstring [] = "+c:CdeEghiIlm:n:prst:VvwW:xyzZ:";
+	static const char optstring [] = "+c:CdeEghiIlm:n:prst:VwW:xyzZ:";
 
 	while (c = getopt (*argc, *argv, optstring), c != EOF){
 		switch (c) {
@@ -1180,6 +1203,7 @@ static void free_memory (void)
 
 static void init_env (void)
 {
+	char *tok;
 	char *env_msg_eot   = getenv ("PAEXEC_EOT");
 	if (env_msg_eot)
 		msg_eot = env_msg_eot;
@@ -1195,6 +1219,16 @@ static void init_env (void)
 	char *env_nodes = getenv ("PAEXEC_NODES");
 	if (env_nodes)
 		assign_str (&arg_nodes, env_nodes);
+
+	char *paexec_env = getenv ("PAEXEC_ENV");
+	if (paexec_env){
+		for (tok = strtok (paexec_env, " ,");
+			 tok;
+			 tok = strtok (NULL, " ,"))
+		{
+			add_envvar (tok, getenv (tok));
+		}
+	}
 }
 
 int main (int argc, char **argv)

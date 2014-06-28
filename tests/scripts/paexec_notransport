@@ -4,4 +4,10 @@ shift # skip node
 
 unset PAEXEC_EOT
 
+# unset variables used in regression tests
+unset ZZZZ
+unset YYYY
+unset CCCC 
+
+#
 eval "$@"

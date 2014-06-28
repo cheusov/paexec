@@ -41,6 +41,8 @@ void *xmalloc (size_t size);
 void *xcalloc(size_t number, size_t size);
 void *xrealloc(void *ptr, size_t size);
 void xfree (void *p);
+void xshquote(const char *arg, char *buf, size_t bufsize);
+
 void err_fatal (const char *m);
 void err_fatal_errno (const char *m);
 void err_internal (const char *routine, const char *m);

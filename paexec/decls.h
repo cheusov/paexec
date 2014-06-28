@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Aleksey Cheusov <vle@gmx.net>
+ * Copyright (c) 2014 Aleksey Cheusov <vle@gmx.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,6 +24,13 @@
 #ifndef _DECLS_H_
 #define _DECLS_H_
 
+#include <mkc_strlcat.h>
 #include <mkc_getline.h>
+#include <mkc_SLIST.h>
+#include <mkc_RB.h>
+
+#ifndef HAVE_FUNC3_SHQUOTE
+size_t shquote (const char *arg, char *buf, size_t bufsize);
+#endif
 
 #endif // _DECLS_H_

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2013 Aleksey Cheusov <vle@gmx.net>
+ * Copyright (c) 2007-2014 Aleksey Cheusov <vle@gmx.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -31,23 +31,7 @@
 #include <string.h>
 #include <assert.h>
 
-#if HAVE_TYPE_INTPTR_T_STDINT_H
-#include <stdint.h>
-#elif HAVE_TYPE_INTPTR_T_INTTYPES_H
-#include <inttypes.h>
-#endif /* header file intptr_t */
-
-#if HAVE_HEADER_SYS_TREE_H
-#include <sys/tree.h>
-#else
-#include "netbsd_sys_tree.h"
-#endif
-
-#if HAVE_HEADER_SYS_QUEUE_H
-#include <sys/queue.h>
-#else
-#include "netbsd_sys_queue.h"
-#endif
+#include "decls.h"
 
 #include "tasks.h"
 #include "wrappers.h"

@@ -126,6 +126,15 @@ void xfree (void *p)
 		free (p);
 }
 
+void xshquote(const char *arg, char *buf, size_t bufsize)
+{
+	size_t ret = shquote (arg, buf, bufsize);
+	if ((size_t)-1 == ret){
+		err_fatal ("paexec: shquote(3) failed");
+		exit (1);
+	}
+}
+
 void err_fatal (const char *m)
 {
 	kill_childs ();
