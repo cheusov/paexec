@@ -499,6 +499,46 @@ fake5.flac
 
 '
 
+    # -X
+    rm -f fakeflac/*.flac
+
+    ls -1 fakeflac/*.wav |
+    runtest -X -c 'flac --silent' -n +3 -p |
+    cmp 'paexec -X (flac) #3.1.1' \
+''
+
+    ls -1 fakeflac/*.flac | sort |
+    cmp 'paexec -X (flac) #3.1.2' \
+'fakeflac/fake1.flac
+fakeflac/fake2.flac
+fakeflac/fake3.flac
+fakeflac/fake4.flac
+fakeflac/fake5.flac
+'
+
+    # -X
+    rm -f fakeflac/*.flac
+
+    ls -1 fakeflac/*.wav |
+    runtest -Xg -c 'flac --silent' -n +3 |
+    cmp 'paexec -X (flac) #3.1.3' \
+'success
+success
+success
+success
+success
+'
+
+    ls -1 fakeflac/*.flac | sort |
+    cmp 'paexec -X (flac) #3.1.4' \
+'fakeflac/fake1.flac
+fakeflac/fake2.flac
+fakeflac/fake3.flac
+fakeflac/fake4.flac
+fakeflac/fake5.flac
+'
+
+    # x
     ls -1 fakeflac/*.flac 2>/dev/null | sed 's,.*/,,' | sort |
     cmp 'paexec -x (flac) #3.2' \
 'fake1.flac
@@ -2521,6 +2561,22 @@ success
 pkg_online-server
 success
 
+'
+
+    # tests for sum_weight calculation (-W0 option)
+    test_tasks2 |
+    runtest -lgX -n+1 -C \
+	awk 'BEGIN {
+	    if (ARGV[1] == "libmaa") { print "libmaa is broken"; exit 1} 
+	    { print ARGV[1] " is fine"} 
+	}' |
+    cmp 'paexec -X #1' \
+'9 success
+11 failure
+11 libmaa dict pkg_online-client dictd pkg_online-server paexec pkg_summary-utils pkg_status
+10 success
+1 success
+6 success
 '
 
     # the first line on input is empty

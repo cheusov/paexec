@@ -135,6 +135,10 @@ Run command specificed by I<-c> for each task. Its stdout is passed to B<paexec>
 If both C<-x> and C<-g> are specified, task is considered failed
 if command's exit status is non-zero.
 
+=item B<-X>
+
+Implies I<-x> and ignore calculator's stdout.
+
 =item B<-r>
 
 Include node identifier or node number (0-based) to the

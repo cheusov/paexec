@@ -336,6 +336,10 @@ static void init__postproc_arg_cmd (void)
 	if (exec_mode){
 		char cond_cmd [4096] = "";
 
+		if (exec_mode == 'x'){
+			strlcpy(tmp, "  printf '%s\\n' \"$res\";", sizeof (tmp));
+		}
+
 		if (graph_mode){
 			snprintf (
 				cond_cmd, sizeof (cond_cmd),
@@ -347,10 +351,10 @@ static void init__postproc_arg_cmd (void)
 				  "while read f; do"
 				  "  res=`%s \"$f\"`;"
 				  "  ex=$?;"
-				  "  printf '%%s\\n' \"$res\";"
-				  "  %s"
-				  "  echo '%s';"
-				  "done", arg_cmd, cond_cmd, magic_eot);
+				  "  %s" /* printing result */
+				  "  %s" /* condition. success/failure */
+				  "  echo '%s';" /* EOT */
+				  "done", arg_cmd, tmp, cond_cmd, magic_eot);
 
 		xfree (arg_cmd);
 		arg_cmd = xstrdup (cmd);
@@ -993,7 +997,7 @@ static void process_args (int *argc, char ***argv)
 	int mode_C = 0;
 
 	/* leading + is for shitty GNU libc */
-	static const char optstring [] = "+c:CdeEghiIlm:n:prst:VwW:xyzZ:";
+	static const char optstring [] = "+c:CdeEghiIlm:n:prst:VwW:xXyzZ:";
 
 	while (c = getopt (*argc, *argv, optstring), c != EOF){
 		switch (c) {
@@ -1086,7 +1090,11 @@ static void process_args (int *argc, char ***argv)
 				graph_mode  = 1;
 				break;
 			case 'x':
-				exec_mode = 1;
+				exec_mode = 'x';
+				msg_eot = magic_eot;
+				break;
+			case 'X':
+				exec_mode = 'X';
 				msg_eot = magic_eot;
 				break;
 			case 'y':

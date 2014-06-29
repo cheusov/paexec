@@ -24,6 +24,7 @@
 #ifndef _DECLS_H_
 #define _DECLS_H_
 
+#include <mkc_strlcpy.h>
 #include <mkc_strlcat.h>
 #include <mkc_getline.h>
 #include <mkc_SLIST.h>
