@@ -23,4 +23,4 @@ MKC_ERR_MSG += "ERROR: ${AWK} doesnt not support fflush() function"
 INTEXTS_REPLS +=	awk ${PROG.${AWK}:U${AWK}}
 
 #
-VERSION=	0.19.1
+VERSION=	1.0.0

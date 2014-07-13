@@ -1,4 +1,23 @@
 ======================================================================
+Version 1.0.0, by Aleksey Cheusov, Sun, 13 Jul 2014 19:10:48 +0300
+
+  mk-configure>=0.27.0 is required for build.
+
+  Option -X was introduced to paexec(1) for ignoring
+  calculator's stdout.
+
+  PAEXEC_ENV environment variable sets a list of variables passed to
+  the calculator.
+
+  PAEXEC_TRANSPORT environment variable sets the transport unless
+  option -t was applied.
+
+  PAEXEC_NODES environment variable sets the nodes unless
+  option -n was applied.
+
+  pareorder(1) is a synonym for paexec_reorder(1)
+
+======================================================================
 Version 0.19.1, by Aleksey Cheusov, Mon, 26 Aug 2013 19:05:53 +0300
 
   paexec: Fix for segfault seen on Linux
