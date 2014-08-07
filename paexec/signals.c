@@ -50,14 +50,19 @@ void unblock_signals (void)
 	xsigprocmask (SIG_UNBLOCK, &set, NULL);
 }
 
-void ignore_sigpipe (void)
+void set_sig_handler (int sig, void (*handler) (int))
 {
 	struct sigaction sa;
 
-	sa.sa_handler = SIG_IGN;
+	sa.sa_handler = handler;
 	sigemptyset (&sa.sa_mask);
 	sa.sa_flags = 0;
-	sigaction (SIGPIPE, &sa, NULL);
+	sigaction (sig, &sa, NULL);
+}
+
+void ignore_sigpipe (void)
+{
+	set_sig_handler (SIGPIPE, SIG_IGN);
 }
 
 void wait_for_sigalrm (void)
@@ -80,22 +85,12 @@ void handler_sigchld (int dummy attr_unused)
 
 void set_sigalrm_handler (void)
 {
-	struct sigaction sa;
-
-	sa.sa_handler = handler_sigalrm;
-	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction (SIGALRM, &sa, NULL);
+	set_sig_handler (SIGALRM, handler_sigalrm);
 }
 
 void set_sigchld_handler (void)
 {
-	struct sigaction sa;
-
-	sa.sa_handler = handler_sigchld;
-	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction (SIGCHLD, &sa, NULL);
+	set_sig_handler (SIGCHLD, handler_sigchld);
 }
 
 int sigalrm_tics = 0;
