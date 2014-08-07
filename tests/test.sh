@@ -905,18 +905,26 @@ fake5.flac
     cmp 'paexec bad_command' ''
 
     # bi-i-i-i-i-i-ig result
-    awk '
-    BEGIN {
-	for (i=0; i < 10; ++i) {
-	    print "1234567890-=qwertyuiop[]asdfghjkl;zxcvbnm,./zaqwsxcderfvbgtyhnmjuik,.lo";
-	}
-    }' | runtest -c big_result_cmd -n '+9' |
-    uniq -c |
-    head -n 100 |
-    awk '{$1 = $1; print $0}' |
-    cmp 'paexec big_result_cmd' \
+    for i in 0 1 2 3 4 5 6 7 8 9; do
+	awk '
+	BEGIN {
+	    for (i=0; i < 10; ++i) {
+		print "1234567890-=qwertyuiop[]asdfghjkl;zxcvbnm,./zaqwsxcderfvbgtyhnmjuik,.lo";
+	    }
+	}' | runtest -c big_result_cmd -n '+9' |
+	uniq -c |
+	head -n 100 |
+	awk '{$1 = $1; print $0}' |
+	cmp 'paexec big_result_cmd' \
 '100000 1234567890-=QWERTYUIOP[]ASDFGHJKL;ZXCVBNM,./ZAQWSXCDERFVBGTYHNMJUIK,.LO
 '
+
+	if test -f $tmpex; then
+	    :
+	else
+	    break
+	fi
+    done
 
     # tests for partially ordered set of tasks (-s option)
     test_tasks3 |
