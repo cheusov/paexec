@@ -1265,6 +1265,9 @@ int main (int argc, char **argv)
 
 	free_memory ();
 
+	set_sig_handler (SIGCHLD, SIG_DFL);
+	set_sig_handler (SIGALRM, SIG_IGN);
+
 	unblock_signals ();
 
 	while (pid = waitpid (-1, &status, WNOHANG), pid > 0){
