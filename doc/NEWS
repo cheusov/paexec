@@ -1,4 +1,10 @@
 ======================================================================
+Version 1.0.1, by Aleksey Cheusov, Thu, 14 Aug 2014 01:44:39 +0300
+
+  Unbuffered (broken) stdout seen on Darwin was fixes.
+  Who knows, this may happen on other systems too.
+
+======================================================================
 Version 1.0.0, by Aleksey Cheusov, Sun, 13 Jul 2014 19:10:48 +0300
 
   mk-configure>=0.27.0 is required for build.
