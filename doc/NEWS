@@ -1,7 +1,7 @@
 ======================================================================
 Version 1.0.1, by Aleksey Cheusov, Thu, 14 Aug 2014 01:44:39 +0300
 
-  Unbuffered (broken) stdout seen on Darwin was fixes.
+  Unflushed (broken) stdout seen on Darwin was fixes.
   Who knows, this may happen on other systems too.
 
 ======================================================================
