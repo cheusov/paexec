@@ -73,6 +73,7 @@ OPTIONS:\n\
   -c <command>     path to a command\n\
   -t <trans>       path to a transport program\n\
   -x               run command once per task\n\
+  -X               implies -x and ignore calculator's stdout.\n\
   -y               magic line is used as an end-of-task marker\n\
 \n\
   -r               include a node (or a number) to the output\n\
