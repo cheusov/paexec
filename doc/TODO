@@ -1,4 +1,12 @@
 paexec:
+ - New option -gg (double -g) for reading graph of tasks in
+   lower-to-upper order and running new tasks as soon as they appear
+   on input.  If tasks appears on input slowly (distbb/pkgsrc) this
+   may significantly improve parallelism and reduce total running time
+ - pamake -- 1) shell/whatever-based script with special section that
+   describes hosts, dependency graph of targets and other metainfo,
+   where functions are "targets" 2) preprocessing (m4,cpp,whatever).
+   Maybe it may sense to see dsh/pdsh.
  - mimic dsh and pdsh
  - PAEXEC_COMMAND as a default for -c
  - pass PAEXEC_NODEID to appropriate nodes
