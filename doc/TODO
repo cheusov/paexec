@@ -1,4 +1,5 @@
 paexec:
+ - EXIT STATUS section in man page
  - SIGUSR2 for graceful exit, i.e. complete currently running tasks
    and then exit (Thanks to Mikhailian for idea)
  - New option -gg (double -g) for reading graph of tasks in
