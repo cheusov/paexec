@@ -9,7 +9,7 @@ paexec:
  - pamake -- 1) shell/whatever-based script with special section that
    describes hosts, dependency graph of targets and other metainfo,
    where functions are "targets" 2) preprocessing (m4,cpp,whatever).
-   Maybe it may sense to see dsh/pdsh.
+   Maybe it make sense to see dsh/pdsh.
  - mimic dsh and pdsh
  - PAEXEC_COMMAND as a default for -c
  - pass PAEXEC_NODEID to appropriate nodes
