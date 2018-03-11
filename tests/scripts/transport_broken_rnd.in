@@ -12,7 +12,7 @@ function my_rnd (){
 	rand()
 
 	if (rand() < threshold)
-		return 0.0
+		return -1 # return unusual value for exiting with error
 	else
 		return rand()
 }
@@ -33,16 +33,18 @@ BEGIN {
 }
 
 {
-	if (my_rnd() == 0.0) {
+	rnd = my_rnd()
+	if (rnd < 0.0) {
 		sleep(0.1)
 		exit 1
 	}
 
-	sleep(my_rnd())
+	sleep(rnd)
 
 	print " " $0
 
-	if (!nopostfail && my_rnd() == 0.0) {
+	rnd = my_rnd()
+	if (!nopostfail && rnd < 0.0) {
 		sleep(0.1)
 		exit 1
 	}
