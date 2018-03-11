@@ -10,13 +10,13 @@ B<paexec> -C I<[options]> I<command> I<[args...]>
 
 =head1 DESCRIPTION
 
-Suppose you have a long list of AUTONOMOUS tasks that need to be
+Suppose you have a long list of tasks that need to be
 done, for example, you want to convert thousands of .wav audio files
 to .ogg format.  Also suppose that multiple CPUs are
-available, e.g. multi-CPU SMP system (or modern multikernel CPU) or a
+available, e.g. multi-CPU system or a
 cluster consisting of individual computers connected to the network or
 internet. B<paexec> can efficiently do this work, that
-is B<paexec> efficiently distributes different tasks to different
+is, B<paexec> efficiently distributes different tasks to different
 processors (or computers), receives the results of processing from them
 and sends these results to stdout.
 
@@ -31,28 +31,30 @@ example CPU ordinal number or computer's DNS name like
 node12.cluster.company.com.
 
 I<Command> - user's program that reads one-line task from stdin and sends
-multiline result to stdout where an empty line means
-JOB_IS_DONE__I_AM_READY_FOR_THE_NEXT_ONE. After sending the empty line
-to stdout, stdout MUST BE FLUSHED. Remember that empty line
-MUST NOT appears in general result lines. Otherwise B<paexec> may hang
-because of deadlock.
+multiline result to stdout ending with an end of task (EOT) marker.
+EOT marker means
+"Task is done. I am ready for the next one". After sending EOT
+to stdout, stdout MUST be flushed. Remember that EOT marker
+MUST NOT appears in general result. Otherwise, B<paexec> may hang
+due to deadlock. The default EOT is an empty line. Command may use
+environment variable PAEXEC_EOT for the end-of-task marker.
 
-I<Transport> - special program that helps to run I<command> on the
+I<Transport> - special program that helps to run I<command> on
 I<node>. It takes the I<node> identifier as its first
-argument and I<command> with its arguments as the rest.  For example,
-is '/usr/bin/ssh'. Both I<transport> and I<command> may 
-be specified with their arguments, i.e. '/usr/bin/ssh -x' is allowed
+argument and I<command> with its arguments as the rest.
+Good examples for transport are I<ssh> and I<rsh>.
+Both I<transport> and I<command> may 
+be specified with their arguments, e.g, '/usr/bin/ssh -x' is allowed
 as a I<transport> program.
 
-Algorithm. I<Commands> are run on each I<node> with a help of
-I<transport> program. Then, I<tasks> are read from stdin line-by-line
-(one task per line)
-and are sent to free I<node> (exactly one task per node at
+How B<paexec> works.
+I<Commands> are run on each I<node> with a help of
+I<transport> program. Then, I<tasks> are read from stdin one-by-one
+and sent to free I<node> (exactly one task per node at
 a time). At the same time result lines are read from I<command's>
-stdout and are output to B<paexec's> stdout. When an empty line is
-obtained from the I<node> (this means that I<node> finished
-its job) it is marked as free and becomes ready for the next
-job. These steps repeat until the end of stdin is reached and all
+stdout and are output to B<paexec's> stdout. When EOT marker is
+obtained from the I<node>, it is marked as free and becomes ready for the next
+task. These steps repeat until the end of stdin is reached and all
 I<nodes> finish their job.
 
 More formally (to better understand how paexec works):
@@ -68,15 +70,14 @@ More formally (to better understand how paexec works):
       while result_line_from_node_is_available/i
          result = read_result_line_from_node(i)
          send_line_to_stdout(result)
-         if is_empty_line(result)
-            # end of job
+         if is_EOT(result)
             mark_node_as_free(i)
          end
       end
    end
    close_command_on_each_node
 
-Note that I<command> that does your actual task is run once (per node),
+Note that I<command>s are run once per node,
 it is not restarted for every task.
 
 Also note that output contains result lines (obtained from different
@@ -87,9 +88,9 @@ third output line may contain result line from the first I<node>
 again. It is also not guaranteed that the first line of output will be
 from the first I<node> or from the first I<task>. All result
 lines are output as soon as they are read by B<paexec>, i.e as soon as
-they are ready to be output. B<paexec> works this way for the
+they are ready. B<paexec> works this way for the
 efficiency reasons.  You can play with I<-l>, I<-r> and I<-p> options to see
-what happens.
+what happens. For reordering output line you can use B<paexec_reorder> utility.
 
 =head1 OPTIONS
 
@@ -109,11 +110,11 @@ Command with its arguments.
 
 =item B<-C>
 
-Command with its arguments are specified following the options.
+Command and its parameters are specified by free arguments.
 
 =item B<-t> I<transport>
 
-Transport command
+Transport program.
 
 =item B<-n> I<+number>
 
@@ -131,13 +132,13 @@ Filename containing list of nodes, one per line.
 
 =item B<-x>
 
-Run command specificed by I<-c> for each task. Its stdout is passed to B<paexec>.
+Run command specificed by I<-c> for each task. Its stdout is sent to B<paexec>.
 If both C<-x> and C<-g> are specified, task is considered failed
 if command's exit status is non-zero.
 
 =item B<-X>
 
-Implies I<-x> and ignore calculator's stdout.
+Implies I<-x> and ignore command's stdout.
 
 =item B<-r>
 
@@ -333,7 +334,7 @@ for input graph of tasks with weights.
 =item B<-y>
 
 If applied, the magic string is used as an end-of-task marker instead of
-empty line.  It is unlikely that this line appears on calculator's
+empty line.  It is unlikely that this line appears on I<command>'s
 output.  This option has higher priority than PAEXEC_EOT environment
 variable.
 
@@ -397,12 +398,12 @@ See the default value in Makefile.
 
 =item I<PAEXEC_ENV>
 
-A list of variables passed to calculator.
+A list of variables passed to I<command>.
 
 =item I<PAEXEC_EOT>
 
 This variable sets the end-of-task marker which is an empty line by default.
-Also, through this variable an end-of-task marker is passed to all calculators.
+Also, through this variable an end-of-task marker is passed to all I<command>s.
 
 =item I<PAEXEC_NODES>
 
