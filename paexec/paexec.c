@@ -183,6 +183,8 @@ static int exec_mode = 0;
 
 static int use_weights = 0;
 
+char eol_char = '\n';
+
 struct envvar_entry {
 	SLIST_ENTRY(envvar_entry) entries;      /* List. */
 	char* name;
@@ -252,7 +254,7 @@ static void init__read_graph_tasks (void)
 	}
 
 	/* reading all tasks with their dependancies */
-	while (len = xgetline (&buf, &buf_sz, stdin), len != -1){
+	while (len = xgetdelim(&buf, &buf_sz, eol_char, stdin), len != -1){
 		if (len > 0 && buf [len-1] == '\n'){
 			buf [len-1] = 0;
 			--len;
@@ -998,7 +1000,7 @@ static void process_args (int *argc, char ***argv)
 	int mode_C = 0;
 
 	/* leading + is for shitty GNU libc */
-	static const char optstring [] = "+c:CdeEghiIlm:n:prst:VwW:xXyzZ:";
+	static const char optstring [] = "+0c:CdeEghiIlm:n:prst:VwW:xXyzZ:";
 
 	while (c = getopt (*argc, *argv, optstring), c != EOF){
 		switch (c) {
@@ -1100,6 +1102,9 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 'y':
 				msg_eot = magic_eot;
+				break;
+			case '0':
+				eol_char = '\0';
 				break;
 			default:
 				usage ();

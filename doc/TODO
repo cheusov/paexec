@@ -1,5 +1,4 @@
 paexec:
- - New option -0 for processing input from "find -print0".
  - EXIT STATUS section in man page
  - SIGUSR2 for graceful exit, i.e. complete currently running tasks
    and then exit (Thanks to Mikhailian for idea)

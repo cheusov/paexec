@@ -64,12 +64,12 @@ void xsigprocmask (int how, const sigset_t *set, sigset_t *oset)
 	}
 }
 
-ssize_t xgetline(char** lineptr, size_t* n, FILE* stream)
+ssize_t xgetdelim(char **lineptr, size_t *n, int delimiter, FILE *stream)
 {
-	ssize_t ret = getline (lineptr, n, stream);
+	ssize_t ret = getdelim(lineptr, n, delimiter, stream);
 
 	if (ret == (ssize_t) -1 && ferror (stdin)){
-		perror ("getline(3) failed");
+		perror ("getdelim(3) failed");
 		exit (1);
 	}
 

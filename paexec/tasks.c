@@ -212,7 +212,7 @@ static const char * get_new_task_from_stdin (void)
 
 	ssize_t sz = 0;
 
-	sz = xgetline (&task, &task_sz, stdin);
+	sz = xgetdelim(&task, &task_sz, eol_char, stdin);
 	if (sz == -1)
 		return NULL;
 

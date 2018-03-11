@@ -338,6 +338,12 @@ empty line.  It is unlikely that this line appears on I<command>'s
 output.  This option has higher priority than PAEXEC_EOT environment
 variable.
 
+=item B<-0>
+
+Change paexec to expect NUL characters as separators,
+instead of newlines.  This is expected to be used in
+concert with the -print0 function in find(1).
+
 =back
 
 =head1 EXAMPLES

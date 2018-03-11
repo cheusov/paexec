@@ -573,6 +573,17 @@ fake5.flac
 18 /etc/dir with spaces;/etc/dir with spaces/subdir
 '
 
+    find . -type f -name '*.wav' -print0 |
+	runtest -n+6 -0x -C echo |
+    sort | sed 's|^[.]/||' |
+    cmp 'paexec -0' \
+'fakeflac/fake1.wav
+fakeflac/fake2.wav
+fakeflac/fake3.wav
+fakeflac/fake4.wav
+fakeflac/fake5.wav
+'
+
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest_resort -l -t paexec_notransport -c cmd_toupper \

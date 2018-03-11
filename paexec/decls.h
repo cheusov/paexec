@@ -26,12 +26,13 @@
 
 #include <mkc_strlcpy.h>
 #include <mkc_strlcat.h>
-#include <mkc_getline.h>
 #include <mkc_SLIST.h>
 #include <mkc_RB.h>
 
 #ifndef HAVE_FUNC3_SHQUOTE
 size_t shquote (const char *arg, char *buf, size_t bufsize);
 #endif
+
+extern char eol_char;
 
 #endif // _DECLS_H_

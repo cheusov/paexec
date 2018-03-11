@@ -20,7 +20,7 @@ MLINKS     =	paexec_reorder.1 pareorder.1
 CFLAGS    +=	-DPAEXEC_VERSION='"${VERSION}"'
 CFLAGS    +=	-DBUFSIZE=${BUFSIZE}
 
-MKC_FEATURES         =	getline strlcat strlcpy SLIST RB
+MKC_FEATURES         =	strlcat strlcpy SLIST RB
 MKC_SOURCE_FUNCLIBS  =  shquote
 
 MKC_COMMON_DEFINES   =	-D_GNU_SOURCE

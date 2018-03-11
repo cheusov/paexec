@@ -35,7 +35,7 @@
 void nonblock (int fd);
 void xsigprocmask (int how, const sigset_t *set, sigset_t *oset);
 void xsigaddset (sigset_t *set, int signo);
-ssize_t xgetline(char** lineptr, size_t* n, FILE* stream);
+ssize_t xgetdelim(char **lineptr, size_t *n, int delimiter, FILE *stream);
 char *xstrdup (const char *s);
 void *xmalloc (size_t size);
 void *xcalloc(size_t number, size_t size);
