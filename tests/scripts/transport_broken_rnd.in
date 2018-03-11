@@ -7,10 +7,6 @@ function sleep (secs){
 }
 
 function my_rnd (){
-	# FreeBSD's /usr/bin/awk generates very bad first random value.
-	# This is why we run rand() twice.
-	rand()
-
 	if (rand() < threshold)
 		return -1 # return unusual value for exiting with error
 	else
@@ -29,7 +25,9 @@ BEGIN {
 
 	srand()
 
-#	sleep(my_rnd())
+	# FreeBSD's /usr/bin/awk generates very bad first random value.
+	# This is why we run rand() twice.
+	rand()
 }
 
 {
