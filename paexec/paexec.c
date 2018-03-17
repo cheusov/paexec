@@ -170,7 +170,7 @@ static int end_of_stdin = 0;
 static const char *msg_success = "success";
 static const char *msg_failure = "failure";
 static const char *msg_fatal   = "fatal";
-static const char *msg_eot = "";
+static const char *msg_eot = NULL;
 char msg_delim = ' '; /* also used in tasks.c */
 
 static int resistant = 0;
@@ -184,6 +184,8 @@ static int exec_mode = 0;
 static int use_weights = 0;
 
 char eol_char = '\n';
+
+static char replstr[2] = "";
 
 struct envvar_entry {
 	SLIST_ENTRY(envvar_entry) entries;      /* List. */
@@ -327,6 +329,36 @@ static void init__read_graph_tasks (void)
 	}
 }
 
+static char const runner_function1[] = "run() { %s \"$1\"; }";
+static char const runner_function2[] = "run() { %s; }";
+
+static char* generate_run_command(void)
+{
+	static char run_command [4096];
+	char *repl_ptr = NULL;
+
+	if (replstr[0]){
+		repl_ptr = arg_cmd;
+		while (repl_ptr = strstr(repl_ptr, replstr), repl_ptr != NULL){
+			repl_ptr[0] = '$';
+			repl_ptr[1] = '1';
+			repl_ptr += 2;
+		}
+
+		snprintf(run_command, sizeof(run_command), runner_function2, arg_cmd);
+	}else{
+		snprintf(run_command, sizeof(run_command), runner_function1, arg_cmd);
+	}
+
+	if (strlen(run_command) + 1 == sizeof(run_command)){
+		err_fatal ("paexec: Internal error6! (buffer size)");
+	}
+
+//	fprintf(stderr, "run_command: %s\n", run_command);
+
+	return run_command;
+}
+
 static void init__postproc_arg_cmd (void)
 {
 	char shq_cmd [4096];
@@ -351,13 +383,17 @@ static void init__postproc_arg_cmd (void)
 		}
 
 		snprintf (cmd, sizeof (cmd),
-				  "while read f; do"
-				  "  res=`%s \"$f\"`;"
+				  "%s\n while read f; do"
+				  "  res=`run \"$f\"`;"
 				  "  ex=$?;"
 				  "  %s" /* printing result */
 				  "  %s" /* condition. success/failure */
 				  "  echo '%s';" /* EOT */
-				  "done", arg_cmd, tmp, cond_cmd, magic_eot);
+				  "done", generate_run_command(), tmp, cond_cmd, magic_eot);
+
+		if (strlen(cmd) + 1 == sizeof(cmd)){
+			err_fatal ("paexec: Internal error7! (buffer size)");
+		}
 
 		xfree (arg_cmd);
 		arg_cmd = xstrdup (cmd);
@@ -970,20 +1006,30 @@ static void check_msg (const char *msg)
 static char *gen_cmd (int *argc, char ***argv)
 {
 	char cmd [4096];
+	char *curr_token;
 	size_t len;
 	size_t curr_len;
 	int i;
 
 	len = 0;
 	for (i=0; i < *argc; ++i){
-		curr_len = shquote ((*argv) [i], cmd+len, sizeof (cmd)-len-1);
+		curr_token = (*argv) [i];
+		if (replstr != NULL && !strcmp(curr_token, replstr)){
+			cmd[len+0] = '"';
+			cmd[len+1] = '$';
+			cmd[len+2] = '1';
+			cmd[len+3] = '"';
+			curr_len = 4;
+		}else{
+			curr_len = shquote (curr_token, cmd+len, sizeof (cmd)-len-1);
+		}
 		if (curr_len == (size_t)-1){
 			err_fatal ("paexec: Internal error4! (buffer size)");
 		}
 		len += curr_len;
 		cmd [len++] = ' ';
 
-		if (len >= sizeof (cmd)-1){
+		if (len >= sizeof (cmd)-20){ /* 20 chars is enough for "$1" :-) */
 			err_fatal ("paexec: Internal error5! (buffer size)");
 		}
 	}
@@ -1000,7 +1046,7 @@ static void process_args (int *argc, char ***argv)
 	int mode_C = 0;
 
 	/* leading + is for shitty GNU libc */
-	static const char optstring [] = "+0c:CdeEghiIlm:n:prst:VwW:xXyzZ:";
+	static const char optstring [] = "+0c:CdeEghiIJ:lm:n:prst:VwW:xXyzZ:";
 
 	while (c = getopt (*argc, *argv, optstring), c != EOF){
 		switch (c) {
@@ -1051,6 +1097,20 @@ static void process_args (int *argc, char ***argv)
 			case 'I':
 				print_i2o = 1;
 				flush_i2o = 1;
+				break;
+			case 'J':
+				if (strlen(optarg) != 2){
+					fprintf(stderr, "-Jreplstr argument must have 2-characters length");
+					exit(2);
+				}
+
+				replstr[0] = optarg[0];
+				replstr[1] = optarg[1];
+
+				if (!msg_eot)
+					msg_eot = magic_eot;
+				if (!exec_mode)
+					exec_mode = 'x';
 				break;
 			case 's':
 			case 'g':
@@ -1114,6 +1174,10 @@ static void process_args (int *argc, char ***argv)
 
 	*argv += optind;
 	*argc -= optind;
+
+	if (!msg_eot){
+		msg_eot = "";
+	}
 
 	if (mode_C){
 		if (!*argc){

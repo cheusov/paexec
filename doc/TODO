@@ -14,7 +14,6 @@ paexec:
  - PAEXEC_COMMAND as a default for -c
  - pass PAEXEC_NODEID to appropriate nodes
  - -n 'server1 server2 +5' two remote servers and five local
- - Option -I like in xargs (in combination with -x)
  - Option -n%'node_[1-20,22-30]'
  - non-blocking write(2) for sending task to the slave hosts/CPUs.
  - SIGINFO for displaying current status of tasks

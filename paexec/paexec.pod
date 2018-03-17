@@ -344,6 +344,15 @@ Change paexec to expect NUL characters as separators,
 instead of newlines.  This is expected to be used in
 concert with the -print0 function in find(1).
 
+=item B<-J> I<replstr>
+
+Execute I<command> for each I<task>, replacing one or more occurrences
+of I<replstr> with the entire I<task>. Only 2-character I<replstr> is
+allowed. Tale a note that such replacement works only if shell
+variable expansion is allowed in appropriate part of command (if B<-c> is applied)
+or if free argument is exactly a I<replstr> (if B<-C> is applied).
+This option implies -x.
+
 =back
 
 =head1 EXAMPLES
@@ -369,6 +378,15 @@ concert with the -print0 function in find(1).
  { uname -s; uname -r; uname -m; } |
  paexec -x -lp -n+2 -c banner |
  paexec_reorder -l
+
+=item 5
+
+  find . -name '*.dat' -print0 |
+  paexec -0 -n+10 -C -J// scp // remoteserver:/remote/path
+
+=item 6
+
+  ls -1 *.txt | paexec -n+10 -J%% -c 'awk "BEGIN {print toupper(\"%%\")}"'
 
 =back
 

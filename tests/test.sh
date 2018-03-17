@@ -400,6 +400,118 @@ usage: paexec    [OPTIONS]
 'paexec: missing arguments. Run paexec -h for details
 '
 
+    # -J
+    printf 'AAA\nBBB\nZ Y X\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
+    runtest -J '{}' -c 'echo "xxx{}yyy"' -n +3 | sort |
+    cmp 'paexec -J #1.1' \
+'xxx"Y;Xyyy
+xxxAAAyyy
+xxxBBByyy
+xxxCCCyyy
+xxxDDDyyy
+xxxEEEyyy
+xxxFFFyyy
+xxxGGGyyy
+xxxTRTRTR'"'"'BRBRBRyyy
+xxxZ Y Xyyy
+'
+
+    # -J
+    printf 'aaa\nbbb\nz y x\ntrtrtrbrbrbr\nccc\nddd\neee\nfff\ny;x\nggg\n' |
+    runtest -n+2 -J '$$' -c 'awk "BEGIN {print toupper(\"$$\")}"' | sort |
+    cmp 'paexec -J #1.2' \
+'AAA
+BBB
+CCC
+DDD
+EEE
+FFF
+GGG
+TRTRTRBRBRBR
+Y;X
+Z Y X
+'
+
+    # -J
+    printf 'AAA\nBBB\nZ Y X\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
+    runtest -J '{}' -c 'echo "{} is equal to {}"' -n +3 | sort |
+    cmp 'paexec -J #1.3' \
+'"Y;X is equal to "Y;X
+AAA is equal to AAA
+BBB is equal to BBB
+CCC is equal to CCC
+DDD is equal to DDD
+EEE is equal to EEE
+FFF is equal to FFF
+GGG is equal to GGG
+TRTRTR'"'"'BRBRBR is equal to TRTRTR'"'"'BRBRBR
+Z Y X is equal to Z Y X
+'
+
+    # -J
+    printf 'AAA\nBBB\nZ Y X\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
+    runtest -J '{}' -c "echo '{} is equal to {}'" -n +3 | sort |
+    cmp 'paexec -J #1.4' \
+'$1 is equal to $1
+$1 is equal to $1
+$1 is equal to $1
+$1 is equal to $1
+$1 is equal to $1
+$1 is equal to $1
+$1 is equal to $1
+$1 is equal to $1
+$1 is equal to $1
+$1 is equal to $1
+'
+
+    # -J
+    printf 'AAA\nBBB\nZ Y X\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
+    runtest  -n +3 -J '{}' -C echo '{}' 'is equal to' '{}' | sort |
+    cmp 'paexec -J #1.5' \
+'"Y;X is equal to "Y;X
+AAA is equal to AAA
+BBB is equal to BBB
+CCC is equal to CCC
+DDD is equal to DDD
+EEE is equal to EEE
+FFF is equal to FFF
+GGG is equal to GGG
+TRTRTR'"'"'BRBRBR is equal to TRTRTR'"'"'BRBRBR
+Z Y X is equal to Z Y X
+'
+
+    # -J
+    printf 'AAA\nBBB\nZ Y X\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
+    runtest  -n +3 -J '{}' -C echo '{}' is not equal to ' {}' | sort |
+    cmp 'paexec -J #1.6' \
+'"Y;X is not equal to  $1
+AAA is not equal to  $1
+BBB is not equal to  $1
+CCC is not equal to  $1
+DDD is not equal to  $1
+EEE is not equal to  $1
+FFF is not equal to  $1
+GGG is not equal to  $1
+TRTRTR'"'"'BRBRBR is not equal to  $1
+Z Y X is not equal to  $1
+'
+
+    # -J
+    printf 'AAA\nBBB\nZ Y X\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
+    runtest  -n +3 -J '{}' -C echo '{}/' is not equal to '{}' | sort |
+    cmp 'paexec -J #1.7' \
+'$1/ is not equal to "Y;X
+$1/ is not equal to AAA
+$1/ is not equal to BBB
+$1/ is not equal to CCC
+$1/ is not equal to DDD
+$1/ is not equal to EEE
+$1/ is not equal to FFF
+$1/ is not equal to GGG
+$1/ is not equal to TRTRTR'"'"'BRBRBR
+$1/ is not equal to Z Y X
+'
+
     # x
     printf 'aaa\nbbb\nz y x\ntrtrtr'\''brbrbr\nccc\nddd\neee\nfff\n"y;x\nggg\n' |
     runtest -x -c "awk 'BEGIN {print toupper(ARGV [1])}'" -n +3 | sort |
