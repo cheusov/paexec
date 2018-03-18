@@ -530,6 +530,12 @@ usage: paargs [OPTIONS]
 '
     unset ZZZZ YYYY CCCC PAEXEC_ENV
 
+    #
+    runpaargs -t ssh -P localhost -c echo file1 file2 < /dev/null 2>&1 |
+    cmp 'paargs bad files' \
+'paargs: extra arguments. Run paargs -h for details
+'
+
 ############################################################    
     runtest -V | cut_version |
 cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov

@@ -86,7 +86,12 @@ while getopts 0c:fI:hm:P:t:VXzZ: f; do
 done
 shift `expr $OPTIND - 1`
 
-if test -z "$command_specified"; then
+if test -n "$command_specified"; then
+    if test $# -ne 0; then
+	echo 'paargs: extra arguments. Run paargs -h for details' 1>&2
+	exit 1
+    fi
+else
     if test $# -eq 0; then
 	echo 'paargs: missing arguments. Run paargs -h for details' 1>&2
 	exit 1
