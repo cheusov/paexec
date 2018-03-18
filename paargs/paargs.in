@@ -57,7 +57,8 @@ while getopts 0c:fI:hm:P:t:VXzZ: f; do
 	    command="$command -w -z";;
 	c)
 	    command_specified=1
-	    command="$command -c`shquote $OPTARG`";;
+	    addon=$(shquote "$OPTARG")
+	    command="$command -c$addon";;
     esac
 done
 shift `expr $OPTIND - 1`
@@ -69,4 +70,10 @@ if test -z "$command_specified"; then
     fi
 fi
 
-eval $command "$@"
+for fa in "$@"; do
+    addon=$(shquote "$fa")
+    command="$command $addon"
+done
+
+#echo $command 1>&2
+eval "$command"
