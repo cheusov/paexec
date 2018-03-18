@@ -342,7 +342,7 @@ cmp 'paargs -V' 'paargs x.y.x written by Aleksey Cheusov
 '
 
     runpaargs -h 2>&1 | cut_help |
-cmp 'paargs -h' 'paargs - wrapper for paexec
+cmp 'paargs -h' 'paargs -- wrapper for paexec
 usage: paargs [OPTIONS]
 '
 
@@ -511,13 +511,12 @@ usage: paargs [OPTIONS]
 '
 
 ############################################################    
-#    return 0;
     runtest -V | cut_version |
 cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov
 '
 
     runtest -h 2>&1 | cut_help |
-cmp 'paexec -h' 'paexec - parallel executor
+cmp 'paexec -h' 'paexec -- parallel executor
          that distributes tasks over CPUs or machines in a network.
 usage: paexec    [OPTIONS]
        paexec -C [OPTIONS] cmd [args...]

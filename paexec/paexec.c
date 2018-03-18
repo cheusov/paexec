@@ -59,7 +59,7 @@
 static void usage (void)
 {
 	fprintf (stderr, "\
-paexec - parallel executor\n\
+paexec -- parallel executor\n\
          that distributes tasks over CPUs or machines in a network.\n\
 usage: paexec    [OPTIONS]\n\
        paexec -C [OPTIONS] cmd [args...]\n\
@@ -70,11 +70,15 @@ OPTIONS:\n\
   -n <+num>        number of subprocesses to run\n\
   -n <nodes>       list of nodes separated by space character\n\
   -n <:filename>   filename containing a list of nodes, one node per line\n\
-  -c <command>     path to a command\n\
-  -t <trans>       path to a transport program\n\
+  -c <command>     set a command\n\
+  -C               use free arguments as a command and its arguments\n\
+  -t <transport>   set a transport program\n\
+\n\
   -x               run command once per task\n\
   -X               implies -x and ignore calculator's stdout.\n\
   -y               magic line is used as an end-of-task marker\n\
+  -0               change paexec to expect NUL character as\n\
+                   a line separator instead of newline\n\
 \n\
   -r               include a node (or a number) to the output\n\
   -l               include 0-based task number to the output\n\
@@ -100,14 +104,18 @@ OPTIONS:\n\
                    of all tasks that depend on it,\n\
                    directly or indirectly\n\
 \n\
-  -m   s=<success>\n\
-       f=<failure>\n\
-       F=<fatal>\n\
-       t=<eot>\n\
-       d=<delimiter>\n\
-                   set an alternative for 'success',\n\
-                   'failure', 'fatal', '' (end-of-task marker) and\n\
-                   ' ' (task delimiter character).\n\
+  -m   s=<success> set an alternative for 'success' message\n\
+       f=<failure> set an alternative for 'failure' message\n\
+       F=<fatal>   set an alternative for 'fatal' message\n\
+       t=<EOT>     set an alternative for EOT marker\n\
+       d=<delimiter>    set the delimiter for -g mode.\n\
+                        The default is space character.\n\
+       w=<weight>  set an alternative for 'weight:' marker\n\
+\n\
+  -J replstr\n\
+                   execute command for each task, replacing\n\
+                   one or more occurrences of replstr with the entire task.\n\
+\n\
 -n and -c are mandatory options\n\
 \n\
 ");

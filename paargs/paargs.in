@@ -2,20 +2,38 @@
 
 usage (){
     cat 1>&2 <<'EOF'
-paargs - wrapper for paexec
+paargs -- wrapper for paexec
 usage: paargs [OPTIONS]
 OPTIONS:
-  h             display this help
-  V             display version
-  P             
-  t
-  X
-  f
-  m
-  I
-  0
-  Z
-  z
+  -h               display this help
+  -V               display version
+
+  -P <+num>        number of subprocesses to run
+     <nodes>       list of nodes separated by space character
+     <:filename>   filename containing a list of nodes, one node per line
+  -t <transport>   set a transport program
+  -c <command>     command with its arguments. By default, free arguments
+                   are used for setting command and its arguments
+
+  -I <replstr>     execute command for each task, replacing one
+                   or more occurrences of replstr with the entire task
+  -X               ignore calculator's stdout
+  -f               flushes stdout after recieving an end-of-task signal
+  -0               change paexec to expect NUL characters as separators
+                   instead of newline
+
+  -Z <timeout>     passed directly to paexec
+  -z               passed directly to paexec
+
+  -m   s=<success> set an alternative for 'success' message
+       f=<failure> set an alternative for 'failure' message
+       F=<fatal>   set an alternative for 'fatal' message
+       t=<EOT>     set an alternative for EOT marker
+       d=<delimiter>    set the delimiter for -g mode,
+                        no delimiter by default
+       w=<weight>  set an alternative for 'weight:' marker
+
+-P is a mandatory option
 EOF
 }
 

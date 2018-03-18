@@ -110,7 +110,7 @@ Command with its arguments.
 
 =item B<-C>
 
-Command and its parameters are specified by free arguments.
+Command and its arguments are specified by free arguments.
 
 =item B<-t> I<transport>
 
@@ -355,8 +355,8 @@ variable.
 
 =item B<-0>
 
-Change paexec to expect NUL characters as separators,
-instead of newlines.  This is expected to be used in
+Change paexec to expect NUL character as a line separator
+instead of newline.  This is expected to be used in
 concert with the -print0 function in find(1).
 
 =item B<-J> I<replstr>
