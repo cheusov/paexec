@@ -351,7 +351,7 @@ usage: paargs [OPTIONS]
 'paargs: missing arguments. Run paargs -h for details
 '
 
-    printf 'AAA\nBBB\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
+    printf 'AAA\nBBB\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\nZ Y X\n' |
     runpaargs -P +3 -I '{}' echo "xxx" '{}' 'yyy' | paexec_reorder -lgy -Ms |
     cmp 'paargs -P #1.1' \
 '1 xxx AAA yyy
@@ -372,10 +372,12 @@ usage: paargs [OPTIONS]
 8 success
 9 xxx GGG yyy
 9 success
+10 xxx Z Y X yyy
+10 success
 '
 
 ############################################################    
-    return 0;
+#    return 0;
     runtest -V | cut_version |
 cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov
 '
@@ -384,15 +386,12 @@ cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov
 cmp 'paexec -h' 'paexec - parallel executor
          that distributes tasks over CPUs or machines in a network.
 usage: paexec    [OPTIONS]
+       paexec -C [OPTIONS] cmd [args...]
 '
 
     # bad -md= arg
-    runtest -md= 2>&1 |
-    cmp 'paexec -md= #1' 'paexec: bad argument for -md=. Exactly one character is allowed
-'
-
-    runtest -md=aa 2>&1 |
-    cmp 'paexec -md= #2' 'paexec: bad argument for -md=. Exactly one character is allowed
+    runtest -cfake -n+3 -md=aa 2>&1 |
+    cmp 'paexec -md= #1' 'paexec: bad argument for -md=. At most one character is allowed
 '
 
     # bad -ms=/-mf/-mF arg

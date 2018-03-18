@@ -19,7 +19,7 @@ OPTIONS:
 EOF
 }
 
-command='paexec -Cxleg'
+command='paexec -Cxleg -md='
 version='@version@'
 
 shquote (){

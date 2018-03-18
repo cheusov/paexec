@@ -286,17 +286,27 @@ and will wait for restoring nodes.
 
 =item B<-m> s=I<success>
 
+Set alternative string for 'success' message.
+
 =item B<-m> f=I<failure>
+
+Set alternative string for 'failure' message.
 
 =item B<-m> F=I<fatal>
 
+Set alternative string for 'fatal' message.
+An empty string for 'fatal'
+means it will not be output to stdout in case of fatal error.
+
 =item B<-m> t=I<eot>
+
+Set alternative string for EOT message.
 
 =item B<-m> d=I<delimiter>
 
-Set alternative string for 'success', 'failure', 'fatal', '' (end of
-task) and ' ' (task delimiter character). An empty string for 'fatal'
-means it will not be output to stdout in case of fatal error.
+Set alternative string for tasks delimiter (for I<-g> mode).
+Delimiter should be at most one character. No delimiter means
+an entire input line is treated as a task.
 
 =item B<-W> I<num>
 

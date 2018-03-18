@@ -1139,8 +1139,8 @@ static void process_args (int *argc, char ***argv)
 				}else if (optarg [0] == 't' && optarg [1] == '='){
 					msg_eot = xstrdup (optarg+2);
 				}else if (optarg [0] == 'd' && optarg [1] == '='){
-					if (optarg [2] == 0 || optarg [3] != 0){
-						err_fatal ("paexec: bad argument for -md=. Exactly one character is allowed");
+					if (optarg [2] != 0 && optarg [3] != 0){
+						err_fatal ("paexec: bad argument for -md=. At most one character is allowed");
 					}
 					msg_delim = optarg [2];
 				}else{
