@@ -27,7 +27,7 @@ shquote (){
     printf "%s\n" "'$__cmd'"
 }
 
-while getopts 0fI:hm:P:t:VXzZ: f; do
+while getopts 0c:fI:hm:P:t:VXzZ: f; do
     case "$f" in
 	'?')
 	    exit 1;;
@@ -55,13 +55,18 @@ while getopts 0fI:hm:P:t:VXzZ: f; do
 	    command="$command -w -Z`shquote $OPTARG`";;
 	z)
 	    command="$command -w -z";;
+	c)
+	    command_specified=1
+	    command="$command -c`shquote $OPTARG`";;
     esac
 done
 shift `expr $OPTIND - 1`
 
-if test $# -eq 0; then
-    echo 'paargs: missing arguments. Run paargs -h for details' 1>&2
-    exit 1
+if test -z "$command_specified"; then
+    if test $# -eq 0; then
+	echo 'paargs: missing arguments. Run paargs -h for details' 1>&2
+	exit 1
+    fi
 fi
 
 eval $command "$@"

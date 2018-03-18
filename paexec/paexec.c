@@ -1065,6 +1065,7 @@ static void process_args (int *argc, char ***argv)
 				assign_str (&arg_nodes, optarg);
 				break;
 			case 'c':
+				mode_C = 0;
 				arg_cmd = xstrdup (optarg);
 				break;
 			case 'C':
