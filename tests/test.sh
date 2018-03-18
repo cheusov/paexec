@@ -2333,7 +2333,27 @@ success
     test_tasks1 |
     runtest -W0 -e -d -c cmd_make_package \
 	-n +1 2>&1 | grep '^sum_weight' |
-    cmp 'paexec -W0 #2' \
+    cmp 'paexec -W0 #2.1' \
+'sum_weight [pcc]=4
+sum_weight [gcc]=10
+sum_weight [tcl]=8
+sum_weight [glibc]=9
+sum_weight [python]=7
+sum_weight [dictd]=3
+sum_weight [mplayer]=11
+sum_weight [pike]=6
+sum_weight [ruby]=5
+sum_weight [gnome]=12
+sum_weight [kde]=13
+sum_weight [runawk]=2
+sum_weight [mk-configure]=1
+sum_weight [qt4]=14
+'
+
+    test_tasks1 | sed 's/^weight:/W:/' |
+    runtest -W0 -e -d -mw=W: -c cmd_make_package \
+	-n +1 2>&1 | grep '^sum_weight' |
+    cmp 'paexec -W0 -mw=W: #2.2' \
 'sum_weight [pcc]=4
 sum_weight [gcc]=10
 sum_weight [tcl]=8

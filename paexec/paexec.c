@@ -170,6 +170,7 @@ static int end_of_stdin = 0;
 static const char *msg_success = "success";
 static const char *msg_failure = "failure";
 static const char *msg_fatal   = "fatal";
+static const char *msg_weight  = "weight:";
 static const char *msg_eot = NULL;
 char msg_delim = ' '; /* also used in tasks.c */
 
@@ -296,7 +297,7 @@ static void init__read_graph_tasks (void)
 				break;
 		}
 
-		if (tok_cnt == 3 && !strcmp (tok1, "weight:")){
+		if (tok_cnt == 3 && !strcmp (tok1, msg_weight)){
 			/* weight: <task> <weight> */
 			id2 = tasks__add_task (xstrdup (tok2), atoi (tok3));
 			continue;
@@ -1144,6 +1145,8 @@ static void process_args (int *argc, char ***argv)
 						err_fatal ("paexec: bad argument for -md=. At most one character is allowed");
 					}
 					msg_delim = optarg [2];
+				}else if (optarg [0] == 'w' && optarg [1] == '='){
+					msg_weight = xstrdup (optarg+2);
 				}else{
 					err_fatal ("paexec: bad argument for -m");
 				}

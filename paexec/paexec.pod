@@ -308,6 +308,10 @@ Set alternative string for tasks delimiter (for I<-g> mode).
 Delimiter should be at most one character. No delimiter means
 an entire input line is treated as a task.
 
+=item B<-m> w=I<weight>
+
+Set an alternative string for "weight:" message.
+
 =item B<-W> I<num>
 
 When multiple machines or CPUs are used for tasks processing, it makes sense
@@ -323,7 +327,8 @@ and weights of all tasks depending on it directly or indirectly.
 If I<num> is 2, the total weight of task is a maximum value of task's own
 weight
 and weights of all tasks depending on it directly or indirectly.
-Weights are specified with a help of "weight:" keyword. If
+Weights are specified with a help of "weight:" keyword (unless I<-m w=> was specified).
+If
 weight is not specified, it defaults to 1.  The following is the example
 for input graph of tasks with weights.
 
