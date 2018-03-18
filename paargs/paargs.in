@@ -56,21 +56,26 @@ while getopts 0c:fI:hm:P:t:VXzZ: f; do
 	    echo "paargs $version written by Aleksey Cheusov"
 	    exit 0;;
 	P)
-	    command="$command -n`shquote $OPTARG`";;
+	    addon=$(shquote "$OPTARG")
+	    command="$command -n$addon";;
 	t)
-	    command="$command -t`shquote $OPTARG`";;
+	    addon=$(shquote "$OPTARG")
+	    command="$command -t$addon";;
 	X)
 	    command="$command -X";;
 	f)
 	    command="$command -E";;
 	m)
-	    command="$command -m`shquote $OPTARG`";;
+	    addon=$(shquote "$OPTARG")
+	    command="$command -m$addon";;
 	I)
-	    command="$command -J`shquote $OPTARG`";;
+	    addon=$(shquote "$OPTARG")
+	    command="$command -J$addon";;
 	0)
 	    command="$command -0";;
 	Z)
-	    command="$command -w -Z`shquote $OPTARG`";;
+	    addon=$(shquote "$OPTARG")
+	    command="$command -Z$addon";;
 	z)
 	    command="$command -w -z";;
 	c)

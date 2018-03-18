@@ -510,6 +510,26 @@ usage: paargs [OPTIONS]
 10 success
 '
 
+    # -x + -t
+    export PAEXEC_ENV='   ZZZZ, , ,YYYY,CCCC LALALA    '
+    export ZZZZ=zz1234zz
+    export YYYY=yy1234yy
+    export CCCC=cc1234cc
+    printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
+    runpaargs -t paexec_notransport \
+	-P '1 2 3 4 5 6 7 8 9' \
+	awk 'BEGIN {print ENVIRON["ZZZZ"], ENVIRON["YYYY"], ENVIRON["CCCC"], ENVIRON["LALALA"], toupper(ARGV[1])}' |
+    paexec_reorder -lgy -Ms | grep -v success | resort |
+    cmp 'paargs -t #1 (PAEXEC_ENV)' \
+'1 zz1234zz yy1234yy cc1234cc  A
+2 zz1234zz yy1234yy cc1234cc  BB
+3 zz1234zz yy1234yy cc1234cc  CCC
+4 zz1234zz yy1234yy cc1234cc  DDDD
+5 zz1234zz yy1234yy cc1234cc  EEEEE
+6 zz1234zz yy1234yy cc1234cc  FFFFFF
+'
+    unset ZZZZ YYYY CCCC PAEXEC_ENV
+
 ############################################################    
     runtest -V | cut_version |
 cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov
