@@ -20,12 +20,16 @@ runtest_resort (){
     $EXEPREFIX paexec "$@" 2>&1 | resort
 }
 
+runpaargs (){
+    $EXEPREFIX paargs "$@" 2>&1
+}
+
 cut_version (){
-    awk '$1 == "paexec" {$2 = "x.y.x"} {print}'
+    awk '$1 == "paexec" || $1 == "paargs" {$2 = "x.y.x"} {print}'
 }
 
 cut_help (){
-    awk 'NR <= 3'
+    awk '/^OPTIONS/ {exit 0} {print}'
 }
 
 cut_full_path_closed_stdin (){
@@ -333,6 +337,45 @@ cmp (){
 }
 
 do_test (){
+    runpaargs -V | cut_version |
+cmp 'paargs -V' 'paargs x.y.x written by Aleksey Cheusov
+'
+
+    runpaargs -h 2>&1 | cut_help |
+cmp 'paargs -h' 'paargs - wrapper for paexec
+usage: paargs [OPTIONS]
+'
+
+    runpaargs -t ssh -P localhost < /dev/null 2>&1 |
+    cmp 'paargs missing free arguments' \
+'paargs: missing arguments. Run paargs -h for details
+'
+
+    printf 'AAA\nBBB\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
+    runpaargs -P +3 -I '{}' echo "xxx" '{}' 'yyy' | paexec_reorder -lgy -Ms |
+    cmp 'paargs -P #1.1' \
+'1 xxx AAA yyy
+1 success
+2 xxx BBB yyy
+2 success
+3 xxx TRTRTR'"'"'BRBRBR yyy
+3 success
+4 xxx CCC yyy
+4 success
+5 xxx DDD yyy
+5 success
+6 xxx EEE yyy
+6 success
+7 xxx FFF yyy
+7 success
+8 xxx "Y;X yyy
+8 success
+9 xxx GGG yyy
+9 success
+'
+
+############################################################    
+    return 0;
     runtest -V | cut_version |
 cmp 'paexec -V' 'paexec x.y.x written by Aleksey Cheusov
 '

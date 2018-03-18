@@ -20,6 +20,7 @@ all:
 	export PATH=${.CURDIR}/../examples/toupper:$$PATH; \
 	export PATH=${.CURDIR}/../examples/wav2flac:$$PATH; \
 	export PATH=${OBJDIR_paexec}:$$PATH; \
+	export PATH=${OBJDIR_paargs}:$$PATH; \
 	export PATH=${OBJDIR_scripts}:$$PATH; \
 	export PATH=${OBJDIR_transp_closed_stdin}:$$PATH; \
 	export PATH=${OBJDIR_all_substr}:$$PATH; \

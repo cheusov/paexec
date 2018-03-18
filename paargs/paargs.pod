@@ -1,0 +1,26 @@
+=head1 NAME
+
+paargs - lalala
+
+=head1 SYNOPSIS
+
+B<paexec> I<[options]>
+
+B<paexec> -C I<[options]> I<command> I<[args...]>
+
+=head1 DESCRIPTION
+
+lalala
+
+=head1 BUGS/FEEDBACK
+
+Please send any comments, questions, bug reports etc. to me by e-mail
+or (even better) register them at sourceforge project home.  Feature
+requests are also welcomed.
+
+=head1 HOME
+
+L<http://sourceforge.net/projects/paexec>
+
+=head1 SEE ALSO
+L<paexec(1)>

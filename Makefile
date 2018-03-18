@@ -2,8 +2,8 @@ BIRTHDATE   =	2008-01-25
 PROJECTNAME =	paexec
 
 #####
-SUBPRJ      =	paexec:tests presentation doc
-SUBPRJ_DFLT?=	paexec
+SUBPRJ      =	paexec:tests paargs presentation doc
+SUBPRJ_DFLT?=	paexec paargs
 
 examples    =	divide all_substr cc_wrapper cc_wrapper2 \
 		make_package toupper dirtest

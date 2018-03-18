@@ -1,0 +1,67 @@
+#!/bin/sh
+
+usage (){
+    cat 1>&2 <<'EOF'
+paargs - wrapper for paexec
+usage: paargs [OPTIONS]
+OPTIONS:
+  h             display this help
+  V             display version
+  P             
+  t
+  X
+  f
+  m
+  I
+  0
+  Z
+  z
+EOF
+}
+
+command='paexec -Cxleg'
+version='@version@'
+
+shquote (){
+    __cmd=`printf '%s\n' "$1" | sed "s|'|'\\\\\''|g"`
+    printf "%s\n" "'$__cmd'"
+}
+
+while getopts 0fI:hm:P:t:VXzZ: f; do
+    case "$f" in
+	'?')
+	    exit 1;;
+	h)
+	    usage
+	    exit 0;;
+	V)
+	    echo "paargs $version written by Aleksey Cheusov"
+	    exit 0;;
+	P)
+	    command="$command -n`shquote $OPTARG`";;
+	t)
+	    command="$command -t`shquote $OPTARG`";;
+	X)
+	    command="$command -X";;
+	f)
+	    command="$command -E";;
+	m)
+	    command="$command -m`shquote $OPTARG`";;
+	I)
+	    command="$command -J`shquote $OPTARG`";;
+	0)
+	    command="$command -0";;
+	Z)
+	    command="$command -w -Z`shquote $OPTARG`";;
+	z)
+	    command="$command -w -z";;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+if test $# -eq 0; then
+    echo 'paargs: missing arguments. Run paargs -h for details' 1>&2
+    exit 1
+fi
+
+eval $command "$@"
