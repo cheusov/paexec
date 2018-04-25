@@ -75,7 +75,7 @@ while getopts 0c:fI:hm:P:t:VXzZ: f; do
 	    command="$command -0";;
 	Z)
 	    addon=$(shquote "$OPTARG")
-	    command="$command -Z$addon";;
+	    command="$command -w -Z$addon";;
 	z)
 	    command="$command -w -z";;
 	c)
