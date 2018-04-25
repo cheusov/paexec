@@ -4,7 +4,7 @@ paargs - wrapper for paexec similar to xargs
 
 =head1 SYNOPSIS
 
-B<paargs> I<[options]>
+B<paargs> I<[OPTIONS]> <command> <args>
 
 =head1 DESCRIPTION
 
@@ -12,14 +12,92 @@ B<paargs> is a simple wrapper over B<paexec> that simplifies
 use of B<paexec>'s capalities. The use of B<paargs> is actually very
 similar to B<xargs>. B<paargs> runs B<paexec>
 with the following options enabled by default:
+
+=over 4
+
+=item *
+
 I<-C> -- for specifying I<command> as free arguments,
+
+=item *
+
 I<-x> -- for being B<xargs>-like,
+
+=item *
+
 I<-l> -- 0-based task number is included to the output of B<paargs>, this
 allows to reorder the sliced output,
+
+=item *
+
 I<-e> -- for the same purposes as I<-l>,
-l<-g> -- this flag allows analysis of I<command>'s exit status,
+
+=item *
+
+I<-g> -- this flag allows analysis of I<command>'s exit status,
+
+=item *
+
 I<-md=> -- disables task delimiter for I<-g> mode enabled by default,
 as a result the whole line given on input is considered as a task.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>
+
+Display this help.
+
+=item B<-V>
+
+Display version.
+
+=item B<-P> I<nodes>
+
+Same as I<-n> in B<paexec>.
+
+=item B<-t> I<transport>
+
+Passed directly to B<paexec>.
+
+=item B<-c> I<command>
+
+Command with its arguments. By default, free arguments
+are used for setting command and its arguments.
+
+=item B<-I> I<replstr>
+
+Execute command for each task, replacing one
+or more occurrences of I<replstr> with the entire task.
+
+=item B<-X>
+
+Passed directly to B<paexec>.
+
+=item B<-f>
+
+Flushes stdout after recieving an end-of-task line.
+
+=item B<-0>
+
+Passed directly to B<paexec>.
+
+=item B<-Z> I<timeout>
+
+Passed directly to B<paexec>.
+
+=item B<-z>
+
+Passed directly to B<paexec>.
+
+=item B<-m> I<arg>
+
+Passed directly to B<paexec>.
+
+=back
 
 =head1 BUGS/FEEDBACK
 
