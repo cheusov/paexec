@@ -1,4 +1,24 @@
 ======================================================================
+Version 1.1.0, by Aleksey Cheusov, Wed, 25 Apr 2018 23:21:24 +0300
+
+  paexec:
+    - add new option -0. It works just like in "xargs -0".
+    - add new option -J. 
+    - add new option -mw=.
+    - fix help message display by -h.
+    - -md= now allows no delimiter mode in -g mode.
+    - -c and -C override each other if one is implied after another.
+
+  Add new tool "paargs". It is a wrapper over paexec(1) that
+  simplifies use of paexec.
+
+  Fix transport_broken_rnd test script.
+
+  This fixes regression test on Solaris.
+
+  Update man page for paexec(1).
+
+======================================================================
 Version 1.0.1, by Aleksey Cheusov, Thu, 14 Aug 2014 01:44:39 +0300
 
   Unflushed (broken) stdout seen on Darwin was fixes.
