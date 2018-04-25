@@ -1,16 +1,25 @@
 =head1 NAME
 
-paargs - lalala
+paargs - wrapper for paexec similar to xargs
 
 =head1 SYNOPSIS
 
-B<paexec> I<[options]>
-
-B<paexec> -C I<[options]> I<command> I<[args...]>
+B<paargs> I<[options]>
 
 =head1 DESCRIPTION
 
-lalala
+B<paargs> is a simple wrapper over B<paexec> that simplifies
+use of B<paexec>'s capalities. The use of B<paargs> is actually very
+similar to B<xargs>. B<paargs> runs B<paexec>
+with the following options enabled by default:
+I<-C> -- for specifying I<command> as free arguments,
+I<-x> -- for being B<xargs>-like,
+I<-l> -- 0-based task number is included to the output of B<paargs>, this
+allows to reorder the sliced output,
+I<-e> -- for the same purposes as I<-l>,
+l<-g> -- this flag allows analysis of I<command>'s exit status,
+I<-md=> -- disables task delimiter for I<-g> mode enabled by default,
+as a result the whole line given on input is considered as a task.
 
 =head1 BUGS/FEEDBACK
 

@@ -162,8 +162,8 @@ line. Space character is used as a separator.
 
 =item B<-e>
 
-When end-of-task marker is obtained from node, an empty line is
-printed to stdout. This option may be useful together with I<-l>
+When end-of-task marker is obtained from node, EOT marker is
+output to stdout. This option may be useful together with I<-l>
 and/or I<-r>.
 
 =item B<-E>
