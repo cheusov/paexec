@@ -391,16 +391,14 @@ static void init__postproc_arg_cmd (void)
 				msg_success, msg_failure);
 		}
 
-		snprintf (cmd, sizeof (cmd),
+		if (snprintf (cmd, sizeof (cmd),
 				  "%s\n while read f; do"
 				  "  res=`run \"$f\"`;"
 				  "  ex=$?;"
 				  "  %s" /* printing result */
 				  "  %s" /* condition. success/failure */
 				  "  echo '%s';" /* EOT */
-				  "done", generate_run_command(), tmp, cond_cmd, magic_eot);
-
-		if (strlen(cmd) + 1 == sizeof(cmd)){
+				  "done", generate_run_command(), tmp, cond_cmd, magic_eot) >= sizeof (cmd)){
 			err_fatal ("paexec: Internal error7! (buffer size)");
 		}
 
@@ -415,12 +413,16 @@ static void init__postproc_arg_cmd (void)
 
 	SLIST_FOREACH (p, &envvars, entries){
 		xshquote ((p->value ? p->value : ""), tmp, sizeof (tmp));
-		snprintf (tmp2, sizeof (tmp2), "%s=%s ", p->name, tmp);
+		if (snprintf (tmp2, sizeof (tmp2), "%s=%s ", p->name, tmp) >= sizeof (tmp2)){
+            err_fatal ("paexec: Internal error! (buffer size)");
+        }
 		strlcat (env_str, tmp2, sizeof (env_str));
 	}
 
 	/**/
-	snprintf (cmd, sizeof (cmd), "env %s /bin/sh -c %s", env_str, shq_cmd);
+	if (snprintf (cmd, sizeof (cmd), "env %s /bin/sh -c %s", env_str, shq_cmd) >= sizeof (cmd)){
+        err_fatal ("paexec: Internal error! (buffer size)");
+    }
 	xfree (arg_cmd);
 	arg_cmd = xstrdup (cmd);
 
