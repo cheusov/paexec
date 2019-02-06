@@ -1023,7 +1023,7 @@ static char *gen_cmd (int *argc, char ***argv)
 	len = 0;
 	for (i=0; i < *argc; ++i){
 		curr_token = (*argv) [i];
-		if (replstr != NULL && !strcmp(curr_token, replstr)){
+		if (replstr[0] && !strcmp(curr_token, replstr)){
 			cmd[len+0] = '"';
 			cmd[len+1] = '$';
 			cmd[len+2] = '1';
