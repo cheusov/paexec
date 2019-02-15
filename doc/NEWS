@@ -1,4 +1,11 @@
 ======================================================================
+Version 1.1.1, by Aleksey Cheusov, Fri, 15 Feb 2019 21:58:39 +0300
+
+  Fix build using clang
+
+  Verify snprintf didn't truncate the output
+
+======================================================================
 Version 1.1.0, by Aleksey Cheusov, Wed, 25 Apr 2018 23:21:24 +0300
 
   paexec:

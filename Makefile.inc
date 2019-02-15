@@ -24,4 +24,4 @@ INTEXTS_REPLS +=	awk ${PROG.${AWK}:U${AWK}}
 INTEXTS_REPLS +=	version ${VERSION:U}
 
 #
-VERSION=	1.1.0
+VERSION=	1.1.1
