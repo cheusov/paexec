@@ -1030,6 +1030,19 @@ fakeflac/fake5.wav
 6 pid FFFFFF
 '
 
+    printf 'a\nbb\n   ccc  with   spaces   \ndddd\neeeee\nffffff\n' |
+    runtest -lpx -n+7 \
+	    -C awk 'BEGIN {print toupper(ARGV[1])}' |
+    resort | awk '{ sub(/^[0-9]+ [0-9]+ /, "num pid "); print }' |
+    cmp 'paexec toupper #6.5 (-x and spaces)' \
+'num pid A
+num pid BB
+num pid    CCC  WITH   SPACES   
+num pid DDDD
+num pid EEEEE
+num pid FFFFFF
+'
+
     # all_substr
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runtest -l -c cmd_all_substr \

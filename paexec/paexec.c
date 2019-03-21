@@ -392,7 +392,8 @@ static void init__postproc_arg_cmd (void)
 		}
 
 		if (snprintf (cmd, sizeof (cmd),
-				  "%s\n while read f; do"
+				  "%s; IFS=; "
+				  "while read f; do"
 				  "  res=`run \"$f\"`;"
 				  "  ex=$?;"
 				  "  %s" /* printing result */
