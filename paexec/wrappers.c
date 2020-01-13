@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2013 Aleksey Cheusov <vle@gmx.net>
+ * Copyright (c) 2007-2019 Aleksey Cheusov <vle@gmx.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -32,6 +32,10 @@
 #include "decls.h"
 #include "wrappers.h"
 #include "common.h"
+
+#if !HAVE_FUNC6_PSELECT_SYS_SELECT_H
+ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
+#endif
 
 void nonblock (int fd)
 {
