@@ -2,6 +2,9 @@
 
 export LC_ALL=C
 
+: ${PAEXEC_FIND:=find}
+FIND_CMD=$PAEXEC_FIND
+
 #EXEPREFIX='valgrind -q'
 #EXEPREFIX='env EF_PROTECT_BELOW=1 ef'
 
@@ -886,7 +889,7 @@ fake5.flac
 18 /etc/dir with spaces;/etc/dir with spaces/subdir
 '
 
-    find . -type f -name '*.wav' -print0 |
+    $FIND_CMD . -type f -name '*.wav' -print0 |
 	runtest -n+6 -0x -C echo |
     sort | sed 's|^[.]/||' |
     cmp 'paexec -0' \
