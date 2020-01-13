@@ -448,6 +448,11 @@ Also, through this variable an end-of-task marker is passed to all I<command>s.
 
 Unless option B<-n> was applied, this variables specifies the nodes.
 
+=item I<PAEXEC_SH>
+
+This variable sets the shell interpreter used inside B<paexec>.
+By default it is /bin/sh.
+
 =item I<PAEXEC_TRANSPORT>
 
 Unless option B<-t> was applied, this variables specifies the transport.

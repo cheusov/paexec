@@ -182,6 +182,8 @@ static const char *msg_weight  = "weight:";
 static const char *msg_eot = NULL;
 char msg_delim = ' '; /* also used in tasks.c */
 
+static const char *shell = NULL;
+
 static int resistant = 0;
 static int resistance_timeout = 0;
 static int resistance_last_restart = 0;
@@ -421,7 +423,7 @@ static void init__postproc_arg_cmd (void)
 	}
 
 	/**/
-	if (snprintf (cmd, sizeof (cmd), "env %s /bin/sh -c %s", env_str, shq_cmd) >= sizeof (cmd)){
+	if (snprintf (cmd, sizeof (cmd), "env %s %s -c %s", env_str, shell, shq_cmd) >= sizeof (cmd)){
         err_fatal ("paexec: Internal error! (buffer size)");
     }
 	xfree (arg_cmd);
@@ -1312,6 +1314,12 @@ static void init_env (void)
 	char *env_nodes = getenv ("PAEXEC_NODES");
 	if (env_nodes)
 		assign_str (&arg_nodes, env_nodes);
+
+	char *env_shell   = getenv ("PAEXEC_SH");
+	if (env_shell)
+		shell = env_shell;
+	else
+		shell = "/bin/sh";
 
 	char *paexec_env = getenv ("PAEXEC_ENV");
 	if (paexec_env){
