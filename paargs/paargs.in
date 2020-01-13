@@ -1,4 +1,4 @@
-#!/bin/sh
+#!@sh@
 
 usage (){
     cat 1>&2 <<'EOF'
