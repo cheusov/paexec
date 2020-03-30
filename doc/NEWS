@@ -1,4 +1,23 @@
 ======================================================================
+Version 1.1.2, by Aleksey Cheusov, Mon, 30 Mar 2020 21:50:03 +0300
+
+  paexec -x:
+    * fix handling tasks with leading spaces
+    * fix handling tasks with backslashes
+
+  paargs:
+    * on SunOS-5.10 use /usr/xpg4/bin/sh
+      instead of horribly broken /bin/sh
+
+  Fix build failure on SunOS-5.10 (getdelim(3) is absent)
+
+  Introduce PAEXEC_SH environment variable
+  for fixing /bin/sh on SunOS-5.10
+
+  Introduce PAEXEC_FIND variable for regression tests (required on
+  SunOS-5.10)
+
+======================================================================
 Version 1.1.1, by Aleksey Cheusov, Fri, 15 Feb 2019 21:58:39 +0300
 
   Fix build using clang
