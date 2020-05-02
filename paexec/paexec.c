@@ -374,7 +374,7 @@ static void init__postproc_arg_cmd (void)
 {
 	char shq_cmd [4096];
 	char cmd [4096];
-	char tmp [4096];
+	char tmp [4096]="";
 	char env_str [4096]="";
 	char tmp2 [4096]="";
 	struct envvar_entry *p;
