@@ -97,6 +97,10 @@ Passed directly to B<paexec>.
 
 Passed directly to B<paexec>.
 
+=item B<-d>
+
+Turn on a debugging mode (for debugging purposes only)
+
 =back
 
 =head1 BUGS/FEEDBACK

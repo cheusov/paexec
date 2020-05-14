@@ -172,7 +172,7 @@ Imply B<-e> and flushes stdout.
 
 =item B<-d>
 
-Turn on a debugging mode (for debugging purposes only)
+Turn on a debugging mode (for debugging purposes only).
 
 =item B<-i>
 
