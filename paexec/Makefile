@@ -20,6 +20,8 @@ MLINKS     =	paexec_reorder.1 pareorder.1
 CFLAGS    +=	-DPAEXEC_VERSION='"${VERSION}"'
 CFLAGS    +=	-DBUFSIZE=${BUFSIZE}
 
+CFLAGS.check +=	-Wno-error=stringop-truncation
+
 MKC_FEATURES         =	strlcat strlcpy SLIST RB
 MKC_SOURCE_FUNCLIBS  =  shquote getdelim
 
