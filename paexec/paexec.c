@@ -48,6 +48,8 @@
 #include "signals.h"
 #include "pr.h"
 
+#include "mkc_strlcpy.h"
+
 #ifndef BUFSIZE
 #define BUFSIZE 2048
 #endif
@@ -273,7 +275,7 @@ static void init__read_graph_tasks (void)
 			--len;
 		}
 
-		strncpy (buf_copy, buf, sizeof (buf_copy));
+		strlcpy(buf_copy, buf, sizeof (buf_copy));
 
 		tok1 = tok2 = tok3 = tok = NULL;
 		tok_cnt = 0;
