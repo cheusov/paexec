@@ -41,10 +41,10 @@ extern char msg_delim; /* from paexec.c */
 static int *deleted_tasks = NULL;
 
 struct task_entry {
-	SLIST_ENTRY (task_entry) entries;      /* List. */
+	SLIST_ENTRY(task_entry) entries;      /* List. */
 	int task_id;
 };
-static SLIST_HEAD (task_head, task_entry) *arcs_outg = NULL, *arcs_inco = NULL;
+static SLIST_HEAD(task_head, task_entry) *arcs_outg = NULL, *arcs_inco = NULL;
 
 static int arcs_count = 0;
 
@@ -59,15 +59,15 @@ typedef struct task_struct {
 	int task_id;
 } task_t;
 
-static int tasks_cmp (task_t *a, task_t *b)
+static int tasks_cmp(task_t *a, task_t *b)
 {
-	return strcmp (a->task, b->task);
+	return strcmp(a->task, b->task);
 }
 
-static RB_HEAD (tasks_entries, task_struct) tasks = RB_INITIALIZER(&tasks);
+static RB_HEAD(tasks_entries, task_struct) tasks = RB_INITIALIZER(&tasks);
 
-RB_PROTOTYPE (tasks_entries, task_struct, linkage, tasks_cmp)
-RB_GENERATE (tasks_entries, task_struct, linkage, tasks_cmp)
+RB_PROTOTYPE(tasks_entries, task_struct, linkage, tasks_cmp)
+RB_GENERATE(tasks_entries, task_struct, linkage, tasks_cmp)
 
 int graph_mode  = 0;
 /* numeric task id to textual representation*/
@@ -84,55 +84,55 @@ int current_taskid = 0;
 static int *failed_taskids     = NULL;
 int failed_taskids_count = 0;
 
-void tasks__init (void)
+void tasks__init(void)
 {
 }
 
-void tasks__destroy (void)
+void tasks__destroy(void)
 {
 	task_t *data, *next;
-	data = (task_t *) RB_MIN (tasks_entries, &tasks);
+	data = (task_t *) RB_MIN(tasks_entries, &tasks);
 	while (data){
-		next = (task_t *) RB_NEXT (tasks_entries, &tasks, data);
-		RB_REMOVE (tasks_entries, &tasks, data);
-		free (data->task);
-		free (data);
+		next = (task_t *) RB_NEXT(tasks_entries, &tasks, data);
+		RB_REMOVE(tasks_entries, &tasks, data);
+		free(data->task);
+		free(data);
 
 		data = next;
 	}
 
 	if (deleted_tasks)
-		xfree (deleted_tasks);
+		xfree(deleted_tasks);
 
 	if (id2weight)
-		xfree (id2weight);
+		xfree(id2weight);
 	if (id2sum_weight)
-		xfree (id2sum_weight);
+		xfree(id2sum_weight);
 }
 
-void tasks__delete_task (int task, int print_task, int with_prefix)
+void tasks__delete_task(int task, int print_task, int with_prefix)
 {
 	struct task_entry *p;
 	int to;
 
-	assert (task < tasks_count);
-	assert (task >= 0);
+	assert(task < tasks_count);
+	assert(task >= 0);
 
 	if (!graph_mode){
 		if (id2task [task]){
-			xfree (id2task [task]);
+			xfree(id2task [task]);
 			id2task [task] = NULL;
 		}
 	}
 
 	if (graph_mode){
-		SLIST_FOREACH (p, &arcs_outg [task], entries){
+		SLIST_FOREACH(p, &arcs_outg [task], entries){
 			to = p->task_id;
 			if (tasks_graph_deg [to] > 0)
 				--tasks_graph_deg [to];
 		}
 
-		if (tasks_graph_deg [task] >= -1){
+		if(tasks_graph_deg [task] >= -1){
 			tasks_graph_deg [task] = -2;
 
 			--remained_tasks_count;
@@ -142,45 +142,45 @@ void tasks__delete_task (int task, int print_task, int with_prefix)
 	if (print_task){
 		if (!deleted_tasks [task]){
 			if (with_prefix)
-				printf ("%c", msg_delim);
+				printf("%c", msg_delim);
 
-			printf ("%s", id2task [task]);
+			printf("%s", id2task [task]);
 
 			deleted_tasks [task] = 1;
 		}
 	}
 }
 
-static void delete_task_rec2 (int task, int with_prefix)
+static void delete_task_rec2(int task, int with_prefix)
 {
 	struct task_entry *p;
 	int to;
 
-	assert (task >= 0);
+	assert(task >= 0);
 
-	tasks__delete_task (task, 1, with_prefix);
+	tasks__delete_task(task, 1, with_prefix);
 
-	SLIST_FOREACH (p, &arcs_outg [task], entries){
+	SLIST_FOREACH(p, &arcs_outg [task], entries){
 		to = p->task_id;
-		delete_task_rec2 (to, 1);
+		delete_task_rec2(to, 1);
 	}
 }
 
-void tasks__delete_task_rec (int task)
+void tasks__delete_task_rec(int task)
 {
-	memset (deleted_tasks, 0, tasks_count * sizeof (*deleted_tasks));
+	memset(deleted_tasks, 0, tasks_count * sizeof(*deleted_tasks));
 
-	delete_task_rec2 (task, 0);
+	delete_task_rec2(task, 0);
 }
 
-static int get_new_task_num_from_graph (void)
+static int get_new_task_num_from_graph(void)
 {
 	int i;
 	int best_weight = 0;
 	int best_task = -1;
 
 	for (i=1; i < tasks_count; ++i){
-		assert (tasks_graph_deg [i] >= -2);
+		assert(tasks_graph_deg [i] >= -2);
 
 		if (tasks_graph_deg [i] == 0){
 			if (id2sum_weight [i] > best_weight){
@@ -193,10 +193,10 @@ static int get_new_task_num_from_graph (void)
 	return best_task;
 }
 
-static const char * get_new_task_from_graph (void)
+static const char * get_new_task_from_graph(void)
 {
 	/* topological sort of task graph */
-	int num = get_new_task_num_from_graph ();
+	int num = get_new_task_num_from_graph();
 	if (num == -1)
 		return NULL;
 
@@ -205,7 +205,7 @@ static const char * get_new_task_from_graph (void)
 	return id2task [num];
 }
 
-static const char * get_new_task_from_stdin (void)
+static const char * get_new_task_from_stdin(void)
 {
 	static char *task = NULL;
 	static size_t task_sz = 0;
@@ -221,61 +221,61 @@ static const char * get_new_task_from_stdin (void)
 
 	current_taskid = tasks_count++;
 
-	id2task = (char **) xrealloc (
-		id2task, tasks_count * sizeof (*id2task));
+	id2task = (char **) xrealloc(
+		id2task, tasks_count * sizeof(*id2task));
 	id2task [current_taskid] = xstrdup(task);
 
 	return task;
 }
 
-const char *tasks__get_new_task (void)
+const char *tasks__get_new_task(void)
 {
 	const char *task = NULL;
 	size_t task_len = 0;
 
 	if (failed_taskids_count > 0){
 		current_taskid = failed_taskids [--failed_taskids_count];
-		assert (current_taskid < tasks_count);
+		assert(current_taskid < tasks_count);
 		task = id2task [current_taskid];
-		assert (task);
+		assert(task);
 	}else if (graph_mode){
-		task = get_new_task_from_graph ();
+		task = get_new_task_from_graph();
 	}else{
-		task = get_new_task_from_stdin ();
+		task = get_new_task_from_stdin();
 	}
 
 	if (!task)
 		return NULL;
 
-	task_len = strlen (task);
+	task_len = strlen(task);
 
 	if (task_len >= current_task_sz){
 		current_task_sz = task_len+1;
-		current_task = (char *) xrealloc (current_task, current_task_sz);
+		current_task = (char *) xrealloc(current_task, current_task_sz);
 	}
 
-	memcpy (current_task, task, task_len+1);
+	memcpy(current_task, task, task_len+1);
 
 	return current_task;
 }
 
-int tasks__add_task (char *s, int weight)
+int tasks__add_task(char *s, int weight)
 {
-	task_t *n = malloc (sizeof (*n));
+	task_t *n = malloc(sizeof(*n));
 	task_t *data;
 	int task_id;
 
 	n->task = s;
 
-	data = RB_INSERT (tasks_entries, &tasks, n);
+	data = RB_INSERT(tasks_entries, &tasks, n);
 	if (data){
 		task_id = data->task_id;
 		if (id2weight [task_id] < weight){
 			id2weight     [task_id] = weight;
 			id2sum_weight [task_id] = weight;
 		}
-		free (s);
-		free (n);
+		free(s);
+		free(n);
 		return task_id;
 	}else{
 		n->task_id = tasks_count;
@@ -283,61 +283,61 @@ int tasks__add_task (char *s, int weight)
 		++tasks_count;
 		++remained_tasks_count;
 
-		arcs_outg = (struct task_head *) xrealloc (
-			arcs_outg, tasks_count * sizeof (*arcs_outg));
+		arcs_outg = (struct task_head *) xrealloc(
+			arcs_outg, tasks_count * sizeof(*arcs_outg));
 		SLIST_INIT(&arcs_outg [tasks_count-1]);
 
-		arcs_inco = (struct task_head *) xrealloc (
-			arcs_inco, tasks_count * sizeof (*arcs_inco));
+		arcs_inco = (struct task_head *) xrealloc(
+			arcs_inco, tasks_count * sizeof(*arcs_inco));
 		SLIST_INIT(&arcs_inco [tasks_count-1]);
 
-		id2task = (char **) xrealloc (
-			id2task, tasks_count * sizeof (*id2task));
+		id2task = (char **) xrealloc(
+			id2task, tasks_count * sizeof(*id2task));
 		id2task [tasks_count-1] = s;
 
-		id2weight = (int *) xrealloc (
-			id2weight, tasks_count * sizeof (*id2weight));
+		id2weight = (int *) xrealloc(
+			id2weight, tasks_count * sizeof(*id2weight));
 		id2weight [tasks_count-1] = weight;
 
-		id2sum_weight = (int *) xrealloc (
-			id2sum_weight, tasks_count * sizeof (*id2sum_weight));
+		id2sum_weight = (int *) xrealloc(
+			id2sum_weight, tasks_count * sizeof(*id2sum_weight));
 		id2sum_weight [tasks_count-1] = weight;
 
-		deleted_tasks = (int *) xrealloc (
-			deleted_tasks, tasks_count * sizeof (*deleted_tasks));
+		deleted_tasks = (int *) xrealloc(
+			deleted_tasks, tasks_count * sizeof(*deleted_tasks));
 		deleted_tasks [tasks_count-1] = -1;
 
-		tasks_graph_deg = (int *) xrealloc (
-			tasks_graph_deg, tasks_count * sizeof (*tasks_graph_deg));
+		tasks_graph_deg = (int *) xrealloc(
+			tasks_graph_deg, tasks_count * sizeof(*tasks_graph_deg));
 		tasks_graph_deg [tasks_count-1] = 0;
 
 		return tasks_count-1;
 	}
 }
 
-void tasks__add_task_arc (int task_from, int task_to)
+void tasks__add_task_arc(int task_from, int task_to)
 {
 	struct task_entry *p1,*p2;
 	++arcs_count;
 
-	p1 = xmalloc (sizeof (*p1));
-	memset (p1, 0, sizeof (*p1));
+	p1 = xmalloc(sizeof(*p1));
+	memset(p1, 0, sizeof(*p1));
 	p1->task_id = task_to;
-	SLIST_INSERT_HEAD (&arcs_outg [task_from], p1, entries);
+	SLIST_INSERT_HEAD(&arcs_outg [task_from], p1, entries);
 
-	p2 = xmalloc (sizeof (*p2));
-	memset (p2, 0, sizeof (*p2));
+	p2 = xmalloc(sizeof(*p2));
+	memset(p2, 0, sizeof(*p2));
 	p2->task_id = task_from;
-	SLIST_INSERT_HEAD (&arcs_inco [task_to], p2, entries);
+	SLIST_INSERT_HEAD(&arcs_inco [task_to], p2, entries);
 
 	++tasks_graph_deg [task_to];
 }
 
-void tasks__mark_task_as_failed (int id)
+void tasks__mark_task_as_failed(int id)
 {
-	failed_taskids = (int *) xrealloc (
+	failed_taskids = (int *) xrealloc(
 		failed_taskids,
-		(failed_taskids_count+1) * sizeof (*failed_taskids));
+		(failed_taskids_count+1) * sizeof(*failed_taskids));
 
 	failed_taskids [failed_taskids_count++] = id;
 }
@@ -345,7 +345,7 @@ void tasks__mark_task_as_failed (int id)
 static int *check_cycles__stack;
 static int *check_cycles__mark;
 
-static void check_cycles__outgoing (int stack_sz)
+static void check_cycles__outgoing(int stack_sz)
 {
 	struct task_entry *p;
 	int j;
@@ -354,21 +354,21 @@ static void check_cycles__outgoing (int stack_sz)
 	int to;
 	int from = check_cycles__stack [stack_sz-1];
 
-	assert (stack_sz > 0);
+	assert(stack_sz > 0);
 
-	assert (check_cycles__mark [from] == 0);
+	assert(check_cycles__mark [from] == 0);
 	check_cycles__mark [from] = 2; /* currently in the path */
 
-	SLIST_FOREACH (p, &arcs_outg [from], entries){
+	SLIST_FOREACH(p, &arcs_outg [from], entries){
 		to = p->task_id;
-		assert (stack_sz < tasks_count);
+		assert(stack_sz < tasks_count);
 
 		check_cycles__stack [stack_sz] = to;
 
 		switch (check_cycles__mark [to]){
 			case 2:
 				loop = 0;
-				fprintf (stderr, "Cyclic dependancy detected:\n");
+				fprintf(stderr, "Cyclic dependancy detected:\n");
 				for (j=1; j <= stack_sz; ++j){
 					s = check_cycles__stack [j-1];
 					t = check_cycles__stack [j];
@@ -377,102 +377,102 @@ static void check_cycles__outgoing (int stack_sz)
 						continue;
 
 					loop = 1;
-					fprintf (stderr, "  %s -> %s\n", id2task [s], id2task [t]);
+					fprintf(stderr, "  %s -> %s\n", id2task [s], id2task [t]);
 				}
 
-				exit (1);
+				exit(1);
 			case 0:
-				check_cycles__outgoing (stack_sz + 1);
+				check_cycles__outgoing(stack_sz + 1);
 				break;
 			case 1:
 				break;
 			default:
-				abort (); /* this should not happen */
+				abort(); /* this should not happen */
 		}
 	}
 
 	check_cycles__mark [from] = 1; /* already seen */
 }
 
-void tasks__check_for_cycles (void)
+void tasks__check_for_cycles(void)
 {
 	int i;
 
-	check_cycles__stack = xmalloc (
-		tasks_count * sizeof (check_cycles__stack [0]));
+	check_cycles__stack = xmalloc(
+		tasks_count * sizeof(check_cycles__stack [0]));
 
-	check_cycles__mark = xmalloc (
-		tasks_count * sizeof (check_cycles__mark [0]));
-	memset (check_cycles__mark, 0,
-		tasks_count * sizeof (check_cycles__mark [0]));
+	check_cycles__mark = xmalloc(
+		tasks_count * sizeof(check_cycles__mark [0]));
+	memset(check_cycles__mark, 0,
+		tasks_count * sizeof(check_cycles__mark [0]));
 
 	/* */
 	for (i=1; i < tasks_count; ++i){
 		switch (check_cycles__mark [i]){
 			case 0:
 				check_cycles__stack [0] = i;
-				check_cycles__outgoing (1);
+				check_cycles__outgoing(1);
 				break;
 			case 1:
 				break;
 			case 2:
-				abort (); /* this should not happen */
+				abort(); /* this should not happen */
 		}
 	}
 
-	xfree (check_cycles__mark);
-	xfree (check_cycles__stack);
+	xfree(check_cycles__mark);
+	xfree(check_cycles__stack);
 }
 
 static char *seen = NULL;
 
-static void tasks__make_sum_weights_rec (int *accu_w, int task)
+static void tasks__make_sum_weights_rec(int *accu_w, int task)
 {
 	struct task_entry *p;
 	int to;
 
 	seen [task] = 1;
-	SLIST_FOREACH (p, &arcs_outg [task], entries){
+	SLIST_FOREACH(p, &arcs_outg [task], entries){
 		to = p->task_id;
 		if (seen [to])
 			continue;
 
-		tasks__make_sum_weights_rec (accu_w, to);
+		tasks__make_sum_weights_rec(accu_w, to);
 		*accu_w += id2weight [to];
 		seen [to] = 1;
 	}
 }
 
-void tasks__make_sum_weights (void)
+void tasks__make_sum_weights(void)
 {
 	int i;
 
 	if (!graph_mode)
 		return;
 
-	seen = (char *) xmalloc (tasks_count);
+	seen = (char *) xmalloc(tasks_count);
 
 	for (i=1; i < tasks_count; ++i){
-		memset (seen, 0, tasks_count);
-		tasks__make_sum_weights_rec (&id2sum_weight [i], i);
+		memset(seen, 0, tasks_count);
+		tasks__make_sum_weights_rec(&id2sum_weight [i], i);
 	}
 
-	xfree (seen);
+	xfree(seen);
 }
 
-static void tasks__make_max_weights_rec (int *accu_w, int task)
+static void tasks__make_max_weights_rec(int *accu_w, int task)
 {
 	struct task_entry *p;
 	int to;
 	int curr_w;
 
 	seen [task] = 1;
-	SLIST_FOREACH (p, &arcs_outg [task], entries){
+	SLIST_FOREACH(p, &arcs_outg [task], entries){
 		to = p->task_id;
 		if (seen [to])
 			continue;
 
-		tasks__make_max_weights_rec (accu_w, to);
+		tasks__make_max_weights_rec(accu_w, to);
 		curr_w = id2weight [to];
 		if (*accu_w < curr_w)
 			*accu_w = curr_w;
@@ -480,25 +480,25 @@ static void tasks__make_max_weights_rec (int *accu_w, int task)
 	}
 }
 
-void tasks__make_max_weights (void)
+void tasks__make_max_weights(void)
 {
 	int i;
 
 	if (!graph_mode)
 		return;
 
-	seen = (char *) xmalloc (tasks_count);
+	seen = (char *) xmalloc(tasks_count);
 
 	for (i=1; i < tasks_count; ++i){
-		memset (seen, 0, tasks_count);
+		memset(seen, 0, tasks_count);
 
-		tasks__make_max_weights_rec (&id2sum_weight [i], i);
+		tasks__make_max_weights_rec(&id2sum_weight [i], i);
 	}
 
-	xfree (seen);
+	xfree(seen);
 }
 
-void tasks__print_sum_weights (void)
+void tasks__print_sum_weights(void)
 {
 	int i;
 
@@ -506,7 +506,7 @@ void tasks__print_sum_weights (void)
 		return;
 
 	for (i=1; i < tasks_count; ++i){
-		fprintf (stderr, "weight [%s]=%d\n", id2task [i], id2weight [i]);
-		fprintf (stderr, "sum_weight [%s]=%d\n", id2task [i], id2sum_weight [i]);
+		fprintf(stderr, "weight [%s]=%d\n", id2task [i], id2weight [i]);
+		fprintf(stderr, "sum_weight [%s]=%d\n", id2task [i], id2sum_weight [i]);
 	}
 }

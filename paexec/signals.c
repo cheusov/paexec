@@ -28,53 +28,53 @@
 #include "common.h"
 #include "wrappers.h"
 
-void block_signals (void)
+void block_signals(void)
 {
 	sigset_t set;
 
-	sigemptyset (&set);
-	xsigaddset (&set, SIGALRM);
-	xsigaddset (&set, SIGCHLD);
+	sigemptyset(&set);
+	xsigaddset(&set, SIGALRM);
+	xsigaddset(&set, SIGCHLD);
 
-	xsigprocmask (SIG_BLOCK, &set, NULL);
+	xsigprocmask(SIG_BLOCK, &set, NULL);
 }
 
-void unblock_signals (void)
+void unblock_signals(void)
 {
 	sigset_t set;
 
-	sigemptyset (&set);
-	xsigaddset (&set, SIGALRM);
-	xsigaddset (&set, SIGCHLD);
+	sigemptyset(&set);
+	xsigaddset(&set, SIGALRM);
+	xsigaddset(&set, SIGCHLD);
 
-	xsigprocmask (SIG_UNBLOCK, &set, NULL);
+	xsigprocmask(SIG_UNBLOCK, &set, NULL);
 }
 
-void set_sig_handler (int sig, void (*handler) (int))
+void set_sig_handler(int sig, void (*handler) (int))
 {
 	struct sigaction sa;
 
 	sa.sa_handler = handler;
-	sigemptyset (&sa.sa_mask);
+	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
-	sigaction (sig, &sa, NULL);
+	sigaction(sig, &sa, NULL);
 }
 
-void ignore_sigpipe (void)
+void ignore_sigpipe(void)
 {
-	set_sig_handler (SIGPIPE, SIG_IGN);
+	set_sig_handler(SIGPIPE, SIG_IGN);
 }
 
-void wait_for_sigalrm (void)
+void wait_for_sigalrm(void)
 {
 	sigset_t set;
 
-	sigemptyset (&set);
+	sigemptyset(&set);
 
-	sigsuspend (&set);
+	sigsuspend(&set);
 }
 
-void handler_sigchld (int dummy attr_unused)
+void handler_sigchld(int dummy attr_unused)
 {
 	int status;
 	pid_t pid;
@@ -83,19 +83,19 @@ void handler_sigchld (int dummy attr_unused)
 	}
 }
 
-void set_sigalrm_handler (void)
+void set_sigalrm_handler(void)
 {
-	set_sig_handler (SIGALRM, handler_sigalrm);
+	set_sig_handler(SIGALRM, handler_sigalrm);
 }
 
-void set_sigchld_handler (void)
+void set_sigchld_handler(void)
 {
-	set_sig_handler (SIGCHLD, handler_sigchld);
+	set_sig_handler(SIGCHLD, handler_sigchld);
 }
 
 int sigalrm_tics = 0;
-void handler_sigalrm (int dummy attr_unused)
+void handler_sigalrm(int dummy attr_unused)
 {
 	++sigalrm_tics;
-	alarm (1);
+	alarm(1);
 }

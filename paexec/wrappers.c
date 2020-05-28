@@ -37,34 +37,34 @@
 ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 #endif
 
-void nonblock (int fd)
+void nonblock(int fd)
 {
-	int ret = fcntl (fd, F_GETFL, 0);
+	int ret = fcntl(fd, F_GETFL, 0);
 	if (ret == -1){
-		perror ("fcntl failed(2)");
-		exit (1);
+		perror("fcntl failed(2)");
+		exit(1);
 	}
 
-	ret = fcntl (fd, F_SETFL, ret | O_NONBLOCK);
+	ret = fcntl(fd, F_SETFL, ret | O_NONBLOCK);
 	if (ret == -1){
-		perror ("fcntl failed(2)");
-		exit (1);
+		perror("fcntl failed(2)");
+		exit(1);
 	}
 }
 
-void xsigaddset (sigset_t *set, int signo)
+void xsigaddset(sigset_t *set, int signo)
 {
-	if (sigaddset (set, signo)){
-		perror ("sigaddset(2) failed");
-		exit (1);
+	if (sigaddset(set, signo)){
+		perror("sigaddset(2) failed");
+		exit(1);
 	}
 }
 
-void xsigprocmask (int how, const sigset_t *set, sigset_t *oset)
+void xsigprocmask(int how, const sigset_t *set, sigset_t *oset)
 {
-	if (sigprocmask (how, set, oset)){
-		perror ("sigprocmask(2) failed");
-		exit (1);
+	if (sigprocmask(how, set, oset)){
+		perror("sigprocmask(2) failed");
+		exit(1);
 	}
 }
 
@@ -72,31 +72,31 @@ ssize_t xgetdelim(char **lineptr, size_t *n, int delimiter, FILE *stream)
 {
 	ssize_t ret = getdelim(lineptr, n, delimiter, stream);
 
-	if (ret == (ssize_t) -1 && ferror (stdin)){
-		perror ("getdelim(3) failed");
-		exit (1);
+	if (ret == (ssize_t) -1 && ferror(stdin)){
+		perror("getdelim(3) failed");
+		exit(1);
 	}
 
 	return ret;
 }
 
-char *xstrdup (const char *s)
+char *xstrdup(const char *s)
 {
-	char *ret = strdup (s);
+	char *ret = strdup(s);
 	if (!ret){
-		perror ("strdup(3) failed");
-		exit (1);
+		perror("strdup(3) failed");
+		exit(1);
 	}
 
 	return ret;
 }
 
-void *xmalloc (size_t size)
+void *xmalloc(size_t size)
 {
-	void *ret = malloc (size);
+	void *ret = malloc(size);
 	if (!ret){
-		perror ("malloc(3) failed");
-		exit (1);
+		perror("malloc(3) failed");
+		exit(1);
 	}
 
 	return ret;
@@ -104,10 +104,10 @@ void *xmalloc (size_t size)
 
 void *xcalloc(size_t number, size_t size)
 {
-	void *ret = calloc (number, size);
+	void *ret = calloc(number, size);
 	if (!ret){
-		perror ("calloc(3) failed");
-		exit (1);
+		perror("calloc(3) failed");
+		exit(1);
 	}
 
 	return ret;
@@ -115,63 +115,63 @@ void *xcalloc(size_t number, size_t size)
 
 void *xrealloc(void *ptr, size_t size)
 {
-	void *ret = realloc (ptr, size);
+	void *ret = realloc(ptr, size);
 	if (!ret){
-		perror ("realloc(3) failed");
-		exit (1);
+		perror("realloc(3) failed");
+		exit(1);
 	}
 
 	return ret;
 }
 
-void xfree (void *p)
+void xfree(void *p)
 {
 	if (p)
-		free (p);
+		free(p);
 }
 
 void xshquote(const char *arg, char *buf, size_t bufsize)
 {
-	size_t ret = shquote (arg, buf, bufsize);
+	size_t ret = shquote(arg, buf, bufsize);
 	if ((size_t)-1 == ret){
-		err_fatal ("paexec: shquote(3) failed");
-		exit (1);
+		err_fatal("paexec: shquote(3) failed");
+		exit(1);
 	}
 }
 
-void err_fatal (const char *m)
+void err_fatal(const char *m)
 {
-	kill_childs ();
-	wait_for_childs ();
+	kill_childs();
+	wait_for_childs();
 
-	fflush (stdout);
+	fflush(stdout);
 
-	fprintf (stderr, "%s\n", m);
-	exit (1);
+	fprintf(stderr, "%s\n", m);
+	exit(1);
 }
 
-void err_fatal_errno (const char *m)
+void err_fatal_errno(const char *m)
 {
-	kill_childs ();
-	wait_for_childs ();
+	kill_childs();
+	wait_for_childs();
 
-	fflush (stdout);
+	fflush(stdout);
 
-	fprintf (stderr, "%s: %s\n", m, strerror (errno));
-	exit (1);
+	fprintf(stderr, "%s: %s\n", m, strerror(errno));
+	exit(1);
 }
 
-void err_internal (const char *routine, const char *m)
+void err_internal(const char *routine, const char *m)
 {
-	kill_childs ();
-	wait_for_childs ();
+	kill_childs();
+	wait_for_childs();
 
-	fflush (stdout);
+	fflush(stdout);
 
 	if (routine)
-		fprintf (stderr, "%s (%s)\n", m, routine);
+		fprintf(stderr, "%s (%s)\n", m, routine);
 	else
-		fprintf (stderr, "%s\n", m);
+		fprintf(stderr, "%s\n", m);
 
-	exit (1);
+	exit(1);
 }

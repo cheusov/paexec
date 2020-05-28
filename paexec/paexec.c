@@ -58,9 +58,9 @@
 #define PAEXEC_VERSION "x.y.z"
 #endif
 
-static void usage (void)
+static void usage(void)
 {
-	fprintf (stderr, "\
+	fprintf(stderr, "\
 paexec -- parallel executor\n\
          that distributes tasks over CPUs or machines in a network.\n\
 usage: paexec    [OPTIONS]\n\
@@ -207,42 +207,42 @@ struct envvar_entry {
 };
 static SLIST_HEAD(envvar_head, envvar_entry) envvars = SLIST_HEAD_INITIALIZER(envvars);
 
-static void add_envvar (const char *name, const char *value)
+static void add_envvar(const char *name, const char *value)
 {
-	struct envvar_entry *val = calloc(1, sizeof (struct envvar_entry));
-	val->name  = strdup (name);
-	val->value = (value ? strdup (value) : NULL);
+	struct envvar_entry *val = calloc(1, sizeof(struct envvar_entry));
+	val->name  = strdup(name);
+	val->value = (value ? strdup(value) : NULL);
 	SLIST_INSERT_HEAD(&envvars, val, entries);
 }
 
-static void assign_str (char **ptr, const char *str)
+static void assign_str(char **ptr, const char *str)
 {
-	size_t len = strlen (str);
+	size_t len = strlen(str);
 
-	*ptr = xrealloc (*ptr, len+1);
-	memcpy (*ptr, str, len+1);
+	*ptr = xrealloc(*ptr, len+1);
+	memcpy(*ptr, str, len+1);
 }
 
-static void close_all_ins (void)
+static void close_all_ins(void)
 {
 	int i;
 	for (i=0; i < nodes_count; ++i){
 		if (!busy [i] && fd_in [i] != -1){
-			close (fd_in [i]);
+			close(fd_in [i]);
 			fd_in [i] = -1;
 		}
 	}
 }
 
-static void bad_input_line (const char *line)
+static void bad_input_line(const char *line)
 {
 	char buf [4000];
-	snprintf (buf, sizeof (buf), "Bad input line: %s\n", line);
+	snprintf(buf, sizeof(buf), "Bad input line: %s\n", line);
 
-	err_fatal (buf);
+	err_fatal(buf);
 }
 
-static void init__read_graph_tasks (void)
+static void init__read_graph_tasks(void)
 {
 	char *buf = NULL;
 	size_t buf_sz = 0;
@@ -259,7 +259,7 @@ static void init__read_graph_tasks (void)
 
 	/* */
 	if (debug){
-		fprintf (stderr, "start: init__read_graph_tasks\n");
+		fprintf(stderr, "start: init__read_graph_tasks\n");
 	}
 
 	/* */
@@ -275,7 +275,7 @@ static void init__read_graph_tasks (void)
 			--len;
 		}
 
-		strlcpy(buf_copy, buf, sizeof (buf_copy));
+		strlcpy(buf_copy, buf, sizeof(buf_copy));
 
 		tok1 = tok2 = tok3 = tok = NULL;
 		tok_cnt = 0;
@@ -300,7 +300,7 @@ static void init__read_graph_tasks (void)
 					tok3 = tok;
 					tok_cnt = 3;
 				}else{
-					bad_input_line (buf_copy);
+					bad_input_line(buf_copy);
 				}
 				tok = NULL;
 			}
@@ -309,36 +309,36 @@ static void init__read_graph_tasks (void)
 				break;
 		}
 
-		if (tok_cnt == 3 && !strcmp (tok1, msg_weight)){
+		if (tok_cnt == 3 && !strcmp(tok1, msg_weight)){
 			/* weight: <task> <weight> */
-			id2 = tasks__add_task (xstrdup (tok2), atoi (tok3));
+			id2 = tasks__add_task(xstrdup(tok2), atoi(tok3));
 			continue;
 		}
 
 		if (tok_cnt == 2){
 			/* <task-from> <task-to> */
-			id1 = tasks__add_task (xstrdup (tok1), 1);
-			id2 = tasks__add_task (xstrdup (tok2), 1);
+			id1 = tasks__add_task(xstrdup(tok1), 1);
+			id2 = tasks__add_task(xstrdup(tok2), 1);
 
-			tasks__add_task_arc (id1, id2);
+			tasks__add_task_arc(id1, id2);
 			continue;
 		}
 
 		if (tok_cnt == 1){
 			/* <task> */
-			id1 = tasks__add_task (xstrdup (tok1), 1);
+			id1 = tasks__add_task(xstrdup(tok1), 1);
 			continue;
 		}
 
-		bad_input_line (buf_copy);
+		bad_input_line(buf_copy);
 	}
 
 	if (buf)
-		free (buf);
+		free(buf);
 
 	/* */
 	if (debug){
-		fprintf (stderr, "end: init__read_graph_tasks\n");
+		fprintf(stderr, "end: init__read_graph_tasks\n");
 	}
 }
 
@@ -364,7 +364,7 @@ static char* generate_run_command(void)
 	}
 
 	if (strlen(run_command) + 1 == sizeof(run_command)){
-		err_fatal ("paexec: Internal error6! (buffer size)");
+		err_fatal("paexec: Internal error6! (buffer size)");
 	}
 
 //	fprintf(stderr, "run_command: %s\n", run_command);
@@ -372,7 +372,7 @@ static char* generate_run_command(void)
 	return run_command;
 }
 
-static void init__postproc_arg_cmd (void)
+static void init__postproc_arg_cmd(void)
 {
 	char shq_cmd [4096];
 	char cmd [4096];
@@ -385,17 +385,17 @@ static void init__postproc_arg_cmd (void)
 		char cond_cmd [4096] = "";
 
 		if (exec_mode == 'x'){
-			strlcpy(tmp, "  printf '%s\\n' \"$res\";", sizeof (tmp));
+			strlcpy(tmp, "  printf '%s\\n' \"$res\";", sizeof(tmp));
 		}
 
 		if (graph_mode){
-			snprintf (
-				cond_cmd, sizeof (cond_cmd),
+			snprintf(
+				cond_cmd, sizeof(cond_cmd),
 				"if test $ex = 0; then echo '%s'; else echo '%s'; fi;",
 				msg_success, msg_failure);
 		}
 
-		if (snprintf (cmd, sizeof (cmd),
+		if (snprintf(cmd, sizeof(cmd),
 				  "%s; IFS=; "
 				  "while read -r f; do"
 				  "  res=`run \"$f\"`;"
@@ -403,55 +403,55 @@ static void init__postproc_arg_cmd (void)
 				  "  %s" /* printing result */
 				  "  %s" /* condition. success/failure */
 				  "  echo '%s';" /* EOT */
-				  "done", generate_run_command(), tmp, cond_cmd, magic_eot) >= sizeof (cmd)){
-			err_fatal ("paexec: Internal error7! (buffer size)");
+				  "done", generate_run_command(), tmp, cond_cmd, magic_eot) >= sizeof(cmd)){
+			err_fatal("paexec: Internal error7! (buffer size)");
 		}
 
-		xfree (arg_cmd);
-		arg_cmd = xstrdup (cmd);
+		xfree(arg_cmd);
+		arg_cmd = xstrdup(cmd);
 	}
 
-	xshquote (arg_cmd, shq_cmd, sizeof (shq_cmd));
+	xshquote(arg_cmd, shq_cmd, sizeof(shq_cmd));
 
 	/* env(1) arg for environment variables */
 	add_envvar("PAEXEC_EOT", msg_eot);
 
-	SLIST_FOREACH (p, &envvars, entries){
-		xshquote ((p->value ? p->value : ""), tmp, sizeof (tmp));
-		if (snprintf (tmp2, sizeof (tmp2), "%s=%s ", p->name, tmp) >= sizeof (tmp2)){
-            err_fatal ("paexec: Internal error! (buffer size)");
+	SLIST_FOREACH(p, &envvars, entries){
+		xshquote((p->value ? p->value : ""), tmp, sizeof(tmp));
+		if (snprintf(tmp2, sizeof(tmp2), "%s=%s ", p->name, tmp) >= sizeof(tmp2)){
+            err_fatal("paexec: Internal error! (buffer size)");
         }
-		strlcat (env_str, tmp2, sizeof (env_str));
+		strlcat(env_str, tmp2, sizeof(env_str));
 	}
 
 	/**/
-	if (snprintf (cmd, sizeof (cmd), "env %s %s -c %s", env_str, shell, shq_cmd) >= sizeof (cmd)){
-        err_fatal ("paexec: Internal error! (buffer size)");
+	if (snprintf(cmd, sizeof(cmd), "env %s %s -c %s", env_str, shell, shq_cmd) >= sizeof(cmd)){
+        err_fatal("paexec: Internal error! (buffer size)");
     }
-	xfree (arg_cmd);
-	arg_cmd = xstrdup (cmd);
+	xfree(arg_cmd);
+	arg_cmd = xstrdup(cmd);
 
 	/**/
 	if (arg_transport){
 		/* one more shquote(3) for ssh-like transport */
-		xshquote (arg_cmd, shq_cmd, sizeof (shq_cmd));
-		xfree (arg_cmd);
-		arg_cmd = xstrdup (shq_cmd);
+		xshquote(arg_cmd, shq_cmd, sizeof(shq_cmd));
+		xfree(arg_cmd);
+		arg_cmd = xstrdup(shq_cmd);
 	}
 
-	if (strlen (cmd) + 20 >= sizeof (shq_cmd)){
-		err_fatal ("paexec: internal error, buffer size limit");
+	if (strlen(cmd) + 20 >= sizeof(shq_cmd)){
+		err_fatal("paexec: internal error, buffer size limit");
 	}
 }
 
-static void init__child_processes (void)
+static void init__child_processes(void)
 {
 	char full_cmd [2000];
 	int i;
 
 	/* */
 	if (debug){
-		fprintf (stderr, "start: init__child_processes\n");
+		fprintf(stderr, "start: init__child_processes\n");
 	}
 
 	/* */
@@ -461,7 +461,7 @@ static void init__child_processes (void)
 
 		if (!buf_out [i]){
 			/* +1 for \0 and -d option */
-			buf_out [i] = xmalloc (initial_bufsize+1);
+			buf_out [i] = xmalloc(initial_bufsize+1);
 		}
 		if (!bufsize_out [i])
 			bufsize_out [i] = initial_bufsize;
@@ -473,23 +473,23 @@ static void init__child_processes (void)
 		ret_codes [i] = rt_undef;
 
 		if (arg_transport)
-			snprintf (full_cmd, sizeof (full_cmd), "%s %s %s",
+			snprintf(full_cmd, sizeof(full_cmd), "%s %s %s",
 					  arg_transport, nodes [i], arg_cmd);
 		else
-			snprintf (full_cmd, sizeof (full_cmd), "%s", arg_cmd);
+			snprintf(full_cmd, sizeof(full_cmd), "%s", arg_cmd);
 
 		if (debug){
-			fprintf (stderr, "running cmd: %s\n", full_cmd);
+			fprintf(stderr, "running cmd: %s\n", full_cmd);
 		}
 
-		pids [i] = pr_open (
+		pids [i] = pr_open(
 			full_cmd,
 			PR_CREATE_STDIN | PR_CREATE_STDOUT,
 			&fd_in [i], &fd_out [i], NULL);
 
 		++alive_nodes_count;
 
-		nonblock (fd_out [i]);
+		nonblock(fd_out [i]);
 
 		if (fd_in [i] > max_fd){
 			max_fd = fd_in [i];
@@ -501,116 +501,116 @@ static void init__child_processes (void)
 
 	/* */
 	if (debug){
-		fprintf (stderr, "end: init__child_processes\n");
+		fprintf(stderr, "end: init__child_processes\n");
 	}
 }
 
-static void mark_node_as_dead (int node)
+static void mark_node_as_dead(int node)
 {
 	if (debug){
-		fprintf (stderr, "mark_node_as_dead (%d)\n", node);
+		fprintf(stderr, "mark_node_as_dead (%d)\n", node);
 	}
 
 	if (busy [node]){
 		busy [node] = 0;
 		--busy_count;
-		tasks__mark_task_as_failed (node2taskid [node]);
+		tasks__mark_task_as_failed(node2taskid [node]);
 		--alive_nodes_count;
 	}
 
 	if (fd_in [node] >= 0)
-		close (fd_in  [node]);
+		close(fd_in  [node]);
 	if (fd_out [node] >= 0)
-		close (fd_out [node]);
+		close(fd_out [node]);
 
 	fd_in  [node] = -1;
 	fd_out [node] = -1;
 
-	unblock_signals ();
-	waitpid (pids [node], NULL, WNOHANG);
-	block_signals ();
+	unblock_signals();
+	waitpid(pids [node], NULL, WNOHANG);
+	block_signals();
 
 	pids [node] = (pid_t) -1;
 }
 
-static void init (void)
+static void init(void)
 {
 	/* arrays */
-	pids  = xmalloc (nodes_count * sizeof (*pids));
-	memset (pids,-1, nodes_count * sizeof (*pids));
+	pids  = xmalloc(nodes_count * sizeof(*pids));
+	memset(pids,-1, nodes_count * sizeof(*pids));
 
-	fd_in  = xmalloc (nodes_count * sizeof (*fd_in));
-	memset (fd_in, -1, nodes_count * sizeof (*fd_in));
+	fd_in  = xmalloc(nodes_count * sizeof(*fd_in));
+	memset(fd_in, -1, nodes_count * sizeof(*fd_in));
 
-	fd_out = xmalloc (nodes_count * sizeof (*fd_out));
-	memset (fd_out, -1, nodes_count * sizeof (*fd_out));
+	fd_out = xmalloc(nodes_count * sizeof(*fd_out));
+	memset(fd_out, -1, nodes_count * sizeof(*fd_out));
 
-	node2task        = xmalloc (nodes_count * sizeof (*node2task));
-	node2task_buf_sz = xmalloc (nodes_count * sizeof (*node2task_buf_sz));
-	memset (node2task, 0, nodes_count * sizeof (*node2task));
-	memset (node2task_buf_sz, 0, nodes_count * sizeof (*node2task_buf_sz));
+	node2task        = xmalloc(nodes_count * sizeof(*node2task));
+	node2task_buf_sz = xmalloc(nodes_count * sizeof(*node2task_buf_sz));
+	memset(node2task, 0, nodes_count * sizeof(*node2task));
+	memset(node2task_buf_sz, 0, nodes_count * sizeof(*node2task_buf_sz));
 
-	buf_out = xmalloc (nodes_count * sizeof (*buf_out));
-	memset (buf_out, 0, nodes_count * sizeof (*buf_out));
+	buf_out = xmalloc(nodes_count * sizeof(*buf_out));
+	memset(buf_out, 0, nodes_count * sizeof(*buf_out));
 
-	bufsize_out = xmalloc (nodes_count * sizeof (*bufsize_out));
-	memset (bufsize_out, 0, nodes_count * sizeof (*bufsize_out));
+	bufsize_out = xmalloc(nodes_count * sizeof(*bufsize_out));
+	memset(bufsize_out, 0, nodes_count * sizeof(*bufsize_out));
 
-	size_out = xmalloc (nodes_count * sizeof (*size_out));
-	memset (size_out, 0, nodes_count * sizeof (*size_out));
+	size_out = xmalloc(nodes_count * sizeof(*size_out));
+	memset(size_out, 0, nodes_count * sizeof(*size_out));
 
-	busy = xmalloc (nodes_count * sizeof (*busy));
-	memset (busy, 0, nodes_count * sizeof (*busy));
+	busy = xmalloc(nodes_count * sizeof(*busy));
+	memset(busy, 0, nodes_count * sizeof(*busy));
 
-	node2taskid = xmalloc (nodes_count * sizeof (*node2taskid));
+	node2taskid = xmalloc(nodes_count * sizeof(*node2taskid));
 
-	ret_codes = xmalloc (nodes_count * sizeof (*ret_codes));
+	ret_codes = xmalloc(nodes_count * sizeof(*ret_codes));
 
 	/* stdin */
-	buf_stdin = xmalloc (initial_bufsize);
+	buf_stdin = xmalloc(initial_bufsize);
 	buf_stdin [0] = 0;
 
 	/* tasks */
-	tasks__init ();
+	tasks__init();
 
 	/**/
-	init__read_graph_tasks ();
+	init__read_graph_tasks();
 
 	/**/
-	tasks__check_for_cycles ();
+	tasks__check_for_cycles();
 
 	/**/
 	switch (use_weights){
 		case 1:
-			tasks__make_sum_weights ();
+			tasks__make_sum_weights();
 			break;
 		case 2:
-			tasks__make_max_weights ();
+			tasks__make_max_weights();
 			break;
 	}
 
 	if (debug)
-		tasks__print_sum_weights ();
+		tasks__print_sum_weights();
 
 	/* */
-	init__postproc_arg_cmd ();
+	init__postproc_arg_cmd();
 
 	/* in/out */
-	init__child_processes ();
+	init__child_processes();
 
 	/* signal handlers */
-	set_sigchld_handler ();
-	set_sigalrm_handler ();
+	set_sigchld_handler();
+	set_sigalrm_handler();
 
 	/* alarm(2) */
 	if (resistance_timeout)
-		alarm (1);
+		alarm(1);
 
 	/* ignore SIGPIPE signal */
-	ignore_sigpipe ();
+	ignore_sigpipe();
 }
 
-void kill_childs (void)
+void kill_childs(void)
 {
 	int i;
 
@@ -619,12 +619,12 @@ void kill_childs (void)
 
 	for (i=0; i < nodes_count; ++i){
 		if (pids [i] != (pid_t) -1){
-			kill (pids [i], SIGTERM);
+			kill(pids [i], SIGTERM);
 		}
 	}
 }
 
-void wait_for_childs (void)
+void wait_for_childs(void)
 {
 	int i;
 
@@ -632,16 +632,16 @@ void wait_for_childs (void)
 		return;
 
 	if (debug)
-		printf ("wait for childs\n");
+		printf("wait for childs\n");
 
 	for (i=0; i < nodes_count; ++i){
 		if (pids [i] != (pid_t) -1){
-			mark_node_as_dead (i);
+			mark_node_as_dead(i);
 		}
 	}
 }
 
-static int find_free_node (void)
+static int find_free_node(void)
 {
 	int i;
 	for (i=0; i < nodes_count; ++i){
@@ -649,50 +649,50 @@ static int find_free_node (void)
 			return i;
 	}
 
-	err_internal (__func__, "there is no free node");
+	err_internal(__func__, "there is no free node");
 	return -1;
 }
 
-static void print_header (int num)
+static void print_header(int num)
 {
 	if (show_node){
 		if (nodes && nodes [num])
-			printf ("%s ", nodes [num]);
+			printf("%s ", nodes [num]);
 		else
-			printf ("%d ", num);
+			printf("%d ", num);
 	}
 	if (show_taskid){
-		printf ("%d ", node2taskid [num]);
+		printf("%d ", node2taskid [num]);
 	}
 	if (show_pid){
-		printf ("%ld ", (long) pids [num]);
+		printf("%ld ", (long) pids [num]);
 	}
 }
 
-static void print_line (int num, const char *line)
+static void print_line(int num, const char *line)
 {
-	print_header (num);
-	printf ("%s\n", line);
+	print_header(num);
+	printf("%s\n", line);
 }
 
-static void print_EOT (int num)
+static void print_EOT(int num)
 {
 	if (print_eot){
-		print_line (num, msg_eot);
+		print_line(num, msg_eot);
 		if (flush_eot)
-			fflush (stdout);
+			fflush(stdout);
 	}
 }
 
-static void send_to_node (void)
+static void send_to_node(void)
 {
-	int n = find_free_node ();
-	size_t task_len = strlen (current_task);
+	int n = find_free_node();
+	size_t task_len = strlen(current_task);
 
-	assert (n >= 0);
+	assert(n >= 0);
 
 	if (debug){
-		printf ("send to %d (pid: %ld)\n", n, (long) pids [n]);
+		printf("send to %d (pid: %ld)\n", n, (long) pids [n]);
 	}
 
 	busy [n]      = 1;
@@ -703,74 +703,74 @@ static void send_to_node (void)
 
 	if (task_len >= node2task_buf_sz [n]){
 		node2task_buf_sz [n] = task_len + 1;
-		node2task [n] = xrealloc (node2task [n], node2task_buf_sz [n]);
+		node2task [n] = xrealloc(node2task [n], node2task_buf_sz [n]);
 	}
-	memcpy (node2task [n], current_task, task_len + 1);
+	memcpy(node2task [n], current_task, task_len + 1);
 
 	if (print_i2o){
-		print_line (n, current_task);
+		print_line(n, current_task);
 		if (flush_i2o){
-			fflush (stdout);
+			fflush(stdout);
 		}
 	}
 
-	if (-1 == write (fd_in [n], current_task, task_len) ||
-		-1 == write (fd_in [n], "\n", 1))
+	if (-1 == write(fd_in [n], current_task, task_len) ||
+		-1 == write(fd_in [n], "\n", 1))
 	{
 		if (resistant){
-			mark_node_as_dead (n);
+			mark_node_as_dead(n);
 			if (msg_fatal [0])
-				print_line (n, msg_fatal);
-			print_EOT (n);
+				print_line(n, msg_fatal);
+			print_EOT(n);
 
 			if (alive_nodes_count == 0 && !wait_mode){
-				err_fatal ("all nodes failed");
+				err_fatal("all nodes failed");
 			}
 			return;
 		}else{
-			err_fatal_errno ("paexec: Sending task to the node failed:");
+			err_fatal_errno("paexec: Sending task to the node failed:");
 		}
 	}
 }
 
-static int unblock_select_block (
+static int unblock_select_block(
 	int nfds, fd_set * readfds, fd_set * writefds,
 	fd_set * exceptfds, struct timeval * timeout)
 {
 	int ret;
 	char msg [200];
 
-	unblock_signals ();
+	unblock_signals();
 
 	do {
 		errno = 0;
-		ret = select (nfds, readfds, writefds, exceptfds, timeout);
-	}while (ret == -1 && errno == EINTR);
+		ret = select(nfds, readfds, writefds, exceptfds, timeout);
+	}while(ret == -1 && errno == EINTR);
 
 	if (ret == -1){
-		snprintf (msg, sizeof (msg), "select(2) failed: %s", strerror (errno));
-		err_fatal (msg);
+		snprintf(msg, sizeof(msg), "select(2) failed: %s", strerror(errno));
+		err_fatal(msg);
 	}
 
-	block_signals ();
+	block_signals();
 
 	return ret;
 }
 
-static int try_to_reinit_failed_nodes (void)
+static int try_to_reinit_failed_nodes(void)
 {
 	if (resistance_timeout &&
 		sigalrm_tics - resistance_last_restart >= resistance_timeout)
 	{
 		resistance_last_restart = sigalrm_tics;
-		init__child_processes ();
+		init__child_processes();
 		return 1;
 	}
 
 	return 0;
 }
 
-static int condition (
+static int condition(
 	fd_set *rset, int max_descr,
 	int *ret, const char **task)
 {
@@ -778,33 +778,33 @@ static int condition (
 	*task = NULL;
 
 	if (busy_count < alive_nodes_count && !end_of_stdin &&
-		(*task = tasks__get_new_task ()) != NULL)
+		(*task = tasks__get_new_task()) != NULL)
 	{
 		return 1;
 	}
 
-	if (!task && !graph_mode && feof (stdin)){
+	if (!task && !graph_mode && feof(stdin)){
 		end_of_stdin = 1;
-		close_all_ins ();
+		close_all_ins();
 	}
 
 	if (busy_count > 0
-			&& (*ret = unblock_select_block (
+			&& (*ret = unblock_select_block(
 					max_descr+1, rset, NULL, NULL, NULL)) != 0)
 	{
 		return 1;
 	}
 
 	if (failed_taskids_count > 0 && wait_mode){
-		wait_for_sigalrm ();
-		try_to_reinit_failed_nodes ();
+		wait_for_sigalrm();
+		try_to_reinit_failed_nodes();
 		return 1;
 	}
 
 	return 0;
 }
 
-static void loop (void)
+static void loop(void)
 {
 	char msg [2000];
 	fd_set rset;
@@ -820,19 +820,19 @@ static void loop (void)
 
 	if (graph_mode && tasks_count == 1){
 		/* no tasks */
-		close_all_ins ();
-		wait_for_childs ();
+		close_all_ins();
+		wait_for_childs();
 		return;
 	}
 
-	FD_ZERO (&rset);
+	FD_ZERO(&rset);
 
-	FD_CLR (0, &rset);
+	FD_CLR(0, &rset);
 
-	while (condition (&rset, max_fd, &ret, &task)){
+	while (condition(&rset, max_fd, &ret, &task)){
 		/* ret == -777 means select(2) was not called */
 
-		if (try_to_reinit_failed_nodes ())
+		if (try_to_reinit_failed_nodes())
 			continue;
 
 		if (ret == -1 && errno == EINTR){
@@ -840,58 +840,58 @@ static void loop (void)
 		}
 
 		if (debug){
-			printf ("select ret=%d\n", ret);
+			printf("select ret=%d\n", ret);
 		}
 
 		if (ret == -777 && task)
-			send_to_node ();
+			send_to_node();
 
 		/* fd_out */
 		for (i=0; ret != -777 && i < nodes_count; ++i){
-			if (fd_out [i] >= 0 && FD_ISSET (fd_out [i], &rset)){
+			if (fd_out [i] >= 0 && FD_ISSET(fd_out [i], &rset)){
 				buf_out_i = buf_out [i];
 
-				assert (bufsize_out [i] > size_out [i]);
+				assert(bufsize_out [i] > size_out [i]);
 
-				cnt = read (fd_out [i],
+				cnt = read(fd_out [i],
 							buf_out_i + size_out [i],
 							bufsize_out [i] - size_out [i]);
 
 				if (debug && cnt >= 0){
 					buf_out_i [size_out [i] + cnt] = 0;
-					printf ("cnt = %d\n", cnt);
-					printf ("fd_out [%d] = %d\n", i, fd_out [i]);
-					printf ("buf_out [%d] = %s\n", i, buf_out_i);
-					printf ("size_out [%d] = %d\n", i, (int) size_out [i]);
+					printf("cnt = %d\n", cnt);
+					printf("fd_out [%d] = %d\n", i, fd_out [i]);
+					printf("buf_out [%d] = %s\n", i, buf_out_i);
+					printf("size_out [%d] = %d\n", i, (int) size_out [i]);
 				}
 
 				if (cnt == -1 || cnt == 0){
 					/* read error or unexpected end of file */
 					if (resistant){
-						FD_CLR (fd_out [i], &rset);
-						mark_node_as_dead (i);
+						FD_CLR(fd_out [i], &rset);
+						mark_node_as_dead(i);
 						if (msg_fatal [0])
-							print_line (i, msg_fatal);
-						print_EOT (i);
+							print_line(i, msg_fatal);
+						print_EOT(i);
 
 						if (alive_nodes_count == 0 && !wait_mode){
-							err_fatal ("all nodes failed");
+							err_fatal("all nodes failed");
 						}
 						continue;
 					}else{
 						if (cnt == 0){
-							snprintf (
-								msg, sizeof (msg),
+							snprintf(
+								msg, sizeof(msg),
 								"Node %s exited unexpectedly",
 								nodes [i]);
 						}else{
-							snprintf (
-								msg, sizeof (msg),
+							snprintf(
+								msg, sizeof(msg),
 								"reading from node %s failed: %s",
-								nodes [i], strerror (errno));
+								nodes [i], strerror(errno));
 						}
 
-						err_fatal (msg);
+						err_fatal(msg);
 					}
 				}
 
@@ -903,15 +903,15 @@ static void loop (void)
 
 						curr_line = buf_out_i + printed;
 
-						if (!strcmp (curr_line, msg_eot)){
+						if (!strcmp(curr_line, msg_eot)){
 							/* end of task marker */
-							assert (busy [i] == 1);
+							assert(busy [i] == 1);
 
 							busy [i] = 0;
 							--busy_count;
 
 							if (end_of_stdin){
-								close (fd_in [i]);
+								close(fd_in [i]);
 								fd_in [i] = -1;
 							}
 
@@ -919,42 +919,42 @@ static void loop (void)
 							if (graph_mode){
 								switch (ret_codes [i]){
 									case rt_failure:
-										print_header (i);
-										tasks__delete_task_rec (node2taskid [i]);
-										printf ("\n");
+										print_header(i);
+										tasks__delete_task_rec(node2taskid [i]);
+										printf("\n");
 										break;
 									case rt_success:
-										tasks__delete_task (node2taskid [i], 0, 0);
+										tasks__delete_task(node2taskid [i], 0, 0);
 										break;
 									case rt_undef:
-										print_line (i, "?");
+										print_line(i, "?");
 										break;
 									default:
-										abort ();
+										abort();
 								}
 
 								end_of_stdin = (remained_tasks_count == 0);
 								if (end_of_stdin)
-									close_all_ins ();
+									close_all_ins();
 							}else{
-								tasks__delete_task (node2taskid [i], 0, 0);
+								tasks__delete_task(node2taskid [i], 0, 0);
 							}
 
-							print_EOT (i);
+							print_EOT(i);
 							break;
 						}
 
 						if (graph_mode){
-							if (!strcmp (curr_line, msg_success)){
+							if (!strcmp(curr_line, msg_success)){
 								ret_codes [i] = rt_success;
-							}else if (!strcmp (curr_line, msg_failure)){
+							}else if (!strcmp(curr_line, msg_failure)){
 								ret_codes [i] = rt_failure;
 							}else{
 								ret_codes [i] = rt_undef;
 							}
 						}
 
-						print_line (i, curr_line);
+						print_line(i, curr_line);
 
 						printed = j + 1;
 					}
@@ -963,7 +963,7 @@ static void loop (void)
 				if (printed){
 					cnt -= printed;
 
-					memmove (buf_out_i,
+					memmove(buf_out_i,
 							 buf_out_i + printed,
 							 cnt);
 				}
@@ -974,7 +974,7 @@ static void loop (void)
 					bufsize_out [i] *= 2;
 
 					/* +1 for \0 and -d option */
-					buf_out [i] = xrealloc (buf_out [i], bufsize_out [i]+1);
+					buf_out [i] = xrealloc(buf_out [i], bufsize_out [i]+1);
 				}
 			}
 		}
@@ -985,19 +985,19 @@ static void loop (void)
 				continue;
 
 			if (busy [i]){
-				FD_SET (fd_out [i], &rset);
+				FD_SET(fd_out [i], &rset);
 			}else{
-				FD_CLR (fd_out [i], &rset);
+				FD_CLR(fd_out [i], &rset);
 			}
 		}
 
 		if (debug){
-			printf ("alive_nodes_count = %d\n", alive_nodes_count);
-			printf ("busy_count = %d\n", busy_count);
-			printf ("end_of_stdin = %d\n", end_of_stdin);
+			printf("alive_nodes_count = %d\n", alive_nodes_count);
+			printf("busy_count = %d\n", busy_count);
+			printf("end_of_stdin = %d\n", end_of_stdin);
 			for (i=0; i < nodes_count; ++i){
-				printf ("busy [%d]=%d\n", i, busy [i]);
-				printf ("pid [%d]=%d\n", i, (int) pids [i]);
+				printf("busy [%d]=%d\n", i, busy [i]);
+				printf("pid [%d]=%d\n", i, (int) pids [i]);
 			}
 		}
 
@@ -1009,17 +1009,17 @@ static void loop (void)
 			break;
 	}
 
-	close_all_ins ();
+	close_all_ins();
 }
 
-static void check_msg (const char *msg)
+static void check_msg(const char *msg)
 {
-	if (strpbrk (msg, "'\"")){
-		err_fatal ("paexec: symbols ' and \" are not allowed in -m argument");
+	if (strpbrk(msg, "'\"")){
+		err_fatal("paexec: symbols ' and \" are not allowed in -m argument");
 	}
 }
 
-static char *gen_cmd (int *argc, char ***argv)
+static char *gen_cmd(int *argc, char ***argv)
 {
 	char cmd [4096];
 	char *curr_token;
@@ -1029,7 +1029,7 @@ static char *gen_cmd (int *argc, char ***argv)
 
 	len = 0;
 	for (i=0; i < *argc; ++i){
-		curr_token = (*argv) [i];
+		curr_token =(*argv) [i];
 		if (replstr[0] && !strcmp(curr_token, replstr)){
 			cmd[len+0] = '"';
 			cmd[len+1] = '$';
@@ -1037,26 +1037,26 @@ static char *gen_cmd (int *argc, char ***argv)
 			cmd[len+3] = '"';
 			curr_len = 4;
 		}else{
-			curr_len = shquote (curr_token, cmd+len, sizeof (cmd)-len-1);
+			curr_len = shquote(curr_token, cmd+len, sizeof(cmd)-len-1);
 		}
 		if (curr_len == (size_t)-1){
-			err_fatal ("paexec: Internal error4! (buffer size)");
+			err_fatal("paexec: Internal error4! (buffer size)");
 		}
 		len += curr_len;
 		cmd [len++] = ' ';
 
-		if (len >= sizeof (cmd)-20){ /* 20 chars is enough for "$1" :-) */
-			err_fatal ("paexec: Internal error5! (buffer size)");
+		if (len >= sizeof(cmd)-20){ /* 20 chars is enough for "$1" :-) */
+			err_fatal("paexec: Internal error5! (buffer size)");
 		}
 	}
 
 	cmd [len++] = 0;
 
-	assert (!arg_cmd);
-	return xstrdup (cmd);
+	assert(!arg_cmd);
+	return xstrdup(cmd);
 }
 
-static void process_args (int *argc, char ***argv)
+static void process_args(int *argc, char ***argv)
 {
 	int c;
 	int mode_C = 0;
@@ -1064,33 +1064,33 @@ static void process_args (int *argc, char ***argv)
 	/* leading + is for shitty GNU libc */
 	static const char optstring [] = "+0c:CdeEghiIJ:lm:n:prst:VwW:xXyzZ:";
 
-	while (c = getopt (*argc, *argv, optstring), c != EOF){
+	while (c = getopt(*argc, *argv, optstring), c != EOF){
 		switch (c) {
 			case 'V':
-				printf ("paexec %s written by Aleksey Cheusov\n", PAEXEC_VERSION);
-				exit (0);
+				printf("paexec %s written by Aleksey Cheusov\n", PAEXEC_VERSION);
+				exit(0);
 				break;
 			case 'h':
-				usage ();
-				exit (0);
+				usage();
+				exit(0);
 				break;
 			case 'd':
 				debug = 1;
 				break;
 			case 'n':
-				assign_str (&arg_nodes, optarg);
+				assign_str(&arg_nodes, optarg);
 				break;
 			case 'c':
 				mode_C = 0;
-				arg_cmd = xstrdup (optarg);
+				arg_cmd = xstrdup(optarg);
 				break;
 			case 'C':
 				mode_C = 1;
 				break;
 			case 't':
-				optarg += strspn (optarg, " \t");
+				optarg += strspn(optarg, " \t");
 				if (optarg [0])
-					assign_str (&arg_transport, optarg);
+					assign_str(&arg_transport, optarg);
 				break;
 			case 'p':
 				show_pid = 1;
@@ -1141,34 +1141,34 @@ static void process_args (int *argc, char ***argv)
 				break;
 			case 'Z':
 				resistant = 1;
-				resistance_timeout = atoi (optarg);
+				resistance_timeout = atoi(optarg);
 				break;
 			case 'm':
 				if (optarg [0] == 's' && optarg [1] == '='){
-					msg_success = xstrdup (optarg+2);
-					check_msg (msg_success);
+					msg_success = xstrdup(optarg+2);
+					check_msg(msg_success);
 				}else if (optarg [0] == 'f' && optarg [1] == '='){
-					msg_failure = xstrdup (optarg+2);
-					check_msg (msg_failure);
+					msg_failure = xstrdup(optarg+2);
+					check_msg(msg_failure);
 				}else if (optarg [0] == 'F' && optarg [1] == '='){
-					msg_fatal = xstrdup (optarg+2);
-					check_msg (msg_fatal);
+					msg_fatal = xstrdup(optarg+2);
+					check_msg(msg_fatal);
 				}else if (optarg [0] == 't' && optarg [1] == '='){
-					msg_eot = xstrdup (optarg+2);
+					msg_eot = xstrdup(optarg+2);
 				}else if (optarg [0] == 'd' && optarg [1] == '='){
 					if (optarg [2] != 0 && optarg [3] != 0){
-						err_fatal ("paexec: bad argument for -md=. At most one character is allowed");
+						err_fatal("paexec: bad argument for -md=. At most one character is allowed");
 					}
 					msg_delim = optarg [2];
 				}else if (optarg [0] == 'w' && optarg [1] == '='){
-					msg_weight = xstrdup (optarg+2);
+					msg_weight = xstrdup(optarg+2);
 				}else{
-					err_fatal ("paexec: bad argument for -m");
+					err_fatal("paexec: bad argument for -m");
 				}
 
 				break;
 			case 'W':
-				use_weights = atoi (optarg);
+				use_weights = atoi(optarg);
 				graph_mode  = 1;
 				break;
 			case 'x':
@@ -1186,8 +1186,8 @@ static void process_args (int *argc, char ***argv)
 				eol_char = '\0';
 				break;
 			default:
-				usage ();
-				exit (1);
+				usage();
+				exit(1);
 		}
 	}
 
@@ -1200,172 +1200,172 @@ static void process_args (int *argc, char ***argv)
 
 	if (mode_C){
 		if (!*argc){
-			err_fatal ("paexec: missing arguments. Run paexec -h for details");
+			err_fatal("paexec: missing arguments. Run paexec -h for details");
 		}
 
-		arg_cmd = gen_cmd (argc, argv);
+		arg_cmd = gen_cmd(argc, argv);
 	}else{
 		if (*argc){
-			err_fatal ("paexec: extra arguments. Run paexec -h for details");
+			err_fatal("paexec: extra arguments. Run paexec -h for details");
 		}
 	}
 
 	if (!resistance_timeout && wait_mode){
-		err_fatal ("paexec: -w is useless without -Z");
+		err_fatal("paexec: -w is useless without -Z");
 	}
 
 	if (arg_nodes){
 		if (arg_nodes [0] == '+'){
-			free (arg_transport);
+			free(arg_transport);
 			arg_transport = NULL;
 		}
 
-		nodes_create (arg_nodes);
+		nodes_create(arg_nodes);
 	}else{
-		err_fatal ("paexec: -n option is mandatory!");
+		err_fatal("paexec: -n option is mandatory!");
 	}
 
 	if (!arg_cmd){
-		err_fatal ("paexec: -c option is mandatory!");
+		err_fatal("paexec: -c option is mandatory!");
 	}
 
 	if (use_weights < 0 || use_weights > 2){
-		err_fatal ("paexec: Only -W1 and -W2 are supported!");
+		err_fatal("paexec: Only -W1 and -W2 are supported!");
 	}
 
 	if (arg_transport && !arg_transport [0]){
-		free (arg_transport);
+		free(arg_transport);
 		arg_transport = NULL;
 	}
 }
 
-static void free_memory (void)
+static void free_memory(void)
 {
 	int i;
 
 	if (arg_nodes)
-		xfree (arg_nodes);
+		xfree(arg_nodes);
 
 	if (arg_transport)
-		xfree (arg_transport);
+		xfree(arg_transport);
 
 	if (arg_cmd)
-		xfree (arg_cmd);
+		xfree(arg_cmd);
 
-	nodes_destroy ();
+	nodes_destroy();
 
 	if (fd_in)
-		xfree (fd_in);
+		xfree(fd_in);
 	if (fd_out)
-		xfree (fd_out);
+		xfree(fd_out);
 
 	if (buf_stdin)
-		xfree (buf_stdin);
+		xfree(buf_stdin);
 
 	if (buf_out){
 		for (i=0; i < nodes_count; ++i){
 			if (buf_out [i])
-				xfree (buf_out [i]);
+				xfree(buf_out [i]);
 		}
-		xfree (buf_out);
+		xfree(buf_out);
 	}
 
 	if (node2task){
 		for (i=0; i < nodes_count; ++i){
 			if (node2task [i])
-				xfree (node2task [i]);
+				xfree(node2task [i]);
 		}
-		xfree (node2task);
+		xfree(node2task);
 	}
 	if (node2task_buf_sz)
-		xfree (node2task_buf_sz);
+		xfree(node2task_buf_sz);
 
 	if (size_out)
-		xfree (size_out);
+		xfree(size_out);
 
 	if (busy)
-		xfree (busy);
+		xfree(busy);
 
 	if (pids)
-		xfree (pids);
+		xfree(pids);
 
 	if (node2taskid)
-		xfree (node2taskid);
+		xfree(node2taskid);
 
 	if (ret_codes)
-		xfree (ret_codes);
+		xfree(ret_codes);
 
-	tasks__destroy ();
+	tasks__destroy();
 }
 
-static void init_env (void)
+static void init_env(void)
 {
 	char *tok;
-	char *env_msg_eot   = getenv ("PAEXEC_EOT");
+	char *env_msg_eot   = getenv("PAEXEC_EOT");
 	if (env_msg_eot)
 		msg_eot = env_msg_eot;
 
-	char *env_bufsize   = getenv ("PAEXEC_BUFSIZE");
+	char *env_bufsize   = getenv("PAEXEC_BUFSIZE");
 	if (env_bufsize)
-		initial_bufsize = atoi (env_bufsize);
+		initial_bufsize = atoi(env_bufsize);
 
-	char *env_transport = getenv ("PAEXEC_TRANSPORT");
+	char *env_transport = getenv("PAEXEC_TRANSPORT");
 	if (env_transport)
-		assign_str (&arg_transport, env_transport);
+		assign_str(&arg_transport, env_transport);
 
-	char *env_nodes = getenv ("PAEXEC_NODES");
+	char *env_nodes = getenv("PAEXEC_NODES");
 	if (env_nodes)
-		assign_str (&arg_nodes, env_nodes);
+		assign_str(&arg_nodes, env_nodes);
 
-	char *env_shell   = getenv ("PAEXEC_SH");
+	char *env_shell   = getenv("PAEXEC_SH");
 	if (env_shell)
 		shell = env_shell;
 	else
 		shell = "/bin/sh";
 
-	char *paexec_env = getenv ("PAEXEC_ENV");
+	char *paexec_env = getenv("PAEXEC_ENV");
 	if (paexec_env){
-		for (tok = strtok (paexec_env, " ,");
+		for (tok = strtok(paexec_env, " ,");
 			 tok;
-			 tok = strtok (NULL, " ,"))
+			 tok = strtok(NULL, " ,"))
 		{
-			add_envvar (tok, getenv (tok));
+			add_envvar(tok, getenv(tok));
 		}
 	}
 }
 
-int main (int argc, char **argv)
+int main(int argc, char **argv)
 {
 	int i;
 	pid_t pid;
 	int status;
 
-	block_signals ();
+	block_signals();
 
-	init_env ();
+	init_env();
 
-	process_args (&argc, &argv);
+	process_args(&argc, &argv);
 
 	if (debug){
-		printf ("nodes_count = %d\n", nodes_count);
+		printf("nodes_count = %d\n", nodes_count);
 		for (i=0; i < nodes_count; ++i){
-			printf ("nodes [%d]=%s\n", i, nodes [i]);
+			printf("nodes [%d]=%s\n", i, nodes [i]);
 		}
-		printf ("cmd = %s\n", arg_cmd);
+		printf("cmd = %s\n", arg_cmd);
 	}
 
-	init ();
+	init();
 
-	loop ();
+	loop();
 
-	free_memory ();
+	free_memory();
 
-	set_sig_handler (SIGCHLD, SIG_DFL);
-	set_sig_handler (SIGALRM, SIG_IGN);
+	set_sig_handler(SIGCHLD, SIG_DFL);
+	set_sig_handler(SIGALRM, SIG_IGN);
 
-	unblock_signals ();
+	unblock_signals();
 
-	while (pid = waitpid (-1, &status, WNOHANG), pid > 0){
+	while (pid = waitpid(-1, &status, WNOHANG), pid > 0){
 	}
 
 	return 0;

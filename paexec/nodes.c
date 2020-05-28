@@ -33,24 +33,24 @@
 char **nodes    = NULL;
 int nodes_count = 0;
 
-static void nodes_create__count (const char *nodes_str)
+static void nodes_create__count(const char *nodes_str)
 {
 	int i;
 
-	nodes_count = (int) strtol (nodes_str, NULL, 10);
+	nodes_count = (int) strtol(nodes_str, NULL, 10);
 	if (nodes_count == (int) LONG_MAX)
-		err_fatal_errno ("paexec: invalid option -n:");
+		err_fatal_errno("paexec: invalid option -n:");
 
-	nodes = xmalloc (nodes_count * sizeof (nodes [0]));
+	nodes = xmalloc(nodes_count * sizeof(nodes [0]));
 
 	for (i=0; i < nodes_count; ++i){
 		char num [50];
-		snprintf (num, sizeof (num), "%d", i);
-		nodes [i] = xstrdup (num);
+		snprintf(num, sizeof(num), "%d", i);
+		nodes [i] = xstrdup(num);
 	}
 }
 
-static void nodes_create__list (char *nodes_str)
+static void nodes_create__list(char *nodes_str)
 {
 	char *last = NULL;
 	char *p = nodes_str;
@@ -71,11 +71,11 @@ static void nodes_create__list (char *nodes_str)
 
 					++nodes_count;
 
-					nodes = xrealloc (
+					nodes = xrealloc(
 						nodes,
-						nodes_count * sizeof (*nodes));
+						nodes_count * sizeof(*nodes));
 
-					nodes [nodes_count - 1] = xstrdup (last);
+					nodes [nodes_count - 1] = xstrdup(last);
 
 					last = NULL;
 				}
@@ -94,66 +94,66 @@ static void nodes_create__list (char *nodes_str)
 	}
 }
 
-static void nodes_create__file (const char *nodes_str)
+static void nodes_create__file(const char *nodes_str)
 {
 	char node [4096];
-	FILE *fd = fopen (nodes_str, "r");
+	FILE *fd = fopen(nodes_str, "r");
 	size_t len = 0;
 
 	if (!fd)
-		err_fatal_errno ("paexec: Cannot obtain a list of nodes");
+		err_fatal_errno("paexec: Cannot obtain a list of nodes");
 
-	while (fgets (node, sizeof (node), fd)){
-		len = strlen (node);
+	while (fgets(node, sizeof(node), fd)){
+		len = strlen(node);
 		if (len > 0 && node [len-1] == '\n')
 			node [len-1] = 0;
 
 		++nodes_count;
 
-		nodes = xrealloc (
+		nodes = xrealloc(
 			nodes,
-			nodes_count * sizeof (*nodes));
+			nodes_count * sizeof(*nodes));
 
-		nodes [nodes_count - 1] = xstrdup (node);
+		nodes [nodes_count - 1] = xstrdup(node);
 	}
 
-	fclose (fd);
+	fclose(fd);
 }
 
-void nodes_create (const char *nodes_str)
+void nodes_create(const char *nodes_str)
 {
 	unsigned char c0 = nodes_str [0];
 	char *nodes_copy;
 
 	if (c0 == '+'){
 		/* "+NUM" format */
-		nodes_create__count (nodes_str + 1);
+		nodes_create__count(nodes_str + 1);
 	}else if (c0 == ':'){
 		/* "+NUM" format */
-		nodes_create__file (nodes_str + 1);
-	}else if (isalnum (c0) || c0 == '/' || c0 == '_'){
+		nodes_create__file(nodes_str + 1);
+	}else if (isalnum(c0) || c0 == '/' || c0 == '_'){
 		/* list of nodes */
-		nodes_copy = xstrdup (nodes_str);
-		nodes_create__list (nodes_copy);
-		xfree (nodes_copy);
+		nodes_copy = xstrdup(nodes_str);
+		nodes_create__list(nodes_copy);
+		xfree(nodes_copy);
 	}else{
-		err_fatal ("paexec: invalid argument for option -n");
+		err_fatal("paexec: invalid argument for option -n");
 	}
 
 	/* final check */
 	if (nodes_count == 0)
-		err_fatal ("paexec: invalid argument for option -n");
+		err_fatal("paexec: invalid argument for option -n");
 }
 
-void nodes_destroy (void)
+void nodes_destroy(void)
 {
 	int i;
 
 	if (nodes){
 		for (i=0; i < nodes_count; ++i){
 			if (nodes [i])
-				xfree (nodes [i]);
+				xfree(nodes [i]);
 		}
-		xfree (nodes);
+		xfree(nodes);
 	}
 }
