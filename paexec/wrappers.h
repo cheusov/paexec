@@ -32,22 +32,22 @@
 #include <signal.h>
 #include <stdio.h>
 
-void nonblock (int fd);
-void xsigprocmask (int how, const sigset_t *set, sigset_t *oset);
-void xsigaddset (sigset_t *set, int signo);
+void nonblock(int fd);
+void xsigprocmask(int how, const sigset_t *set, sigset_t *oset);
+void xsigaddset(sigset_t *set, int signo);
 ssize_t xgetdelim(char **lineptr, size_t *n, int delimiter, FILE *stream);
-char *xstrdup (const char *s);
-void *xmalloc (size_t size);
+char *xstrdup(const char *s);
+void *xmalloc(size_t size);
 void *xcalloc(size_t number, size_t size);
 void *xrealloc(void *ptr, size_t size);
-void xfree (void *p);
+void xfree(void *p);
 void xshquote(const char *arg, char *buf, size_t bufsize);
 
-void err_fatal (const char *m);
-void err_fatal_errno (const char *m);
-void err_internal (const char *routine, const char *m);
+void err_fatal(const char *m);
+void err_fatal_errno(const char *m);
+void err_internal(const char *routine, const char *m);
 
-void kill_childs (void); /* paexec.c */
-void wait_for_childs (void); /* paexec.c */
+void kill_childs(void); /* paexec.c */
+void wait_for_childs(void); /* paexec.c */
 
 #endif /* _WRAPPERS_H_ */

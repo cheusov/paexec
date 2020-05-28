@@ -38,17 +38,17 @@ extern int remained_tasks_count;
 /* a number of tasks with FATAL failure (e.g. connection lost) */
 extern int failed_taskids_count;
 
-void tasks__init (void);
-int  tasks__add_task (char *s, int weight);
-void tasks__add_task_arc (int task_from, int task_to);
-void tasks__check_for_cycles (void);
-void tasks__delete_task (int task, int print_task, int with_prefix);
-void tasks__delete_task_rec (int task);
-void tasks__destroy (void);
-const char *tasks__get_new_task (void);
-void tasks__mark_task_as_failed (int taskid);
-void tasks__make_sum_weights (void);
-void tasks__make_max_weights (void);
-void tasks__print_sum_weights (void);
+void tasks__init(void);
+int  tasks__add_task(char *s, int weight);
+void tasks__add_task_arc(int task_from, int task_to);
+void tasks__check_for_cycles(void);
+void tasks__delete_task(int task, int print_task, int with_prefix);
+void tasks__delete_task_rec(int task);
+void tasks__destroy(void);
+const char *tasks__get_new_task(void);
+void tasks__mark_task_as_failed(int taskid);
+void tasks__make_sum_weights(void);
+void tasks__make_max_weights(void);
+void tasks__print_sum_weights(void);
 
 #endif // _TASKS_H_

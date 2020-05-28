@@ -23,5 +23,5 @@
 
 extern char **nodes;
 extern int nodes_count;
-void nodes_create (const char *nodes_str);
-void nodes_destroy (void);
+void nodes_create(const char *nodes_str);
+void nodes_destroy(void);

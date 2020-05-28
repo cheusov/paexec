@@ -23,12 +23,12 @@
 
 extern int sigalrm_tics;
 
-void block_signals (void);
-void unblock_signals (void);
-void set_sig_handler (int sig, void (*handler) (int));
-void ignore_sigpipe (void);
-void wait_for_sigalrm (void);
-void handler_sigchld (int dummy);
-void set_sigalrm_handler (void);
-void set_sigchld_handler (void);
-void handler_sigalrm (int dummy);
+void block_signals(void);
+void unblock_signals(void);
+void set_sig_handler(int sig, void (*handler) (int));
+void ignore_sigpipe(void);
+void wait_for_sigalrm(void);
+void handler_sigchld(int dummy);
+void set_sigalrm_handler(void);
+void set_sigchld_handler(void);
+void handler_sigalrm(int dummy);
