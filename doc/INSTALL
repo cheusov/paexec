@@ -12,18 +12,25 @@
    I'd recommend to use latest stable version.
 
    http://crufty.net/help/sjg/bmake.html
-   http://freshmeat.net/projects/bmake/
 
    NOTE:    !!! GNU make IS NOT GOOD !!!
 
 2)
-   We also need mk-configure >= 0.23.0.
+   We also need mk-configure >= 0.33.0.
+
+   https://github.com/cheusov/mk-configure
+
+     or
 
    http://sourceforge.net/projects/mk-configure/
 
 3)
    "libmaa" library is also needed. It is a part of
    "dict" project available here:
+
+   https://github.com/cheusov/libmaa
+
+     or
 
    http://sourceforge.net/projects/dict/
 
@@ -42,6 +49,11 @@
 
 7) mkcmake
 
+   In order to see additional information about settings and
+   the structure of project you want to run
+
+   mkcmake help
+   
 8) mkcmake test
    If this step fails on your system, please let me now.
 

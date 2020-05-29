@@ -1,5 +1,5 @@
 # initial buffer size for the tasks and results
-BUFSIZE   ?=	4096
+BUFSIZE   ?=	${USE_BUFSIZE:U4096}
 
 PROG       =	paexec
 SRCS       =	paexec.c wrappers.c tasks.c nodes.c signals.c

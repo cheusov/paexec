@@ -38,5 +38,6 @@ prepdist: all-presentation _prepdist
 
 #####
 .include "help.mk"
+.include "use.mk"
 .include "Makefile.inc"
 .include <mkc.subprj.mk>
