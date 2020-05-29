@@ -31,13 +31,11 @@
 
 #include <maa.h>
 
+#include <mkc_getdelim.h>
+
 #include "decls.h"
 #include "wrappers.h"
 #include "common.h"
-
-#if !HAVE_FUNC6_PSELECT_SYS_SELECT_H
-ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
-#endif
 
 void nonblock(int fd)
 {
