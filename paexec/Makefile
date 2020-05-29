@@ -8,7 +8,7 @@ WARNS     ?=	4
 WARNERR   ?=	yes
 
 PROG       =	paexec
-SRCS       =	paexec.c wrappers.c tasks.c nodes.c signals.c pr.c
+SRCS       =	paexec.c wrappers.c tasks.c nodes.c signals.c
 
 SCRIPTS    =	paexec_reorder
 
@@ -22,6 +22,9 @@ CFLAGS    +=	-DBUFSIZE=${BUFSIZE}
 
 MKC_FEATURES         =	strlcat strlcpy SLIST RB
 MKC_SOURCE_FUNCLIBS  =  shquote getdelim
+
+MKC_REQUIRE_HEADERS    =	maa.h
+MKC_REQUIRE_FUNCLIBS   =	pr_open:maa
 
 MKC_COMMON_DEFINES   =	-D_GNU_SOURCE
 MKC_COMMON_HEADERS   =	unistd.h stdlib.h

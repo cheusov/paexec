@@ -29,6 +29,8 @@
 #include <string.h>
 #include <signal.h>
 
+#include <maa.h>
+
 #include "decls.h"
 #include "wrappers.h"
 #include "common.h"
@@ -134,44 +136,37 @@ void xshquote(const char *arg, char *buf, size_t bufsize)
 {
 	size_t ret = shquote(arg, buf, bufsize);
 	if ((size_t)-1 == ret){
-		err_fatal("paexec: shquote(3) failed");
+		err__internal(__func__, "paexec: shquote(3) failed");
 		exit(1);
 	}
 }
 
-void err_fatal(const char *m)
+void err__fatal(const char *routine, const char *m)
 {
 	kill_childs();
 	wait_for_childs();
 
 	fflush(stdout);
 
-	fprintf(stderr, "%s\n", m);
-	exit(1);
+	err_fatal(routine, m);
 }
 
-void err_fatal_errno(const char *m)
+void err__fatal_errno(const char *routine, const char *m)
 {
 	kill_childs();
 	wait_for_childs();
 
 	fflush(stdout);
 
-	fprintf(stderr, "%s: %s\n", m, strerror(errno));
-	exit(1);
+	err_fatal_errno(routine, m);
 }
 
-void err_internal(const char *routine, const char *m)
+void err__internal(const char *routine, const char *m)
 {
 	kill_childs();
 	wait_for_childs();
 
 	fflush(stdout);
 
-	if (routine)
-		fprintf(stderr, "%s (%s)\n", m, routine);
-	else
-		fprintf(stderr, "%s\n", m);
-
-	exit(1);
+	err_internal(routine, m);
 }

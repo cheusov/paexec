@@ -37,6 +37,8 @@
 #include <errno.h>
 #include <sys/wait.h>
 
+#include <maa.h>
+
 /***********************************************************/
 
 #include "decls.h"
@@ -46,7 +48,6 @@
 #include "tasks.h"
 #include "nodes.h"
 #include "signals.h"
-#include "pr.h"
 
 #include "mkc_strlcpy.h"
 
@@ -239,7 +240,7 @@ static void bad_input_line(const char *line)
 	char buf [4000];
 	snprintf(buf, sizeof(buf), "Bad input line: %s\n", line);
 
-	err_fatal(buf);
+	err__fatal(NULL, buf);
 }
 
 static void init__read_graph_tasks(void)
@@ -364,7 +365,7 @@ static char* generate_run_command(void)
 	}
 
 	if (strlen(run_command) + 1 == sizeof(run_command)){
-		err_fatal("paexec: Internal error6! (buffer size)");
+		err__fatal(__func__, "paexec: Internal error6! (buffer size)");
 	}
 
 //	fprintf(stderr, "run_command: %s\n", run_command);
@@ -404,7 +405,7 @@ static void init__postproc_arg_cmd(void)
 				  "  %s" /* condition. success/failure */
 				  "  echo '%s';" /* EOT */
 				  "done", generate_run_command(), tmp, cond_cmd, magic_eot) >= sizeof(cmd)){
-			err_fatal("paexec: Internal error7! (buffer size)");
+			err__fatal(__func__, "paexec: Internal error7! (buffer size)");
 		}
 
 		xfree(arg_cmd);
@@ -419,14 +420,14 @@ static void init__postproc_arg_cmd(void)
 	SLIST_FOREACH(p, &envvars, entries){
 		xshquote((p->value ? p->value : ""), tmp, sizeof(tmp));
 		if (snprintf(tmp2, sizeof(tmp2), "%s=%s ", p->name, tmp) >= sizeof(tmp2)){
-            err_fatal("paexec: Internal error! (buffer size)");
+            err__fatal(__func__, "paexec: Internal error! (buffer size)");
         }
 		strlcat(env_str, tmp2, sizeof(env_str));
 	}
 
 	/**/
 	if (snprintf(cmd, sizeof(cmd), "env %s %s -c %s", env_str, shell, shq_cmd) >= sizeof(cmd)){
-        err_fatal("paexec: Internal error! (buffer size)");
+        err__fatal(__func__, "paexec: Internal error! (buffer size)");
     }
 	xfree(arg_cmd);
 	arg_cmd = xstrdup(cmd);
@@ -440,7 +441,7 @@ static void init__postproc_arg_cmd(void)
 	}
 
 	if (strlen(cmd) + 20 >= sizeof(shq_cmd)){
-		err_fatal("paexec: internal error, buffer size limit");
+		err__fatal(__func__, "paexec: internal error, buffer size limit");
 	}
 }
 
@@ -649,7 +650,7 @@ static int find_free_node(void)
 			return i;
 	}
 
-	err_internal(__func__, "there is no free node");
+	err__internal(__func__, "there is no free node");
 	return -1;
 }
 
@@ -724,11 +725,11 @@ static void send_to_node(void)
 			print_EOT(n);
 
 			if (alive_nodes_count == 0 && !wait_mode){
-				err_fatal("all nodes failed");
+				err__fatal(NULL, "all nodes failed");
 			}
 			return;
 		}else{
-			err_fatal_errno("paexec: Sending task to the node failed:");
+			err__fatal_errno(NULL, "paexec: Sending task to the node failed:");
 		}
 	}
 }
@@ -749,7 +750,7 @@ static int unblock_select_block(
 
 	if (ret == -1){
 		snprintf(msg, sizeof(msg), "select(2) failed: %s", strerror(errno));
-		err_fatal(msg);
+		err__fatal(__func__, msg);
 	}
 
 	block_signals();
@@ -875,7 +876,7 @@ static void loop(void)
 						print_EOT(i);
 
 						if (alive_nodes_count == 0 && !wait_mode){
-							err_fatal("all nodes failed");
+							err__fatal(NULL, "all nodes failed");
 						}
 						continue;
 					}else{
@@ -891,7 +892,7 @@ static void loop(void)
 								nodes [i], strerror(errno));
 						}
 
-						err_fatal(msg);
+						err__fatal(NULL, msg);
 					}
 				}
 
@@ -1015,7 +1016,7 @@ static void loop(void)
 static void check_msg(const char *msg)
 {
 	if (strpbrk(msg, "'\"")){
-		err_fatal("paexec: symbols ' and \" are not allowed in -m argument");
+		err__fatal(NULL, "paexec: symbols ' and \" are not allowed in -m argument");
 	}
 }
 
@@ -1040,13 +1041,13 @@ static char *gen_cmd(int *argc, char ***argv)
 			curr_len = shquote(curr_token, cmd+len, sizeof(cmd)-len-1);
 		}
 		if (curr_len == (size_t)-1){
-			err_fatal("paexec: Internal error4! (buffer size)");
+			err__fatal(__func__, "paexec: Internal error4! (buffer size)");
 		}
 		len += curr_len;
 		cmd [len++] = ' ';
 
 		if (len >= sizeof(cmd)-20){ /* 20 chars is enough for "$1" :-) */
-			err_fatal("paexec: Internal error5! (buffer size)");
+			err__fatal(__func__, "paexec: Internal error5! (buffer size)");
 		}
 	}
 
@@ -1157,13 +1158,13 @@ static void process_args(int *argc, char ***argv)
 					msg_eot = xstrdup(optarg+2);
 				}else if (optarg [0] == 'd' && optarg [1] == '='){
 					if (optarg [2] != 0 && optarg [3] != 0){
-						err_fatal("paexec: bad argument for -md=. At most one character is allowed");
+						err__fatal(NULL, "paexec: bad argument for -md=. At most one character is allowed");
 					}
 					msg_delim = optarg [2];
 				}else if (optarg [0] == 'w' && optarg [1] == '='){
 					msg_weight = xstrdup(optarg+2);
 				}else{
-					err_fatal("paexec: bad argument for -m");
+					err__fatal(NULL, "paexec: bad argument for -m");
 				}
 
 				break;
@@ -1200,18 +1201,18 @@ static void process_args(int *argc, char ***argv)
 
 	if (mode_C){
 		if (!*argc){
-			err_fatal("paexec: missing arguments. Run paexec -h for details");
+			err__fatal(NULL, "paexec: missing arguments. Run paexec -h for details");
 		}
 
 		arg_cmd = gen_cmd(argc, argv);
 	}else{
 		if (*argc){
-			err_fatal("paexec: extra arguments. Run paexec -h for details");
+			err__fatal(NULL, "paexec: extra arguments. Run paexec -h for details");
 		}
 	}
 
 	if (!resistance_timeout && wait_mode){
-		err_fatal("paexec: -w is useless without -Z");
+		err__fatal(NULL, "paexec: -w is useless without -Z");
 	}
 
 	if (arg_nodes){
@@ -1222,15 +1223,15 @@ static void process_args(int *argc, char ***argv)
 
 		nodes_create(arg_nodes);
 	}else{
-		err_fatal("paexec: -n option is mandatory!");
+		err__fatal(NULL, "paexec: -n option is mandatory!");
 	}
 
 	if (!arg_cmd){
-		err_fatal("paexec: -c option is mandatory!");
+		err__fatal(NULL, "paexec: -c option is mandatory!");
 	}
 
 	if (use_weights < 0 || use_weights > 2){
-		err_fatal("paexec: Only -W1 and -W2 are supported!");
+		err__fatal(NULL, "paexec: Only -W1 and -W2 are supported!");
 	}
 
 	if (arg_transport && !arg_transport [0]){
