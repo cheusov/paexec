@@ -39,5 +39,3 @@ _prepdist: ${MAN}
 
 ############################################################
 .include <mkc.prog.mk>
-
-CFLAGS.warns.gcc.4 += -Wno-uninitialized
