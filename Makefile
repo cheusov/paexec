@@ -23,8 +23,8 @@ MKC_REQD    =	0.33.0
 test: all-tests
 	@:
 
-clean: clean-tests clean-presentation
-cleandir: cleandir-tests  cleandir-presentation
+clean: clean-tests clean-presentation clean-doc clean-examples
+cleandir: cleandir-tests cleandir-presentation cleandir-doc cleandir-examples
 
 # new recursive target for making a distribution tarball
 TARGETS    +=	_prepdist
