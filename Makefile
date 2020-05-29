@@ -37,5 +37,6 @@ prepdist: all-presentation _prepdist
 	${MAKE} -Cpresentation ${MAKEFILES} _clean_garbage
 
 #####
+.include "help.mk"
 .include "Makefile.inc"
 .include <mkc.subprj.mk>
