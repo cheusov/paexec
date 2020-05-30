@@ -238,7 +238,7 @@ static void close_all_ins(void)
 static void bad_input_line(const char *line)
 {
 	char buf [4000];
-	snprintf(buf, sizeof(buf), "Bad input line: %s\n", line);
+	snprintf(buf, sizeof(buf), "Bad input line: %s", line);
 
 	err__fatal(NULL, buf);
 }
