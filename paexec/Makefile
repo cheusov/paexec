@@ -1,6 +1,10 @@
 # initial buffer size for the tasks and results
 BUFSIZE   ?=	${USE_BUFSIZE:U4096}
 
+# optimization flags
+COPTS     ?=	${USE_COPTS:U-O2 -g}
+
+#
 PROG       =	paexec
 SRCS       =	paexec.c wrappers.c tasks.c nodes.c signals.c
 
