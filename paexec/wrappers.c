@@ -146,7 +146,7 @@ void err__fatal(const char *routine, const char *m)
 
 	fflush(stdout);
 
-	err_fatal(routine, "%s\n", m);
+	err_fatal(routine, "%s", m);
 }
 
 void err__fatal_errno(const char *routine, const char *m)
@@ -156,7 +156,7 @@ void err__fatal_errno(const char *routine, const char *m)
 
 	fflush(stdout);
 
-	err_fatal_errno(routine, "%s\n", m);
+	err_fatal_errno(routine, "%s", m);
 }
 
 void err__internal(const char *routine, const char *m)
@@ -166,5 +166,5 @@ void err__internal(const char *routine, const char *m)
 
 	fflush(stdout);
 
-	err_internal(routine, "%s\n", m);
+	err_internal(routine, "%s", m);
 }
