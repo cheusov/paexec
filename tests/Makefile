@@ -3,6 +3,8 @@ MKC_CUSTOM_FN.sleep_fract =	../checks/sleep_fract
 
 CLEANFILES +=	_test.in _tasks.tmp _test.tmp
 
+USE_TEST_BUFSIZES ?=	1 2 3 4 5 6 7 8 9 10 11 12 13 14 1000 10000
+
 all:
 	@echo 'running tests...'; \
 	set -e; \
@@ -32,6 +34,7 @@ all:
 	export PATH=${OBJDIR_toupper}:$$PATH; \
 	export PATH=${OBJDIR_wav2flac}:$$PATH; \
 	export SLEEP_FRACT=${CUSTOM.sleep_fract:S/0//}; \
+	export USE_TEST_BUFSIZES=${USE_TEST_BUFSIZES:Q}; \
 	if ./test.sh; \
 	then echo 'SUCCEEDED'; \
 	else echo 'FAILED'; false; \
