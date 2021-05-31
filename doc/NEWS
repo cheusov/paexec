@@ -1,4 +1,18 @@
 ======================================================================
+Version 1.1.4, by Aleksey Cheusov, Mon,  1 Jun 2020 17:10:38 +0300
+
+  Remove local function pr_open and use it from libmaa library.
+  So, now paexec requires libmaa.
+
+  "mkcmake help" shows configuring variables and descriptions for
+  targets.
+
+  Use mkc's feature "getdelim" instead of local implementation.
+  So, we need at least mk-configure 0.33.0
+
+  Optimization flags defaults to "-O2 -g"
+
+======================================================================
 Version 1.1.3, by Aleksey Cheusov, Thu, 14 May 2020 20:54:21 +0300
 
   Fix use of uninitialized array.
