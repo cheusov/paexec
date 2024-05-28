@@ -445,6 +445,14 @@ static void init__postproc_arg_cmd(void)
 	}
 }
 
+static void restore_signals(void)
+{
+	unblock_signals();
+	set_sig_handler(SIGALRM, SIG_DFL);
+	set_sig_handler(SIGCHLD, SIG_DFL);
+	set_sig_handler(SIGPIPE, SIG_DFL);
+}
+
 static void init__child_processes(void)
 {
 	char full_cmd [2000];
@@ -483,8 +491,9 @@ static void init__child_processes(void)
 			fprintf(stderr, "running cmd: %s\n", full_cmd);
 		}
 
-		pids [i] = pr_open(
+		pids [i] = pr_open2(
 			full_cmd,
+			restore_signals,
 			PR_CREATE_STDIN | PR_CREATE_STDOUT,
 			&fd_in [i], &fd_out [i], NULL);
 
