@@ -25,7 +25,8 @@ MKC_FEATURES         =	strlcat strlcpy SLIST RB getdelim
 MKC_SOURCE_FUNCLIBS  =  shquote
 
 MKC_REQUIRE_HEADERS    =	maa.h
-MKC_REQUIRE_FUNCLIBS   =	pr_open:maa
+MKC_REQUIRE_FUNCLIBS   =	pr_open2:maa
+MKC_REQUIRE_FUNCS6     =	pr_open2:maa.h
 
 MKC_COMMON_DEFINES   =	-D_GNU_SOURCE
 MKC_COMMON_HEADERS   =	unistd.h stdlib.h
