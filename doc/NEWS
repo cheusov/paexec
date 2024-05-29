@@ -1,4 +1,13 @@
 ======================================================================
+Version 1.1.5, by Aleksey Cheusov, Wed, 29 May 2024 20:06:42 +0400
+
+    Fix: Before running commands reset signal handlers for ALRM, PIPE
+    and CHLD to SIG_DFL. Also, unblock these signals.  This fixes some
+    misterius problems with commands running alarm(2).
+
+    libmaa>=1.5.1 is required for build
+
+======================================================================
 Version 1.1.4, by Aleksey Cheusov, Mon,  1 Jun 2020 17:10:38 +0300
 
   Remove local function pr_open and use it from libmaa library.
