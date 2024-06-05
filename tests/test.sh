@@ -380,7 +380,7 @@ usage: paargs [OPTIONS]
 10 success
 '
 
-        # -J
+    # -J
     printf 'aaa\nbbb\nz y x\ntrtrtrbrbrbr\nccc\nddd\neee\nfff\ny;x\nggg\n' |
 	runpaargs -P+2 -I '$$' -c 'awk "BEGIN {print toupper(\"$$\")}"' |
 	paexec_reorder -lgy -Ms |
@@ -510,6 +510,32 @@ usage: paargs [OPTIONS]
 9 "Y;X
 9 success
 10 GGG
+10 success
+'
+
+    printf 'AAA\nBBB\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\nZ Y X\n' |
+	runpaargs -P +3 delayed_output |
+	paexec_reorder -lgy -Ms |
+    cmp 'paargs #1.2' \
+'1 prefix AAA
+1 success
+2 prefix BBB
+2 success
+3 prefix TRTRTR'"'"'BRBRBR
+3 success
+4 prefix CCC
+4 success
+5 prefix DDD
+5 success
+6 prefix EEE
+6 success
+7 prefix FFF
+7 success
+8 prefix "Y;X
+8 success
+9 prefix GGG
+9 success
+10 prefix Z Y X
 10 success
 '
 

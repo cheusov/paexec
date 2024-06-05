@@ -33,6 +33,7 @@ all:
 	export PATH=${OBJDIR_make_package}:$$PATH; \
 	export PATH=${OBJDIR_toupper}:$$PATH; \
 	export PATH=${OBJDIR_wav2flac}:$$PATH; \
+	export PATH=${OBJDIR_delayed_output}:$$PATH; \
 	export SLEEP_FRACT=${CUSTOM.sleep_fract:S/0//}; \
 	export USE_TEST_BUFSIZES=${USE_TEST_BUFSIZES:Q}; \
 	if ./test.sh; \

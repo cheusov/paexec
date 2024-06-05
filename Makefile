@@ -11,7 +11,7 @@ examples    =	divide all_substr cc_wrapper cc_wrapper2 \
 SUBPRJ     +=	examples/${d}:tests examples/${d}:examples
 .endfor
 
-tests       =	transp_closed_stdin scripts
+tests       =	transp_closed_stdin scripts delayed_output
 .for d in ${tests}
 SUBPRJ     +=	tests/${d}:tests
 .endfor
