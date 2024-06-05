@@ -961,7 +961,7 @@ fakeflac/fake5.wav
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     ( export PAEXEC_EOT=foobarbaz;
 	runpaexec_resort -l -t paexec_notransport -c cmd_toupper \
-	   -n '1 2 3 4 5 6 7 8 9'; ) |
+	   -n ' 1 2   3 4 5 6 7 8    9   '; ) |
     cmp 'paexec toupper #1.1 (PAEXEC_EOT)' \
 '1  A
 2  BB
@@ -974,7 +974,7 @@ fakeflac/fake5.wav
     # toupper
     printf 'a\nbb\nccc\ndddd\neeeee\nffffff\n' |
     runpaexec_resort -l -t '		    ' -c cmd_toupper \
-	-n '1 2 3 4 5 6 7 8 9' |
+	-n ' 1  2  3 ' |
     cmp 'paexec toupper #2' \
 '1  A
 2  BB

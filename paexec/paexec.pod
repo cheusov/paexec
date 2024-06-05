@@ -122,9 +122,9 @@ A number of commands to run in parallel.
 
 =item B<-n> I<nodes>
 
-List of nodes separated by space character. The first character must be
+List of nodes separated by space or tab characters. The first character must be
 alphanumeric, `_' or `/'. All other characters are reserved
-for future extensions.
+for future extensions. Leading and trailing spaces and tabs are ignored.
 
 =item B<-n> I<:filename>
 

@@ -1088,6 +1088,7 @@ static void process_args(int *argc, char ***argv)
 				debug = 1;
 				break;
 			case 'n':
+				optarg += strspn(optarg, " \t");
 				assign_str(&arg_nodes, optarg);
 				break;
 			case 'c':
