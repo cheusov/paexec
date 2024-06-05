@@ -605,8 +605,9 @@ usage: paexec    [OPTIONS]
 '
 
     # -J
+    for t in '' '-t ""'; do
     printf 'AAA\nBBB\nZ Y X\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
-    runpaexec -J '{}' -c 'echo "xxx{}yyy"' -n +3 | sort |
+    runpaexec -J '{}' -c 'echo "xxx{}yyy"' -n +3 $t | sort |
     cmp 'paexec -J #1.1' \
 'xxx"Y;Xyyy
 xxxAAAyyy
@@ -619,10 +620,12 @@ xxxGGGyyy
 xxxTRTRTR'"'"'BRBRBRyyy
 xxxZ Y Xyyy
 '
+    done
 
     # -J
+    for t in '' '-t ""'; do
     printf 'aaa\nbbb\nz y x\ntrtrtrbrbrbr\nccc\nddd\neee\nfff\ny;x\nggg\n' |
-    runpaexec -n+2 -J '$$' -c 'awk "BEGIN {print toupper(\"$$\")}"' | sort |
+    runpaexec -n+2 -J '$$' $t -c 'awk "BEGIN {print toupper(\"$$\")}"' | sort |
     cmp 'paexec -J #1.2' \
 'AAA
 BBB
@@ -635,6 +638,7 @@ TRTRTRBRBRBR
 Y;X
 Z Y X
 '
+    done
 
     # -J
     printf 'AAA\nBBB\nZ Y X\nTRTRTR'\''BRBRBR\nCCC\nDDD\nEEE\nFFF\n"Y;X\nGGG\n' |
