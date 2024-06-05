@@ -1,3 +1,8 @@
+/*
+ * Written by Aleksey Cheusov <vle@gmx.net>
+ * Public domain
+ */
+
 #include <errno.h>
 #include <unistd.h>
 #include <signal.h>
@@ -7,7 +12,7 @@
 static void alarm_handler(int sig)
 {
 	if (sig != SIGALRM)
-		_exit (2);
+		_exit(2);
 }
 
 int main(int argc, char **argv)
@@ -17,8 +22,8 @@ int main(int argc, char **argv)
 	assert(argc == 1);
 
 	unsigned int remaining;
-	signal (SIGALRM, alarm_handler);
-	alarm (1);
+	signal(SIGALRM, alarm_handler);
+	alarm(1);
 
 	remaining = sleep(1000);
 	assert(remaining > 0);

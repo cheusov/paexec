@@ -1,5 +1,8 @@
 #!@awk@ -f
 
+# Written by Aleksey Cheusov <vle@gmx.net>
+# Public domain
+
 function sleep (secs){
 	if (!nosleep && 0 != system("sleep " secs)){
 		exit 10

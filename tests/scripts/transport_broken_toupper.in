@@ -1,5 +1,8 @@
 #!@awk@ -f
 
+# Written by Aleksey Cheusov <vle@gmx.net>
+# Public domain
+
 BEGIN {
 	if (ARGC != 3){
 		print "usage: transport_broken_toupper id ''" > "/dev/stderr"

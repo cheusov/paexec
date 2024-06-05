@@ -1,3 +1,8 @@
+/*
+ * Written by Aleksey Cheusov <vle@gmx.net>
+ * Public domain
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>

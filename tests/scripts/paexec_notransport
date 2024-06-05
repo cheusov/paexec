@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# Written by Aleksey Cheusov <vle@gmx.net>
+# Public domain
+
 shift # skip node
 
 unset PAEXEC_EOT

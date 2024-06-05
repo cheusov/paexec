@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# Written by Aleksey Cheusov <vle@gmx.net>
+# Public domain
+
 #
 # usage: transport <check_filename> <node_id>
 #

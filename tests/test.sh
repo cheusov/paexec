@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# Written by Aleksey Cheusov <vle@gmx.net>
+# Public domain
+
 export LC_ALL=C
 
 : ${PAEXEC_FIND:=find}
