@@ -1,4 +1,11 @@
 ======================================================================
+Version 1.1.6, by Aleksey Cheusov, Fri,  7 Jun 2024 9:19:17 +0400
+
+    option -n: ignore leading spaces and tabs
+
+    Add more tests
+
+======================================================================
 Version 1.1.5, by Aleksey Cheusov, Wed, 29 May 2024 20:06:42 +0400
 
     Fix: Before running commands reset signal handlers for ALRM, PIPE
