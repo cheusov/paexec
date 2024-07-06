@@ -296,6 +296,19 @@ nonstandard_msgs (){
 	"$@"
 }
 
+run_and_compare(){
+    # $1 -- message
+    # $2 -- command to run
+    # $@ -- args passed to paexec
+    _message="$1"; shift
+    _command="$1"; shift
+
+    runpaexec_resort -c "$_command" "$@" < "$tmpfn1" > "$tmpfn2"
+    $_command "$tmpfn1" > "$tmpfn3"
+
+    cmp_file "$_message" "$tmpfn3" < "$tmpfn2"
+}
+
 # on exit
 on_exit (){
     rm -rf $tmpdir
@@ -305,6 +318,36 @@ sig_handler (){
     on_exit
     trap - "$1"
     kill -"$1" $$
+}
+
+check_big_result_cmd_output() {
+    runawk -v status=expect_pkgpath -f alt_assert.awk -e '
+status == "expect_pkgpath" {
+    pkgpath = $1
+    status = "expect_normal_line"
+    line_number = 0
+    next
+}
+status == "expect_normal_line" {
+    if ($1 == "failure") {
+        status = "expect_status"
+        line_number = 0
+        next
+    }
+
+    assert($0 == "line #" line_number " " toupper(pkgpath), "ASSERT 1")
+    ++line_number
+    next
+}
+status == "expect_status" {
+    assert($1 == pkgpath, "ASSERT 3")
+    status = "expect_pkgpath"
+    next
+}
+END {
+    print "success"
+}
+'
 }
 
 trap "sig_handler INT"  INT
@@ -325,21 +368,27 @@ tmpex="$tmpdir/5"
 # 
 echo > $tmpex
 
-cmp (){
+cmp_file (){
     # $1 - progress message
-    # $2 - expected text
+    # $2 - expected file
     printf '    %s... ' "$1" 1>&2
 
     cat > "$tmpfn2"
-    printf '%s' "$2" > "$tmpfn1"
 
-    if $DIFF_PROG "$tmpfn1" "$tmpfn2" > "$tmpfn3"; then
+    if $DIFF_PROG "$2" "$tmpfn2" > "$tmpfn3"; then
 	echo ok
     else
 	echo FAILED
 	awk '{print "   " $0}' "$tmpfn3"
 	rm -f $tmpex
     fi
+}
+
+cmp (){
+    # $1 - progress message
+    # $2 - expected text
+    printf '%s' "$2" > "$tmpfn1"
+    cmp_file "$1" "$tmpfn1"
 }
 
 do_test (){
@@ -1279,18 +1328,16 @@ num pid FFFFFF
 
     # bi-i-i-i-i-i-ig result
     for i in 0 1 2 3 4 5 6 7 8 9; do
+	cmd="big_result_cmd -l500"
+
 	awk '
 	BEGIN {
-	    for (i=0; i < 10; ++i) {
+	    for (i=0; i < 1000; ++i) {
 		print "1234567890-=qwertyuiop[]asdfghjkl;zxcvbnm,./zaqwsxcderfvbgtyhnmjuik,.lo";
 	    }
-	}' | runpaexec -c big_result_cmd -n '+9' |
-	uniq -c |
-	head -n 100 |
-	awk '{$1 = $1; print $0}' |
-	cmp 'paexec big_result_cmd' \
-'100000 1234567890-=QWERTYUIOP[]ASDFGHJKL;ZXCVBNM,./ZAQWSXCDERFVBGTYHNMJUIK,.LO
-'
+	}' > "$tmpfn1"
+
+	run_and_compare "paexec big_result_cmd #$i" "$cmd" -n +9
 
 	if test -f $tmpex; then
 	    :
@@ -2086,6 +2133,16 @@ ok100
 'ok1
 ok2
 ok
+'
+
+    # diamond-like dependancy and failure
+    cp _huge_pkgsrc_test.in "$tmpfn1"
+    cmd='big_result_cmd -l 1500 -s failure'
+    runpaexec -c "$cmd" \
+	      -Z300 -W1 -yg -EI -l -n+15 < _huge_pkgsrc_test.in |
+	paexec_reorder -Mf -yg > "$tmpfn4"
+	check_big_result_cmd_output < "$tmpfn4" |
+    cmp 'paexec packages #14 (huge pkgsrc test)' 'success
 '
 
     # cycle detection1

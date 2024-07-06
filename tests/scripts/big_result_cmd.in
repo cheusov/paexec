@@ -1,17 +1,39 @@
-#!@awk@ -f
+#!/usr/bin/env runawk
 
 # Written by Aleksey Cheusov <vle@gmx.net>
 # Public domain
 
+#env "LC_ALL=C"
+
+#use "power_getopt.awk"
+
+############################################################
+#.begin-str help
+# big_result_cmd -- test command
+# OPTIONS:
+#    -h              display this help
+#    =l <lines>      the number of lines to print,
+#    =s <status>     print the specified status before EOT,
+#
+# In -g -Mm and -g -Mf modes, portions of the result followed
+# by "fatal" marker are automatically cut off.
+#.end-str
+############################################################
+
 BEGIN {
 	eot = ENVIRON ["PAEXEC_EOT"]
+	lines = getarg("l") + 0
+	status = getarg("s")
 }
 
 {
-	for (i=0; i < 10000; ++i){
+	for (i=0; i < lines; ++i){
 		# works fine for empty input too
-		print toupper($0)
+		print "line #" i, toupper($0)
 	}
+
+	if (status != "")
+		print status
 
 	print eot         # end of task marker
 	fflush()          # end of task MUST BE FLUSHED!!!
